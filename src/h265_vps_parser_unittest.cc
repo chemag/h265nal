@@ -9,6 +9,7 @@
 #include <gmock/gmock.h>
 
 #include "h265_common.h"
+#include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 

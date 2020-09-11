@@ -8,6 +8,8 @@
 
 #include "absl/types/optional.h"
 
+#include "rtc_base/bit_buffer.h"
+
 #include "h265_profile_tier_level_parser.h"
 
 namespace h265nal {

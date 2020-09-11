@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "absl/types/optional.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace {
