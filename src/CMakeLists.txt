@@ -45,3 +45,8 @@ add_test(h265_nal_unit_parser_unittest h265_nal_unit_parser_unittest)
 target_link_libraries(h265_nal_unit_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_nal_unit_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_nal_unit_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
+add_executable(h265nal-bin h265nal.cc)
+target_link_libraries(h265nal-bin PUBLIC h265nal)
+# rename executable using target properties
+set_target_properties(h265nal-bin PROPERTIES OUTPUT_NAME h265nal)
