@@ -15,21 +15,11 @@ typedef absl::optional<h265nal::H265ProfileInfoParser::ProfileInfoState>
     OptionalProfileInfo;
 typedef absl::optional<h265nal::H265ProfileTierLevelParser::
     ProfileTierLevelState> OptionalProfileTierLevel;
-
-#define RETURN_EMPTY_ON_FAIL_PI(x) \
-  if (!(x)) {                   \
-    return OptionalProfileInfo();       \
-  }
-
-#define RETURN_EMPTY_ON_FAIL_PTL(x) \
-  if (!(x)) {                   \
-    return OptionalProfileTierLevel();       \
-  }
 }  // namespace
 
 namespace h265nal {
 
-// General note: this is based off the 02/2016 version of the H.265 standard.
+// General note: this is based off the 2016/12 version of the H.265 standard.
 // You can find it on this page:
 // http://www.itu.int/rec/T-REC-H.265
 
@@ -39,49 +29,59 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
     const uint8_t* data, size_t length, const bool profilePresentFlag,
     const unsigned int maxNumSubLayersMinus1) {
 
-  std::vector<uint8_t> unpacked_buffer = ParseRbsp(data, length);
+  std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
-  // Now, we need to use a bit buffer to parse through the actual H265
-  // profile_tier_level format. See Section 7.3.2.1 ("Video parameter set
-  // data syntax") of the H.265 standard for a complete description.
-  // Since we only care about resolution, we ignore the majority of fields, but
-  // we still have to actively parse through a lot of the data, since many of
-  // the fields have variable size.
+  return ParseProfileTierLevel(&bit_buffer, profilePresentFlag,
+                               maxNumSubLayersMinus1);
+}
+
+absl::optional<H265ProfileTierLevelParser::ProfileTierLevelState>
+H265ProfileTierLevelParser::ParseProfileTierLevel(
+    rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
+    const unsigned int maxNumSubLayersMinus1) {
+  uint32_t bits_tmp;
+
+  // profile_tier_level() parser.
+  // Section 7.3.3 ("Profile, tier and level syntax") of the H.265
+  // standard for a complete description.
   ProfileTierLevelState profile_tier_level;
 
   if (profilePresentFlag) {
     OptionalProfileInfo profile_info = H265ProfileInfoParser::ParseProfileInfo(
-        &bit_buffer, true);
+        bit_buffer, true);
     if (profile_info != absl::nullopt) {
       profile_tier_level.general = *profile_info;
     }
   }
   for (int i = 0; i < maxNumSubLayersMinus1; i++) {
     // sub_layer_profile_present_flag[i]  u(1)
-    RETURN_EMPTY_ON_FAIL_PTL(
-          bit_buffer.ReadBits(
-              &(profile_tier_level.sub_layer_profile_present_flag[i]), 1));
+    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      return absl::nullopt;
+    }
+    profile_tier_level.sub_layer_profile_present_flag.push_back(bits_tmp);
     // sub_layer_level_present_flag[i]  u(1)
-    RETURN_EMPTY_ON_FAIL_PTL(
-          bit_buffer.ReadBits(
-              &(profile_tier_level.sub_layer_level_present_flag[i]), 1));
+    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      return absl::nullopt;
+    }
+    profile_tier_level.sub_layer_level_present_flag.push_back(bits_tmp);
   }
 
   if (maxNumSubLayersMinus1 > 0) {
     for (int i = maxNumSubLayersMinus1; i < 8; i++) {
       // reserved_zero_2bits[i]  u(2)
-      RETURN_EMPTY_ON_FAIL_PTL(
-            bit_buffer.ReadBits(
-                &(profile_tier_level.reserved_zero_2bits[i]), 2));
+      if (!bit_buffer->ReadBits(&bits_tmp, 2)) {
+        return absl::nullopt;
+      }
+      profile_tier_level.reserved_zero_2bits.push_back(bits_tmp);
     }
   }
 
   for (int i = 0; i < maxNumSubLayersMinus1; i++) {
     OptionalProfileInfo profile_info =
-        H265ProfileInfoParser::ParseProfileInfo(&bit_buffer, true);
+        H265ProfileInfoParser::ParseProfileInfo(bit_buffer, true);
     if (profile_info != absl::nullopt) {
-      profile_tier_level.sub_layer[i] = *profile_info;
+      profile_tier_level.sub_layer.push_back(*profile_info);
     }
   }
 
@@ -92,7 +92,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
 absl::optional<H265ProfileInfoParser::ProfileInfoState>
 H265ProfileInfoParser::ParseProfileInfo(
       const uint8_t* data, size_t length, bool level_idc_flag) {
-  std::vector<uint8_t> unpacked_buffer = ParseRbsp(data, length);
+  std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseProfileInfo(&bit_buffer, level_idc_flag);
 }
@@ -105,33 +105,40 @@ H265ProfileInfoParser::ParseProfileInfo(
   uint32_t bits_tmp, bits_tmp_hi;
 
   // profile_space  u(2)
-  RETURN_EMPTY_ON_FAIL_PI(
-      bit_buffer->ReadBits(&profile_info.profile_space, 2));
+  if (!bit_buffer->ReadBits(&profile_info.profile_space, 2)) {
+    return absl::nullopt;
+  }
   // tier_flag  u(1)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.tier_flag, 1));
+  if (!bit_buffer->ReadBits(&profile_info.tier_flag, 1)) {
+    return absl::nullopt;
+  }
   // profile_idc  u(5)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.profile_idc, 5));
+  if (!bit_buffer->ReadBits(&profile_info.profile_idc, 5)) {
+    return absl::nullopt;
+  }
   // for (j = 0; j < 32; j++)
   for (int j = 0; j < 32; j++) {
     // profile_compatibility_flag[j]  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.profile_compatibility_flag[j],
-                               1));
+    if (!bit_buffer->ReadBits(&profile_info.profile_compatibility_flag[j], 1)) {
+      return absl::nullopt;
+    }
   }
   // progressive_source_flag  u(1)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.progressive_source_flag, 1));
+  if (!bit_buffer->ReadBits(&profile_info.progressive_source_flag, 1)) {
+    return absl::nullopt;
+  }
   // interlaced_source_flag  u(1)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.interlaced_source_flag, 1));
+  if (!bit_buffer->ReadBits(&profile_info.interlaced_source_flag, 1)) {
+    return absl::nullopt;
+  }
   // non_packed_constraint_flag  u(1)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.non_packed_constraint_flag, 1));
+  if (!bit_buffer->ReadBits(&profile_info.non_packed_constraint_flag, 1)) {
+    return absl::nullopt;
+  }
   // frame_only_constraint_flag  u(1)
-  RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.frame_only_constraint_flag, 1));
+  if (!bit_buffer->ReadBits(&profile_info.frame_only_constraint_flag, 1)) {
+    return absl::nullopt;
+  }
   if (profile_info.profile_idc == 4 ||
       profile_info.profile_compatibility_flag[4] == 1 ||
       profile_info.profile_idc == 5 ||
@@ -149,35 +156,44 @@ H265ProfileInfoParser::ParseProfileInfo(
     // The number of bits in this syntax structure is not affected by
     // this condition
     // max_12bit_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_12bit_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.max_12bit_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // max_10bit_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_10bit_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.max_10bit_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // max_8bit_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_8bit_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.max_8bit_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // max_422chroma_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_422chroma_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.max_422chroma_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // max_420chroma_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_420chroma_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.max_420chroma_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // max_monochrome_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.max_monochrome_constraint_flag,
-                               1));
+    if (!bit_buffer->ReadBits(&profile_info.max_monochrome_constraint_flag,
+                              1)) {
+      return absl::nullopt;
+    }
     // intra_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.intra_constraint_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.intra_constraint_flag, 1)) {
+      return absl::nullopt;
+    }
     // one_picture_only_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.one_picture_only_constraint_flag,
-                               1));
+    if (!bit_buffer->ReadBits(&profile_info.one_picture_only_constraint_flag,
+                              1)) {
+      return absl::nullopt;
+    }
     // lower_bit_rate_constraint_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.lower_bit_rate_constraint_flag,
-                               1));
+    if (!bit_buffer->ReadBits(&profile_info.lower_bit_rate_constraint_flag,
+                              1)) {
+      return absl::nullopt;
+    }
     if (profile_info.profile_idc == 5 ||
         profile_info.profile_compatibility_flag[5] == 1 ||
         profile_info.profile_idc == 9 ||
@@ -185,24 +201,37 @@ H265ProfileInfoParser::ParseProfileInfo(
         profile_info.profile_idc == 10 ||
         profile_info.profile_compatibility_flag[10] == 1) {
       // max_14bit_constraint_flag  u(1)
-      RETURN_EMPTY_ON_FAIL_PI(
-            bit_buffer->ReadBits(&profile_info.max_14bit_constraint_flag, 1));
+      if (!bit_buffer->ReadBits(&profile_info.max_14bit_constraint_flag, 1)) {
+        return absl::nullopt;
+      }
       // reserved_zero_33bits  u(33)
-      RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp_hi, 1));
-      RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp, 32));
+      if (!bit_buffer->ReadBits(&bits_tmp_hi, 1)) {
+        return absl::nullopt;
+      }
+      if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+        return absl::nullopt;
+      }
       profile_info.reserved_zero_33bits =
           ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
     } else {
       // reserved_zero_34bits  u(34)
-      RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp_hi, 2));
-      RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp, 32));
+      if (!bit_buffer->ReadBits(&bits_tmp_hi, 2)) {
+        return absl::nullopt;
+      }
+      if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+        return absl::nullopt;
+      }
       profile_info.reserved_zero_34bits =
           ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
     }
   } else {
     // reserved_zero_43bits  u(43)
-    RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp_hi, 11));
-    RETURN_EMPTY_ON_FAIL_PI(bit_buffer->ReadBits(&bits_tmp, 32));
+    if (!bit_buffer->ReadBits(&bits_tmp_hi, 11)) {
+        return absl::nullopt;
+      }
+    if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+        return absl::nullopt;
+      }
     profile_info.reserved_zero_43bits =
         ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
   }
@@ -218,18 +247,21 @@ H265ProfileInfoParser::ParseProfileInfo(
       profile_info.profile_compatibility_flag[5] == 1 ||
       profile_info.profile_compatibility_flag[9] == 1) {
     // inbld_flag  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.inbld_flag, 1));
+    if (!bit_buffer->ReadBits(&profile_info.inbld_flag, 1)) {
+      return absl::nullopt;
+    }
   } else {
     // reserved_zero_bit  u(1)
-    RETURN_EMPTY_ON_FAIL_PI(
-          bit_buffer->ReadBits(&profile_info.reserved_zero_bit, 1));
+    if (!bit_buffer->ReadBits(&profile_info.reserved_zero_bit, 1)) {
+      return absl::nullopt;
+    }
   }
 
   if (level_idc_flag) {
     // level_idc  u(8)
-    RETURN_EMPTY_ON_FAIL_PI(
-        bit_buffer->ReadBits(&profile_info.level_idc, 8));
+    if (!bit_buffer->ReadBits(&profile_info.level_idc, 8)) {
+      return absl::nullopt;
+    }
   }
 
   return OptionalProfileInfo(profile_info);

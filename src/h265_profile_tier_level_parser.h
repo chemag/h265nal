@@ -82,6 +82,9 @@ class H265ProfileTierLevelParser {
   static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
       const uint8_t* data, size_t length, const bool profilePresentFlag,
       const unsigned int maxNumSubLayersMinus1);
+  static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
+      rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
+      const unsigned int maxNumSubLayersMinus1);
 };
 
 }  // namespace h265nal

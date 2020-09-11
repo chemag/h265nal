@@ -7,6 +7,7 @@
 #target_link_libraries (main LINK_PUBLIC webrtc)
 
 find_library(GTEST_LIBRARY gtest)
+find_library(GMOCK_LIBRARY gmock)
 
 add_library (h265nal
     h265_common.h h265_common.cc
@@ -21,4 +22,4 @@ add_test(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_
 
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
-
+target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)

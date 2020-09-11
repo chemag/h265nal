@@ -47,7 +47,7 @@ Running main() from /builddir/build/BUILD/googletest-release-1.8.1/googletest/sr
 
 
 # Requirements
-Requires gtests, abseil.
+Requires gtests, gmock, abseil.
 
 The [webrtc](`webrtc`) directory contains an RBSP parser copied from webrtc.
 
