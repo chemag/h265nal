@@ -5,6 +5,8 @@
 
 #include "h265_bitstream_parser.h"
 
+#include <stdio.h>
+
 #include <cstdint>
 #include <vector>
 
@@ -91,6 +93,14 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
       }
   }
   return OptionalBitstream(bitstream);
+}
+
+void H265BitstreamParser::BitstreamState::fdump(
+    FILE* outfp, int indent_level) const {
+  for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
+    nal_unit.fdump(outfp, indent_level);
+    fprintf(outfp, "\n");
+  }
 }
 
 }  // namespace h265nal

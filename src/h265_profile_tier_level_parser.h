@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <array>
 #include <vector>
 
@@ -24,6 +26,7 @@ class H265ProfileInfoParser {
     ProfileInfoState() = default;
     ProfileInfoState(const ProfileInfoState&) = default;
     ~ProfileInfoState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
     uint32_t profile_space = 0;
     uint32_t tier_flag = 0;
@@ -70,6 +73,7 @@ class H265ProfileTierLevelParser {
     ProfileTierLevelState() = default;
     ProfileTierLevelState(const ProfileTierLevelState&) = default;
     ~ProfileTierLevelState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
     struct H265ProfileInfoParser::ProfileInfoState general;
     std::vector<uint32_t> sub_layer_profile_present_flag;

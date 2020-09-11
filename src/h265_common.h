@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <cstdint>
 #include <vector>
 
@@ -78,5 +80,10 @@ std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length);
 bool byte_aligned(rtc::BitBuffer *bit_buffer);
 bool more_rbsp_data(rtc::BitBuffer *bit_buffer);
 bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer);
+
+// fdump() indentation help
+int indent_level_incr(int indent_level);
+int indent_level_decr(int indent_level);
+void fdump_indent_level(FILE* outfp, int indent_level);
 
 }  // namespace h265nal

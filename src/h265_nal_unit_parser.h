@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <vector>
 
 #include "absl/types/optional.h"
@@ -22,6 +24,7 @@ class H265NalUnitHeaderParser {
     NalUnitHeaderState() = default;
     NalUnitHeaderState(const NalUnitHeaderState&) = default;
     ~NalUnitHeaderState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
     uint32_t forbidden_zero_bit = 0;
     uint32_t nal_unit_type = 0;
@@ -46,6 +49,7 @@ class H265NalUnitParser {
     NalUnitState() = default;
     NalUnitState(const NalUnitState&) = default;
     ~NalUnitState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
     struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
     // payload

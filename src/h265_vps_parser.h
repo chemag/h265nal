@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <vector>
 
 #include "absl/types/optional.h"
@@ -24,6 +26,7 @@ class H265VpsParser {
     VpsState() = default;
     VpsState(const VpsState&) = default;
     ~VpsState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
     uint32_t vps_video_parameter_set_id = 0;
     uint32_t vps_base_layer_internal_flag = 0;

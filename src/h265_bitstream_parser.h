@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <stdio.h>
+
 #include <vector>
 
 #include "absl/types/optional.h"
@@ -22,8 +24,9 @@ class H265BitstreamParser {
     BitstreamState() = default;
     BitstreamState(const BitstreamState&) = default;
     ~BitstreamState() = default;
+    void fdump(FILE* outfp, int indent_level) const;
 
-    // payload
+    // NAL units
     std::vector<struct H265NalUnitParser::NalUnitState> nal_units;
   };
 

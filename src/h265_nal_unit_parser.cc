@@ -5,6 +5,8 @@
 
 #include "h265_nal_unit_parser.h"
 
+#include <stdio.h>
+
 #include <cstdint>
 #include <vector>
 
@@ -184,6 +186,124 @@ H265NalUnitHeaderParser::ParseNalUnitHeader(
   }
 
   return OptionalNalUnitHeader(nal_unit_header);
+}
+
+void H265NalUnitParser::NalUnitState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "nal_unit {");
+  indent_level = indent_level_incr(indent_level);
+
+  // header
+  fdump_indent_level(outfp, indent_level);
+  nal_unit_header.fdump(outfp, indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  // payload
+  switch (nal_unit_header.nal_unit_type) {
+    case TRAIL_N:
+    case TRAIL_R:
+    case TSA_N:
+    case TSA_R:
+    case STSA_N:
+    case STSA_R:
+    case RADL_N:
+    case RADL_R:
+    case RASL_N:
+    case RASL_R:
+      // slice_segment_layer_rbsp()
+      break;
+    case RSV_VCL_N10:
+    case RSV_VCL_R11:
+    case RSV_VCL_N12:
+    case RSV_VCL_R13:
+    case RSV_VCL_N14:
+    case RSV_VCL_R15:
+      // reserved, non-IRAP, sub-layer non-reference pictures
+      break;
+    case BLA_W_LP:
+    case BLA_W_RADL:
+    case BLA_N_LP:
+    case IDR_W_RADL:
+    case IDR_N_LP:
+    case CRA_NUT:
+      // slice_segment_layer_rbsp()
+      break;
+    case RSV_IRAP_VCL22:
+    case RSV_IRAP_VCL23:
+      // reserved, IRAP pictures
+      break;
+    case RSV_VCL24:
+    case RSV_VCL25:
+    case RSV_VCL26:
+    case RSV_VCL27:
+    case RSV_VCL28:
+    case RSV_VCL29:
+    case RSV_VCL30:
+    case RSV_VCL31:
+      // reserved, non-IRAP pictures
+      break;
+    case VPS_NUT:
+      vps.fdump(outfp, indent_level);
+      break;
+    case SPS_NUT:
+      // seq_parameter_set_rbsp()
+      break;
+    case PPS_NUT:
+      // pic_parameter_set_rbsp()
+      break;
+    case AUD_NUT:
+      // access_unit_delimiter_rbsp()
+      break;
+    case EOS_NUT:
+      // end_of_seq_rbsp()
+      break;
+    case EOB_NUT:
+      // end_of_bitstream_rbsp()
+      break;
+    case FD_NUT:
+      // filler_data_rbsp()
+      break;
+    case PREFIX_SEI_NUT:
+      // sei_rbsp()
+      break;
+    case SUFFIX_SEI_NUT:
+      // sei_rbsp()
+      break;
+    case RSV_NVCL41:
+    case RSV_NVCL42:
+    case RSV_NVCL43:
+    case RSV_NVCL44:
+    case RSV_NVCL45:
+    case RSV_NVCL46:
+    case RSV_NVCL47:
+      // reserved
+      break;
+    default:
+      // unspecified
+      break;
+  }
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
+    FILE* outfp, int indent_level) const {
+
+  fprintf(outfp, "nal_unit_header {");
+  indent_level = indent_level_incr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nal_unit_type: %i", nal_unit_type);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
 }
 
 }  // namespace h265nal

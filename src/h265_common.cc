@@ -4,6 +4,8 @@
 
 #include "h265_common.h"
 
+#include <stdio.h>
+
 #include <cstdint>
 
 namespace h265nal {
@@ -82,6 +84,24 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
     }
   }
   return true;
+}
+
+int indent_level_incr(int indent_level) {
+  return (indent_level == -1) ? -1 : (indent_level + 1);
+}
+
+int indent_level_decr(int indent_level) {
+  return (indent_level == -1) ? -1 : (indent_level - 1);
+}
+
+void fdump_indent_level(FILE* outfp, int indent_level) {
+  if (indent_level == -1) {
+    // no indent
+    fprintf(outfp, " ");
+    return;
+  }
+  fprintf(outfp, "\n");
+  fprintf(outfp, "%*s", 2 * indent_level, "");
 }
 
 }  // namespace h265nal
