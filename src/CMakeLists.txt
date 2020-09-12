@@ -15,6 +15,7 @@ add_library(h265nal
     h265_vps_parser.h h265_vps_parser.cc
     h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
     h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
+    h265_sps_parser.h h265_sps_parser.cc
     h265_bitstream_parser.h h265_bitstream_parser.cc
     h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )
@@ -47,6 +48,12 @@ add_test(h265_st_ref_pic_set_parser_unittest h265_st_ref_pic_set_parser_unittest
 target_link_libraries(h265_st_ref_pic_set_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_st_ref_pic_set_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_st_ref_pic_set_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
+add_executable(h265_sps_parser_unittest h265_sps_parser_unittest.cc)
+add_test(h265_sps_parser_unittest h265_sps_parser_unittest)
+target_link_libraries(h265_sps_parser_unittest PUBLIC h265nal)
+target_link_libraries(h265_sps_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
+target_link_libraries(h265_sps_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
 
 add_executable(h265_bitstream_parser_unittest h265_bitstream_parser_unittest.cc)
 add_test(h265_bitstream_parser_unittest h265_bitstream_parser_unittest)
