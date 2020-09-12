@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_aud_parser.h"
 #include "h265_pps_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
@@ -25,6 +26,7 @@ typedef absl::optional<h265nal::H265NalUnitParser::
 typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
 typedef absl::optional<h265nal::H265SpsParser::SpsState> OptionalSps;
 typedef absl::optional<h265nal::H265PpsParser::PpsState> OptionalPps;
+typedef absl::optional<h265nal::H265AudParser::AudState> OptionalAud;
 }  // namespace
 
 namespace h265nal {
@@ -128,8 +130,14 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       break;
       }
     case AUD_NUT:
+      {
       // access_unit_delimiter_rbsp()
+      OptionalAud aud = H265AudParser::ParseAud(bit_buffer);
+      if (aud != absl::nullopt) {
+        nal_unit.aud = *aud;
+      }
       break;
+      }
     case EOS_NUT:
       // end_of_seq_rbsp()
       break;
@@ -280,7 +288,7 @@ void H265NalUnitParser::NalUnitState::fdump(
       pps.fdump(outfp, indent_level);
       break;
     case AUD_NUT:
-      // access_unit_delimiter_rbsp()
+      aud.fdump(outfp, indent_level);
       break;
     case EOS_NUT:
       // end_of_seq_rbsp()
