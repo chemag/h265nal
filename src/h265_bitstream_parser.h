@@ -26,6 +26,8 @@ class H265BitstreamParser {
     ~BitstreamState() = default;
     void fdump(FILE* outfp, int indent_level) const;
 
+    bool add_offset;
+    bool add_length;
     // NAL units
     std::vector<struct H265NalUnitParser::NalUnitState> nal_units;
   };

@@ -51,7 +51,11 @@ class H265NalUnitParser {
     NalUnitState() = default;
     NalUnitState(const NalUnitState&) = default;
     ~NalUnitState() = default;
-    void fdump(FILE* outfp, int indent_level) const;
+    void fdump(FILE* outfp, int indent_level, bool add_offset,
+               bool add_length) const;
+
+    size_t offset;
+    size_t length;
 
     struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
     // payload

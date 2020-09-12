@@ -89,6 +89,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
         &data[nalu_index.payload_start_offset],
         nalu_index.payload_size);
       if (nal_unit != absl::nullopt) {
+        nal_unit->offset = nalu_index.payload_start_offset;
+        nal_unit->length = nalu_index.payload_size;
         bitstream.nal_units.push_back(*nal_unit);
       }
   }
@@ -98,7 +100,7 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
 void H265BitstreamParser::BitstreamState::fdump(
     FILE* outfp, int indent_level) const {
   for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
-    nal_unit.fdump(outfp, indent_level);
+    nal_unit.fdump(outfp, indent_level, add_offset, add_length);
     fprintf(outfp, "\n");
   }
 }

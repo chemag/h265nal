@@ -27,6 +27,8 @@ typedef struct arg_options {
   int debug;
   int integer;
   bool as_one_line;
+  bool add_offset;
+  bool add_length;
   char *str;
   char *infile;
   char *outfile;
@@ -42,6 +44,10 @@ void usage(char *name) {
   fprintf(stderr, "\t-q:\t\tZero debug verbosity\n");
   fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag\n");
   fprintf(stderr, "\t--noas-one-line:\tReset as_one_line flag\n");
+  fprintf(stderr, "\t--add-offset:\tSet add_offset flag\n");
+  fprintf(stderr, "\t--noadd-offset:\tReset add_offset flag\n");
+  fprintf(stderr, "\t--add-length:\tSet add_length flag\n");
+  fprintf(stderr, "\t--noadd-length:\tReset add_length flag\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
 }
@@ -51,7 +57,11 @@ void usage(char *name) {
 enum {
   QUIET_OPTION = CHAR_MAX + 1,
   AS_ONE_LINE_FLAG_OPTION,
-  NO_AS_ONE_LINE_FLAG_OPTION
+  NO_AS_ONE_LINE_FLAG_OPTION,
+  ADD_OFFSET_FLAG_OPTION,
+  NO_ADD_OFFSET_FLAG_OPTION,
+  ADD_LENGTH_FLAG_OPTION,
+  NO_ADD_LENGTH_FLAG_OPTION
 };
 
 
@@ -63,6 +73,8 @@ arg_options *parse_args(int argc, char** argv) {
   // set default options
   options.debug = kDefaultDebug;
   options.as_one_line = true;
+  options.add_offset = false;
+  options.add_length = false;
   options.infile = nullptr;
   options.outfile = nullptr;
 
@@ -77,6 +89,10 @@ arg_options *parse_args(int argc, char** argv) {
     {"quiet", no_argument, NULL, QUIET_OPTION},
     {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
     {"noas-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
+    {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
+    {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
+    {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
+    {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
     {NULL, 0, NULL, 0}
   };
 
@@ -109,6 +125,22 @@ arg_options *parse_args(int argc, char** argv) {
 
       case NO_AS_ONE_LINE_FLAG_OPTION:
         options.as_one_line = false;
+        break;
+
+      case ADD_OFFSET_FLAG_OPTION:
+        options.add_offset = true;
+        break;
+
+      case NO_ADD_OFFSET_FLAG_OPTION:
+        options.add_offset = false;
+        break;
+
+      case ADD_LENGTH_FLAG_OPTION:
+        options.add_length = true;
+        break;
+
+      case NO_ADD_LENGTH_FLAG_OPTION:
+        options.add_length = false;
         break;
 
       default:
@@ -179,6 +211,8 @@ int main(int argc, char **argv) {
     fprintf(stderr, "Could not init h265 bitstream parser\n");
     return -1;
   }
+  bitstream->add_offset = options->add_offset;
+  bitstream->add_length = options->add_length;
 
   // get outfile file descriptor
   FILE* outfp;
