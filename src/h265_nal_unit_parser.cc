@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_pps_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 #include "absl/types/optional.h"
@@ -23,6 +24,7 @@ typedef absl::optional<h265nal::H265NalUnitParser::
     NalUnitState> OptionalNalUnit;
 typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
 typedef absl::optional<h265nal::H265SpsParser::SpsState> OptionalSps;
+typedef absl::optional<h265nal::H265PpsParser::PpsState> OptionalPps;
 }  // namespace
 
 namespace h265nal {
@@ -117,8 +119,14 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       break;
       }
     case PPS_NUT:
+      {
       // pic_parameter_set_rbsp()
+      OptionalPps pps = H265PpsParser::ParsePps(bit_buffer);
+      if (pps != absl::nullopt) {
+        nal_unit.pps = *pps;
+      }
       break;
+      }
     case AUD_NUT:
       // access_unit_delimiter_rbsp()
       break;
@@ -257,7 +265,7 @@ void H265NalUnitParser::NalUnitState::fdump(
       sps.fdump(outfp, indent_level);
       break;
     case PPS_NUT:
-      // pic_parameter_set_rbsp()
+      pps.fdump(outfp, indent_level);
       break;
     case AUD_NUT:
       // access_unit_delimiter_rbsp()

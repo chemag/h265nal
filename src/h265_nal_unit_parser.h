@@ -12,6 +12,7 @@
 
 #include "rtc_base/bit_buffer.h"
 
+#include "h265_pps_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 
@@ -56,6 +57,7 @@ class H265NalUnitParser {
     // payload
     struct H265VpsParser::VpsState vps;
     struct H265SpsParser::SpsState sps;
+    struct H265PpsParser::PpsState pps;
   };
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
