@@ -68,9 +68,11 @@ class H265NalUnitParser {
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
   static absl::optional<NalUnitState> ParseNalUnit(
-      const uint8_t* data, size_t length);
+      const uint8_t* data, size_t length,
+      struct H265BitstreamParserState* bitstream_parser_state);
   static absl::optional<NalUnitState> ParseNalUnit(
-      rtc::BitBuffer* bit_buffer);
+      rtc::BitBuffer* bit_buffer,
+      struct H265BitstreamParserState* bitstream_parser_state);
 };
 
 }  // namespace h265nal

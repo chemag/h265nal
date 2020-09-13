@@ -37,15 +37,17 @@ namespace h265nal {
 
 // Unpack RBSP and parse NAL Unit state from the supplied buffer.
 absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
-    const uint8_t* data, size_t length) {
+    const uint8_t* data, size_t length,
+    struct H265BitstreamParserState* bitstream_parser_state) {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
-  return ParseNalUnit(&bit_buffer);
+  return ParseNalUnit(&bit_buffer, bitstream_parser_state);
 }
 
 absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
-    rtc::BitBuffer* bit_buffer) {
+    rtc::BitBuffer* bit_buffer,
+    struct H265BitstreamParserState* bitstream_parser_state) {
   // H265 NAL Unit (nal_unit()) parser.
   // Section 7.3.1.1 ("General NAL unit header syntax") of the H.265
   // standard for a complete description.

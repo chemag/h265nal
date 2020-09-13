@@ -18,6 +18,7 @@ add_library(h265nal
     h265_sps_parser.h h265_sps_parser.cc
     h265_pps_parser.h h265_pps_parser.cc
     h265_aud_parser.h h265_aud_parser.cc
+    h265_bitstream_parser_state.h
     h265_bitstream_parser.h h265_bitstream_parser.cc
     h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )

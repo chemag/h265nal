@@ -9,6 +9,7 @@
 #include <gmock/gmock.h>
 
 #include "h265_common.h"
+#include "h265_bitstream_parser_state.h"
 #include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -28,7 +29,9 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
   const uint8_t buffer[] = {0x40, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60,
                             0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
                             0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
-  nal_unit_ = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer));
+  H265BitstreamParserState bitstream_parser_state;
+  nal_unit_ = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
+                                              &bitstream_parser_state);
   EXPECT_TRUE(nal_unit_ != absl::nullopt);
 
   // check the header
