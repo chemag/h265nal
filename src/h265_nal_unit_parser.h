@@ -14,6 +14,7 @@
 
 #include "h265_aud_parser.h"
 #include "h265_pps_parser.h"
+#include "h265_slice_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 
@@ -64,6 +65,8 @@ class H265NalUnitParser {
     struct H265SpsParser::SpsState sps;
     struct H265PpsParser::PpsState pps;
     struct H265AudParser::AudState aud;
+    struct H265SliceSegmentLayerParser::SliceSegmentLayerState
+        slice_segment_layer;
   };
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.

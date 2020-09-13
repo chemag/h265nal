@@ -13,6 +13,7 @@
 #include "h265_common.h"
 #include "h265_aud_parser.h"
 #include "h265_pps_parser.h"
+#include "h265_slice_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 #include "absl/types/optional.h"
@@ -27,6 +28,9 @@ typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
 typedef absl::optional<h265nal::H265SpsParser::SpsState> OptionalSps;
 typedef absl::optional<h265nal::H265PpsParser::PpsState> OptionalPps;
 typedef absl::optional<h265nal::H265AudParser::AudState> OptionalAud;
+typedef absl::optional<
+    h265nal::H265SliceSegmentLayerParser::SliceSegmentLayerState>
+    OptionalSliceSegmentLayer;
 }  // namespace
 
 namespace h265nal {
@@ -72,8 +76,17 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
     case RADL_R:
     case RASL_N:
     case RASL_R:
+      {
       // slice_segment_layer_rbsp()
+      OptionalSliceSegmentLayer slice_segment_layer =
+          H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+              bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
+              bitstream_parser_state);
+      if (slice_segment_layer != absl::nullopt) {
+        nal_unit.slice_segment_layer = *slice_segment_layer;
+      }
       break;
+      }
     case RSV_VCL_N10:
     case RSV_VCL_R11:
     case RSV_VCL_N12:
@@ -88,8 +101,17 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
     case IDR_W_RADL:
     case IDR_N_LP:
     case CRA_NUT:
+      {
       // slice_segment_layer_rbsp()
+      OptionalSliceSegmentLayer slice_segment_layer =
+          H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+              bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
+              bitstream_parser_state);
+      if (slice_segment_layer != absl::nullopt) {
+        nal_unit.slice_segment_layer = *slice_segment_layer;
+      }
       break;
+      }
     case RSV_IRAP_VCL22:
     case RSV_IRAP_VCL23:
       // reserved, IRAP pictures
@@ -248,8 +270,7 @@ void H265NalUnitParser::NalUnitState::fdump(
     case RADL_R:
     case RASL_N:
     case RASL_R:
-      // slice_segment_layer_rbsp()
-      break;
+      slice_segment_layer.fdump(outfp, indent_level);
     case RSV_VCL_N10:
     case RSV_VCL_R11:
     case RSV_VCL_N12:
@@ -264,8 +285,7 @@ void H265NalUnitParser::NalUnitState::fdump(
     case IDR_W_RADL:
     case IDR_N_LP:
     case CRA_NUT:
-      // slice_segment_layer_rbsp()
-      break;
+      slice_segment_layer.fdump(outfp, indent_level);
     case RSV_IRAP_VCL22:
     case RSV_IRAP_VCL23:
       // reserved, IRAP pictures
