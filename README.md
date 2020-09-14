@@ -122,6 +122,8 @@ List of tasks:
     unit packets (not sure about paci)
 * add lacking parsers (e.g. SEI)
 * remove TODO entries from the code
+* move headers to separate `include/` file to allow easier programmatic
+  integration.
 
 
 # License
