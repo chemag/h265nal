@@ -114,6 +114,16 @@ Requires gtests, gmock, abseil.
 The [webrtc](`webrtc`) directory contains an RBSP parser copied from webrtc.
 
 
+# TODO
+
+List of tasks:
+* add RTP H265 support (rfc7798)
+  * we should at least support single NAL unit, aggregation, and fragmentation
+    unit packets (not sure about paci)
+* add lacking parsers (e.g. SEI)
+* remove TODO entries from the code
+
+
 # License
 h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
 
