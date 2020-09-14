@@ -27,6 +27,11 @@ class H265StRefPicSetParser {
     ~StRefPicSetState() = default;
     void fdump(FILE* outfp, int indent_level) const;
 
+    // input parameters
+    uint32_t stRpsIdx = 0;
+    uint32_t num_short_term_ref_pic_sets = 0;
+
+    // contents
     uint32_t inter_ref_pic_set_prediction_flag = 0;
     uint32_t delta_idx_minus1 = 0;
     uint32_t delta_rps_sign = 0;

@@ -49,6 +49,9 @@ H265StRefPicSetParser::ParseStRefPicSet(
   // syntax") of the H.265 standard for a complete description.
   StRefPicSetState st_ref_pic_set;
 
+  st_ref_pic_set.stRpsIdx = stRpsIdx;
+  st_ref_pic_set.num_short_term_ref_pic_sets = num_short_term_ref_pic_sets;
+
   if (stRpsIdx != 0) {
     // inter_ref_pic_set_prediction_flag  u(1)
     if (!bit_buffer->ReadBits(
@@ -143,13 +146,17 @@ void H265StRefPicSetParser::StRefPicSetState::fdump(
   fprintf(outfp, "st_ref_pic_set {");
   indent_level = indent_level_incr(indent_level);
 
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "inter_ref_pic_set_prediction_flag: %i",
-          inter_ref_pic_set_prediction_flag);
+  if (stRpsIdx != 0) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "inter_ref_pic_set_prediction_flag: %i",
+            inter_ref_pic_set_prediction_flag);
+  }
 
   if (inter_ref_pic_set_prediction_flag) {
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "delta_idx_minus1: %i", delta_idx_minus1);
+    if (stRpsIdx == num_short_term_ref_pic_sets) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "delta_idx_minus1: %i", delta_idx_minus1);
+    }
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "delta_rps_sign: %i", delta_rps_sign);

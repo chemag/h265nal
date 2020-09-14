@@ -19,8 +19,6 @@
 namespace {
 typedef absl::optional<h265nal::H265ProfileTierLevelParser::
     ProfileTierLevelState> OptionalProfileTierLevel;
-typedef absl::optional<h265nal::H265StRefPicSetParser::
-    StRefPicSetState> OptionalStRefPicSet;
 typedef absl::optional<h265nal::H265VuiParametersParser::
     VuiParametersState> OptionalVuiParameters;
 typedef absl::optional<h265nal::H265PpsParser::
