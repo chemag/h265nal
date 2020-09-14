@@ -111,7 +111,7 @@ then it (4) stores the state into a `BitstreamParserState` object.
 # Requirements
 Requires gtests, gmock, abseil.
 
-The [webrtc](`webrtc`) directory contains an RBSP parser copied from webrtc.
+The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
 
 
 # TODO
