@@ -97,7 +97,7 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
   EXPECT_EQ(0, nal_unit_->vps.profile_tier_level.general.reserved_zero_43bits);
   EXPECT_EQ(0, nal_unit_->vps.profile_tier_level.general.inbld_flag);
   EXPECT_EQ(0, nal_unit_->vps.profile_tier_level.general.reserved_zero_bit);
-  EXPECT_EQ(93, nal_unit_->vps.profile_tier_level.general.level_idc);
+  EXPECT_EQ(93, nal_unit_->vps.profile_tier_level.general_level_idc);
   EXPECT_EQ(
     0, nal_unit_->vps.profile_tier_level.sub_layer_profile_present_flag.size());
   EXPECT_EQ(

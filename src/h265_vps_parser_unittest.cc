@@ -69,7 +69,7 @@ TEST_F(H265VpsParserTest, TestSampleVPS) {
   EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_43bits);
   EXPECT_EQ(0, vps_->profile_tier_level.general.inbld_flag);
   EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_bit);
-  EXPECT_EQ(93, vps_->profile_tier_level.general.level_idc);
+  EXPECT_EQ(93, vps_->profile_tier_level.general_level_idc);
   EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_profile_present_flag.size());
   EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_level_present_flag.size());
   EXPECT_EQ(0, vps_->profile_tier_level.reserved_zero_2bits.size());

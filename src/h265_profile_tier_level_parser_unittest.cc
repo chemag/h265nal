@@ -62,7 +62,7 @@ TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
   EXPECT_EQ(0, ptls_->general.reserved_zero_43bits);
   EXPECT_EQ(0, ptls_->general.inbld_flag);
   EXPECT_EQ(0, ptls_->general.reserved_zero_bit);
-  EXPECT_EQ(93, ptls_->general.level_idc);
+  EXPECT_EQ(93, ptls_->general_level_idc);
 
   EXPECT_EQ(0, ptls_->sub_layer_profile_present_flag.size());
   EXPECT_EQ(0, ptls_->sub_layer_level_present_flag.size());

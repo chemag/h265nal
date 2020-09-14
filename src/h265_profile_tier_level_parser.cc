@@ -50,19 +50,30 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   // standard for a complete description.
   ProfileTierLevelState profile_tier_level;
 
+  // input parameters
+  profile_tier_level.profilePresentFlag = profilePresentFlag;
+  profile_tier_level.maxNumSubLayersMinus1 = maxNumSubLayersMinus1;
+
   if (profilePresentFlag) {
     OptionalProfileInfo profile_info = H265ProfileInfoParser::ParseProfileInfo(
-        bit_buffer, true);
+        bit_buffer);
     if (profile_info != absl::nullopt) {
       profile_tier_level.general = *profile_info;
     }
   }
+
+  // general_level_idc  u(8)
+  if (!bit_buffer->ReadBits(&(profile_tier_level.general_level_idc), 8)) {
+    return absl::nullopt;
+  }
+
   for (int i = 0; i < maxNumSubLayersMinus1; i++) {
     // sub_layer_profile_present_flag[i]  u(1)
     if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
       return absl::nullopt;
     }
     profile_tier_level.sub_layer_profile_present_flag.push_back(bits_tmp);
+
     // sub_layer_level_present_flag[i]  u(1)
     if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
       return absl::nullopt;
@@ -82,10 +93,16 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
 
   for (int i = 0; i < maxNumSubLayersMinus1; i++) {
     OptionalProfileInfo profile_info =
-        H265ProfileInfoParser::ParseProfileInfo(bit_buffer, true);
+        H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
     if (profile_info != absl::nullopt) {
       profile_tier_level.sub_layer.push_back(*profile_info);
     }
+
+    // sub_layer_level_idc  u(8)
+    if (!bit_buffer->ReadBits(&bits_tmp, 8)) {
+      return absl::nullopt;
+    }
+    profile_tier_level.sub_layer_level_idc.push_back(bits_tmp);
   }
 
   return OptionalProfileTierLevel(profile_tier_level);
@@ -93,17 +110,15 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
 
 
 absl::optional<H265ProfileInfoParser::ProfileInfoState>
-H265ProfileInfoParser::ParseProfileInfo(
-      const uint8_t* data, size_t length, bool level_idc_flag) {
+H265ProfileInfoParser::ParseProfileInfo(const uint8_t* data, size_t length) {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
-  return ParseProfileInfo(&bit_buffer, level_idc_flag);
+  return ParseProfileInfo(&bit_buffer);
 }
 
 
 absl::optional<H265ProfileInfoParser::ProfileInfoState>
-H265ProfileInfoParser::ParseProfileInfo(
-      rtc::BitBuffer* bit_buffer, bool level_idc_flag) {
+H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
   ProfileInfoState profile_info;
   uint32_t bits_tmp, bits_tmp_hi;
 
@@ -260,13 +275,6 @@ H265ProfileInfoParser::ParseProfileInfo(
     }
   }
 
-  if (level_idc_flag) {
-    // level_idc  u(8)
-    if (!bit_buffer->ReadBits(&profile_info.level_idc, 8)) {
-      return absl::nullopt;
-    }
-  }
-
   return OptionalProfileInfo(profile_info);
 }
 
@@ -331,8 +339,6 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(
   fprintf(outfp, "inbld_flag: %i", inbld_flag);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_bit: %i", reserved_zero_bit);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "level_idc: %i", level_idc);
 }
 
 void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
@@ -340,16 +346,21 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
   fprintf(outfp, "profile_tier_level {");
   indent_level = indent_level_incr(indent_level);
 
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "general {");
-  indent_level = indent_level_incr(indent_level);
+  if (profilePresentFlag) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "general {");
+    indent_level = indent_level_incr(indent_level);
+
+    fdump_indent_level(outfp, indent_level);
+    general.fdump(outfp, indent_level);
+
+    indent_level = indent_level_decr(indent_level);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "}");
+  }
 
   fdump_indent_level(outfp, indent_level);
-  general.fdump(outfp, indent_level);
-
-  indent_level = indent_level_decr(indent_level);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+  fprintf(outfp, "general_level_idc: %i", general_level_idc);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "sub_layer_profile_present_flag {");
@@ -365,28 +376,39 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
   }
   fprintf(outfp, " }");
 
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_2bits {");
-  for (const uint32_t& v : reserved_zero_2bits) {
-    fprintf(outfp, " %i ", v);
-  }
-  fprintf(outfp, " }");
-
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sub_layer {");
-  indent_level = indent_level_incr(indent_level);
-
-  for (const struct H265ProfileInfoParser::ProfileInfoState& v : sub_layer) {
+  if (maxNumSubLayersMinus1 > 0) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "{");
-    v.fdump(outfp, indent_level);
+    fprintf(outfp, "reserved_zero_2bits {");
+    for (const uint32_t& v : reserved_zero_2bits) {
+      fprintf(outfp, " %i ", v);
+    }
+    fprintf(outfp, " }");
+  }
+
+  if (maxNumSubLayersMinus1 > 0) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "sub_layer {");
+    indent_level = indent_level_incr(indent_level);
+
+    for (const struct H265ProfileInfoParser::ProfileInfoState& v : sub_layer) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "{");
+      v.fdump(outfp, indent_level);
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "}");
+    }
+
+    indent_level = indent_level_decr(indent_level);
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "}");
-  }
 
-  indent_level = indent_level_decr(indent_level);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "sub_layer_level_idc {");
+    for (const uint32_t& v : sub_layer_level_idc) {
+      fprintf(outfp, " %i ", v);
+    }
+    fprintf(outfp, " }");
+  }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

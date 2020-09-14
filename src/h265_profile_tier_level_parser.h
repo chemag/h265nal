@@ -51,16 +51,14 @@ class H265ProfileInfoParser {
     uint64_t reserved_zero_43bits = 0;
     uint32_t inbld_flag = 0;
     uint32_t reserved_zero_bit = 0;
-    uint32_t level_idc = 0;
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
   static absl::optional<ProfileInfoState> ParseProfileInfo(
-      const uint8_t* data, size_t length, bool level_idc_flag);
+      const uint8_t* data, size_t length);
   static absl::optional<ProfileInfoState> ParseProfileInfo(
-      rtc::BitBuffer* bit_buffer, bool level_idc_flag);
+      rtc::BitBuffer* bit_buffer);
 };
-
 
 // A class for parsing out a video sequence parameter set (profile_tier_level)
 // data from an H265 NALU.
@@ -75,11 +73,18 @@ class H265ProfileTierLevelParser {
     ~ProfileTierLevelState() = default;
     void fdump(FILE* outfp, int indent_level) const;
 
+    // input parameters
+    bool profilePresentFlag;
+    unsigned int maxNumSubLayersMinus1;
+
+    // contents
     struct H265ProfileInfoParser::ProfileInfoState general;
+    uint32_t general_level_idc = 0;
     std::vector<uint32_t> sub_layer_profile_present_flag;
     std::vector<uint32_t> sub_layer_level_present_flag;
     std::vector<uint32_t> reserved_zero_2bits;
     std::vector<struct H265ProfileInfoParser::ProfileInfoState> sub_layer;
+    std::vector<uint32_t> sub_layer_level_idc;
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
