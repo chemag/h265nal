@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
 #include "absl/types/optional.h"
@@ -48,6 +49,7 @@ void usage(char *name) {
   fprintf(stderr, "\t--noadd-offset:\tReset add_offset flag\n");
   fprintf(stderr, "\t--add-length:\tSet add_length flag\n");
   fprintf(stderr, "\t--noadd-length:\tReset add_length flag\n");
+  fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
 }
@@ -61,7 +63,8 @@ enum {
   ADD_OFFSET_FLAG_OPTION,
   NO_ADD_OFFSET_FLAG_OPTION,
   ADD_LENGTH_FLAG_OPTION,
-  NO_ADD_LENGTH_FLAG_OPTION
+  NO_ADD_LENGTH_FLAG_OPTION,
+  VERSION_OPTION
 };
 
 
@@ -93,6 +96,7 @@ arg_options *parse_args(int argc, char** argv) {
     {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
     {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
     {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
+    {"version", no_argument, NULL, VERSION_OPTION},
     {NULL, 0, NULL, 0}
   };
 
@@ -141,6 +145,11 @@ arg_options *parse_args(int argc, char** argv) {
 
       case NO_ADD_LENGTH_FLAG_OPTION:
         options.add_length = false;
+        break;
+
+      case VERSION_OPTION:
+        printf("version: %s\n", PROJECT_VER);
+        exit(0);
         break;
 
       default:

@@ -26,6 +26,12 @@ add_library(h265nal
 target_include_directories(h265nal PUBLIC ../webrtc)
 target_link_libraries(h265nal PUBLIC webrtc)
 
+# https://cmake.org/cmake/help/latest/guide/tutorial/index.html#adding-a-version-number-and-configured-header-file
+configure_file(config.h.in config.h)
+
+# this allows the 'config.h' file to be used throughout the program
+target_include_directories(h265nal PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
+
 
 add_executable(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_unittest.cc)
 add_test(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_unittest)
