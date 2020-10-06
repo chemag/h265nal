@@ -244,13 +244,13 @@ void H265NalUnitParser::NalUnitState::fdump(
   // nal unit offset (starting at NAL unit header)
   if (add_offset) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "offset: 0x%08x", offset);
+    fprintf(outfp, "offset: 0x%08zx", offset);
   }
 
   // nal unit length (starting at NAL unit header)
   if (add_length) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "length: %i", length);
+    fprintf(outfp, "length: %zu", length);
   }
 
   // header
