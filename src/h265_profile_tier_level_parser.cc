@@ -330,11 +330,11 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_14bit_constraint_flag: %i", max_14bit_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_33bits: %li", reserved_zero_33bits);
+  fprintf(outfp, "reserved_zero_33bits: %llu", reserved_zero_33bits);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_34bits: %li", reserved_zero_34bits);
+  fprintf(outfp, "reserved_zero_34bits: %llu", reserved_zero_34bits);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_43bits: %li", reserved_zero_43bits);
+  fprintf(outfp, "reserved_zero_43bits: %llu", reserved_zero_43bits);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "inbld_flag: %i", inbld_flag);
   fdump_indent_level(outfp, indent_level);
