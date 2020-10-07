@@ -150,6 +150,9 @@ TEST_F(H265SpsParserTest, TestSampleSPS) {
   EXPECT_EQ(1, sps_->rbsp_stop_one_bit);
   EXPECT_EQ(0, sps_->rbsp_alignment_zero_bit);
 #endif
+
+  // derived values
+  EXPECT_EQ(920, sps_->getPicSizeInCtbsY());
 }
 
 }  // namespace h265nal

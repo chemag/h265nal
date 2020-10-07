@@ -89,6 +89,9 @@ class H265SpsParser {
     // sps_3d_extension( )
     // sps_scc_extension( )
     uint32_t sps_extension_data_flag = 0;
+
+    // derived values
+    uint32_t getPicSizeInCtbsY();
   };
 
   // Unpack RBSP and parse SPS state from the supplied buffer.

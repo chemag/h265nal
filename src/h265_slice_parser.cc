@@ -161,22 +161,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         return absl::nullopt;
       }
     }
-    // TODO(chemag): calculate PicSizeInCtbsY support (page 77)
-    // MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3 (7-10)
-    // CtbLog2SizeY = MinCbLog2SizeY +
-    //     log2_diff_max_min_luma_coding_block_size (7-11)
-    // CtbSizeY = 1 << CtbLog2SizeY (7-13)
-    // PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY (7-14)
-    // PicWidthInCtbsY = Ceil(pic_width_in_luma_samples / CtbSizeY) (7-15)
-    // PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY (7-16)
-    // PicHeightInCtbsY = Ceil( pic_height_in_luma_samples / CtbSizeY ) (7-17)
-    // PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY (7-18)
-    // PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY  (7-19)
-    // PicSizeInSamplesY = pic_width_in_luma_samples *
-    //     pic_height_in_luma_samples (7-20)
-    // PicWidthInSamplesC = pic_width_in_luma_samples / SubWidthC (7-21)
-    // PicHeightInSamplesC = pic_height_in_luma_samples / SubHeightC (7-22)
-    size_t PicSizeInCtbsY = 2;
+    size_t PicSizeInCtbsY =
+        bitstream_parser_state->sps[sps_id].getPicSizeInCtbsY();
     size_t slice_segment_address_len =
         static_cast<size_t>(std::ceil(std::log2(
             static_cast<float>(PicSizeInCtbsY))));
@@ -680,6 +666,10 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "dependent_slice_segment_flag: %i",
           dependent_slice_segment_flag);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "slice_segment_address: %i",
+          slice_segment_address);
 
   if (!dependent_slice_segment_flag) {
     fdump_indent_level(outfp, indent_level);
