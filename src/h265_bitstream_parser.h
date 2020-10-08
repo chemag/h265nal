@@ -20,7 +20,8 @@ namespace h265nal {
 // A class for parsing out an H265 Bitstream.
 class H265BitstreamParser {
  public:
-  // The parsed state of the bitstream.
+  // The parsed state of the bitstream (a list of parsed NAL units plus
+  // the accumulated VPS/PPS/SPS state).
   struct BitstreamState {
     BitstreamState() = default;
     BitstreamState(const BitstreamState&) = default;

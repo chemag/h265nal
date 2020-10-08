@@ -80,7 +80,12 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
 }
 
 
-// Unpack RBSP and parse NAL Unit state from the supplied buffer.
+// Parse a raw (RBSP) buffer with explicit NAL unit separator (3- or 4-byte
+// sequence start code prefix). Function splits the stream in NAL units,
+// and then parses each NAL unit. For that, it unpacks the RBSP inside
+// each NAL unit buffer, and adds the corresponding parsed struct into
+// the `bitstream` list (a `BitstreamState` object).
+// Function returns the said `bitstream` list.
 absl::optional<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
   BitstreamState bitstream;
