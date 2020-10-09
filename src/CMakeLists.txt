@@ -18,6 +18,7 @@ add_library(h265nal
     h265_sps_parser.h h265_sps_parser.cc
     h265_pps_parser.h h265_pps_parser.cc
     h265_aud_parser.h h265_aud_parser.cc
+    h265_rtp_ap_parser.h h265_rtp_ap_parser.cc
     h265_rtp_single_parser.h h265_rtp_single_parser.cc
     h265_rtp_parser.h h265_rtp_parser.cc
     h265_slice_parser.h h265_slice_parser.cc
@@ -90,6 +91,12 @@ add_test(h265_rtp_parser_unittest h265_rtp_parser_unittest)
 target_link_libraries(h265_rtp_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_rtp_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_rtp_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
+add_executable(h265_rtp_ap_parser_unittest h265_rtp_ap_parser_unittest.cc)
+add_test(h265_rtp_ap_parser_unittest h265_rtp_ap_parser_unittest)
+target_link_libraries(h265_rtp_ap_parser_unittest PUBLIC h265nal)
+target_link_libraries(h265_rtp_ap_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
+target_link_libraries(h265_rtp_ap_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
 
 add_executable(h265_slice_parser_unittest h265_slice_parser_unittest.cc)
 add_test(h265_slice_parser_unittest h265_slice_parser_unittest)

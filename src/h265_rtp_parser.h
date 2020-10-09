@@ -12,6 +12,7 @@
 
 #include "rtc_base/bit_buffer.h"
 
+#include "h265_rtp_ap_parser.h"
 #include "h265_rtp_single_parser.h"
 
 namespace h265nal {
@@ -27,6 +28,7 @@ class H265RtpParser {
     void fdump(FILE* outfp, int indent_level, uint32_t nal_unit_type) const;
 
     struct H265RtpSingleParser::RtpSingleState rtp_single;
+    struct H265RtpApParser::RtpApState rtp_ap;
   };
 
   // Unpack RBSP and parse RTP NAL Unit state from the supplied buffer.

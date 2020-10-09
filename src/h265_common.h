@@ -64,6 +64,7 @@ enum NalUnitType : uint8_t {
   RSV_NVCL46 = 46,
   RSV_NVCL47 = 47,
   // 48-63: unspecified
+  AP = 48,
 };
 
 // Methods for parsing RBSP. See section 7.4.1 of the H265 spec.
