@@ -78,7 +78,48 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
   return OptionalNalUnit(nal_unit);
 }
 
-// Unpack RBSP and parse NAL Unit state from the supplied buffer.
+// Unpack RBSP and parse NAL Unit header state from the supplied buffer.
+absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
+H265NalUnitHeaderParser::ParseNalUnitHeader(
+    const uint8_t* data, size_t length) {
+  std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
+  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+
+  return ParseNalUnitHeader(&bit_buffer);
+}
+
+absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
+H265NalUnitHeaderParser::ParseNalUnitHeader(
+    rtc::BitBuffer* bit_buffer) {
+  // H265 NAL Unit Header (nal_unit_header()) parser.
+  // Section 7.3.1.2 ("NAL unit header syntax") of the H.265
+  // standard for a complete description.
+  NalUnitHeaderState nal_unit_header;
+
+  // forbidden_zero_bit  f(1)
+  if (!bit_buffer->ReadBits(&nal_unit_header.forbidden_zero_bit, 1)) {
+    return absl::nullopt;
+  }
+
+  // nal_unit_type  u(6)
+  if (!bit_buffer->ReadBits(&nal_unit_header.nal_unit_type, 6)) {
+    return absl::nullopt;
+  }
+
+  // nuh_layer_id  u(6)
+  if (!bit_buffer->ReadBits(&nal_unit_header.nuh_layer_id, 6)) {
+    return absl::nullopt;
+  }
+
+  // nuh_temporal_id_plus1  u(3)
+  if (!bit_buffer->ReadBits(&nal_unit_header.nuh_temporal_id_plus1, 3)) {
+    return absl::nullopt;
+  }
+
+  return OptionalNalUnitHeader(nal_unit_header);
+}
+
+// Unpack RBSP and parse NAL Unit payload state from the supplied buffer.
 absl::optional<H265NalUnitPayloadParser::NalUnitPayloadState>
 H265NalUnitPayloadParser::ParseNalUnitPayload(
     const uint8_t* data, size_t length,
@@ -231,46 +272,6 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
   return OptionalNalUnitPayload(nal_unit_payload);
 }
 
-absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
-H265NalUnitHeaderParser::ParseNalUnitHeader(
-    const uint8_t* data, size_t length) {
-  std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
-
-  return ParseNalUnitHeader(&bit_buffer);
-}
-
-absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
-H265NalUnitHeaderParser::ParseNalUnitHeader(
-    rtc::BitBuffer* bit_buffer) {
-  // H265 NAL Unit Header (nal_unit_header()) parser.
-  // Section 7.3.1.2 ("NAL unit header syntax") of the H.265
-  // standard for a complete description.
-  NalUnitHeaderState nal_unit_header;
-
-  // forbidden_zero_bit  f(1)
-  if (!bit_buffer->ReadBits(&nal_unit_header.forbidden_zero_bit, 1)) {
-    return absl::nullopt;
-  }
-
-  // nal_unit_type  u(6)
-  if (!bit_buffer->ReadBits(&nal_unit_header.nal_unit_type, 6)) {
-    return absl::nullopt;
-  }
-
-  // nuh_layer_id  u(6)
-  if (!bit_buffer->ReadBits(&nal_unit_header.nuh_layer_id, 6)) {
-    return absl::nullopt;
-  }
-
-  // nuh_temporal_id_plus1  u(3)
-  if (!bit_buffer->ReadBits(&nal_unit_header.nuh_temporal_id_plus1, 3)) {
-    return absl::nullopt;
-  }
-
-  return OptionalNalUnitHeader(nal_unit_header);
-}
-
 void H265NalUnitParser::NalUnitState::fdump(
     FILE* outfp, int indent_level, bool add_offset, bool add_length) const {
   fprintf(outfp, "nal_unit {");
@@ -296,6 +297,24 @@ void H265NalUnitParser::NalUnitState::fdump(
   fdump_indent_level(outfp, indent_level);
   nal_unit_payload.fdump(outfp, indent_level, nal_unit_header.nal_unit_type);
 
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
+    FILE* outfp, int indent_level) const {
+
+  fprintf(outfp, "nal_unit_header {");
+  indent_level = indent_level_incr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nal_unit_type: %i", nal_unit_type);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
@@ -389,24 +408,6 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       break;
   }
 
-  indent_level = indent_level_decr(indent_level);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "}");
-}
-
-void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
-    FILE* outfp, int indent_level) const {
-
-  fprintf(outfp, "nal_unit_header {");
-  indent_level = indent_level_incr(indent_level);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nal_unit_type: %i", nal_unit_type);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
