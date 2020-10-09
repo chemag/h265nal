@@ -26,6 +26,8 @@ typedef absl::optional<h265nal::H265RtpSingleParser::
     RtpSingleState> OptionalRtpSingle;
 typedef absl::optional<h265nal::H265RtpApParser::
     RtpApState> OptionalRtpAp;
+typedef absl::optional<h265nal::H265RtpFuParser::
+    RtpFuState> OptionalRtpFu;
 }  // namespace
 
 namespace h265nal {
@@ -79,6 +81,16 @@ H265RtpParser::ParseRtp(
     if (rtp_ap != absl::nullopt) {
       rtp.rtp_ap = *rtp_ap;
     }
+
+  } else if (nal_unit_header->nal_unit_type == FU) {
+    // rtp_fu()
+    OptionalRtpFu rtp_fu =
+        H265RtpFuParser::ParseRtpFu(
+            bit_buffer,
+            bitstream_parser_state);
+    if (rtp_fu != absl::nullopt) {
+      rtp.rtp_fu = *rtp_fu;
+    }
   }
 
   return OptionalRtp(rtp);
@@ -95,6 +107,9 @@ void H265RtpParser::RtpState::fdump(
   } else if (nal_unit_type == AP) {
     // rtp_ap()
     rtp_ap.fdump(outfp, indent_level);
+  } else if (nal_unit_type == FU) {
+    // rtp_fu()
+    rtp_fu.fdump(outfp, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);
