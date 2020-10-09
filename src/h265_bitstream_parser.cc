@@ -111,20 +111,26 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
       switch (nal_unit->nal_unit_header.nal_unit_type) {
         case VPS_NUT:
           {
-          uint32_t vps_id = nal_unit->vps.vps_video_parameter_set_id;
-          bitstream.bitstream_parser_state.vps[vps_id] = nal_unit->vps;
+          uint32_t vps_id =
+              nal_unit->nal_unit_payload.vps.vps_video_parameter_set_id;
+          bitstream.bitstream_parser_state.vps[vps_id] =
+              nal_unit->nal_unit_payload.vps;
           break;
           }
         case SPS_NUT:
           {
-          uint32_t sps_id = nal_unit->sps.sps_seq_parameter_set_id;
-          bitstream.bitstream_parser_state.sps[sps_id] = nal_unit->sps;
+          uint32_t sps_id =
+              nal_unit->nal_unit_payload.sps.sps_seq_parameter_set_id;
+          bitstream.bitstream_parser_state.sps[sps_id] =
+              nal_unit->nal_unit_payload.sps;
           break;
           }
         case PPS_NUT:
           {
-          uint32_t pps_id = nal_unit->pps.pps_pic_parameter_set_id;
-          bitstream.bitstream_parser_state.pps[pps_id] = nal_unit->pps;
+          uint32_t pps_id =
+              nal_unit->nal_unit_payload.pps.pps_pic_parameter_set_id;
+          bitstream.bitstream_parser_state.pps[pps_id] =
+              nal_unit->nal_unit_payload.pps;
           break;
           }
       }

@@ -44,6 +44,36 @@ class H265NalUnitHeaderParser {
 };
 
 
+// A class for parsing out an H265 NAL Unit Payload.
+class H265NalUnitPayloadParser {
+ public:
+  // The parsed state of the NAL Unit Payload. Only some select values are
+  // stored. Add more as they are actually needed.
+  struct NalUnitPayloadState {
+    NalUnitPayloadState() = default;
+    NalUnitPayloadState(const NalUnitPayloadState&) = default;
+    ~NalUnitPayloadState() = default;
+    void fdump(FILE* outfp, int indent_level, uint32_t nal_unit_type) const;
+
+    struct H265VpsParser::VpsState vps;
+    struct H265SpsParser::SpsState sps;
+    struct H265PpsParser::PpsState pps;
+    struct H265AudParser::AudState aud;
+    struct H265SliceSegmentLayerParser::SliceSegmentLayerState
+        slice_segment_layer;
+  };
+
+  // Unpack RBSP and parse NAL unit payload state from the supplied buffer.
+  static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
+      const uint8_t* data, size_t length,
+      uint32_t nal_unit_type,
+      struct H265BitstreamParserState* bitstream_parser_state);
+  static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
+      rtc::BitBuffer* bit_buffer,
+      uint32_t nal_unit_type,
+      struct H265BitstreamParserState* bitstream_parser_state);
+};
+
 // A class for parsing out an H265 NAL Unit.
 class H265NalUnitParser {
  public:
@@ -60,13 +90,7 @@ class H265NalUnitParser {
     size_t length;
 
     struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
-    // payload
-    struct H265VpsParser::VpsState vps;
-    struct H265SpsParser::SpsState sps;
-    struct H265PpsParser::PpsState pps;
-    struct H265AudParser::AudState aud;
-    struct H265SliceSegmentLayerParser::SliceSegmentLayerState
-        slice_segment_layer;
+    struct H265NalUnitPayloadParser::NalUnitPayloadState nal_unit_payload;
   };
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.

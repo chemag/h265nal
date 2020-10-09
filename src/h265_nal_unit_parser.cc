@@ -22,6 +22,8 @@
 namespace {
 typedef absl::optional<h265nal::H265NalUnitHeaderParser::
     NalUnitHeaderState> OptionalNalUnitHeader;
+typedef absl::optional<h265nal::H265NalUnitPayloadParser::
+    NalUnitPayloadState> OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265NalUnitParser::
     NalUnitState> OptionalNalUnit;
 typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
@@ -64,8 +66,43 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
     nal_unit.nal_unit_header = *nal_unit_header;
   }
 
+  // nal_unit_payload()
+  OptionalNalUnitPayload nal_unit_payload =
+      H265NalUnitPayloadParser::ParseNalUnitPayload(
+          bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
+          bitstream_parser_state);
+  if (nal_unit_payload != absl::nullopt) {
+    nal_unit.nal_unit_payload = *nal_unit_payload;
+  }
+
+  return OptionalNalUnit(nal_unit);
+}
+
+// Unpack RBSP and parse NAL Unit state from the supplied buffer.
+absl::optional<H265NalUnitPayloadParser::NalUnitPayloadState>
+H265NalUnitPayloadParser::ParseNalUnitPayload(
+    const uint8_t* data, size_t length,
+    uint32_t nal_unit_type,
+    struct H265BitstreamParserState* bitstream_parser_state) {
+  std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
+  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+
+  return ParseNalUnitPayload(&bit_buffer, nal_unit_type,
+                             bitstream_parser_state);
+}
+
+absl::optional<H265NalUnitPayloadParser::NalUnitPayloadState>
+H265NalUnitPayloadParser::ParseNalUnitPayload(
+    rtc::BitBuffer* bit_buffer,
+    uint32_t nal_unit_type,
+    struct H265BitstreamParserState* bitstream_parser_state) {
+  // H265 NAL Unit Payload (nal_unit()) parser.
+  // Section 7.3.1.1 ("General NAL unit header syntax") of the H.265
+  // standard for a complete description.
+  NalUnitPayloadState nal_unit_payload;
+
   // payload (Table 7-1, Section 7.4.2.2)
-  switch (nal_unit.nal_unit_header.nal_unit_type) {
+  switch (nal_unit_type) {
     case TRAIL_N:
     case TRAIL_R:
     case TSA_N:
@@ -80,10 +117,10 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // slice_segment_layer_rbsp()
       OptionalSliceSegmentLayer slice_segment_layer =
           H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
-              bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
+              bit_buffer, nal_unit_type,
               bitstream_parser_state);
       if (slice_segment_layer != absl::nullopt) {
-        nal_unit.slice_segment_layer = *slice_segment_layer;
+        nal_unit_payload.slice_segment_layer = *slice_segment_layer;
       }
       break;
       }
@@ -105,10 +142,10 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // slice_segment_layer_rbsp()
       OptionalSliceSegmentLayer slice_segment_layer =
           H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
-              bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
+              bit_buffer, nal_unit_type,
               bitstream_parser_state);
       if (slice_segment_layer != absl::nullopt) {
-        nal_unit.slice_segment_layer = *slice_segment_layer;
+        nal_unit_payload.slice_segment_layer = *slice_segment_layer;
       }
       break;
       }
@@ -131,7 +168,7 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // video_parameter_set_rbsp()
       OptionalVps vps = H265VpsParser::ParseVps(bit_buffer);
       if (vps != absl::nullopt) {
-        nal_unit.vps = *vps;
+        nal_unit_payload.vps = *vps;
       }
       break;
       }
@@ -140,7 +177,7 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // seq_parameter_set_rbsp()
       OptionalSps sps = H265SpsParser::ParseSps(bit_buffer);
       if (sps != absl::nullopt) {
-        nal_unit.sps = *sps;
+        nal_unit_payload.sps = *sps;
       }
       break;
       }
@@ -149,7 +186,7 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // pic_parameter_set_rbsp()
       OptionalPps pps = H265PpsParser::ParsePps(bit_buffer);
       if (pps != absl::nullopt) {
-        nal_unit.pps = *pps;
+        nal_unit_payload.pps = *pps;
       }
       break;
       }
@@ -158,7 +195,7 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       // access_unit_delimiter_rbsp()
       OptionalAud aud = H265AudParser::ParseAud(bit_buffer);
       if (aud != absl::nullopt) {
-        nal_unit.aud = *aud;
+        nal_unit_payload.aud = *aud;
       }
       break;
       }
@@ -191,9 +228,8 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
       break;
   }
 
-  return OptionalNalUnit(nal_unit);
+  return OptionalNalUnitPayload(nal_unit_payload);
 }
-
 
 absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
 H265NalUnitHeaderParser::ParseNalUnitHeader(
@@ -203,7 +239,6 @@ H265NalUnitHeaderParser::ParseNalUnitHeader(
 
   return ParseNalUnitHeader(&bit_buffer);
 }
-
 
 absl::optional<H265NalUnitHeaderParser::NalUnitHeaderState>
 H265NalUnitHeaderParser::ParseNalUnitHeader(
@@ -257,9 +292,22 @@ void H265NalUnitParser::NalUnitState::fdump(
   fdump_indent_level(outfp, indent_level);
   nal_unit_header.fdump(outfp, indent_level);
 
-  fdump_indent_level(outfp, indent_level);
   // payload
-  switch (nal_unit_header.nal_unit_type) {
+  fdump_indent_level(outfp, indent_level);
+  nal_unit_payload.fdump(outfp, indent_level, nal_unit_header.nal_unit_type);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
+    FILE* outfp, int indent_level, uint32_t nal_unit_type) const {
+  fprintf(outfp, "nal_unit_payload {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  switch (nal_unit_type) {
     case TRAIL_N:
     case TRAIL_R:
     case TSA_N:
