@@ -210,7 +210,11 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       OptionalVps vps = H265VpsParser::ParseVps(bit_buffer);
       if (vps != absl::nullopt) {
         nal_unit_payload.vps = *vps;
+        uint32_t vps_id =
+              nal_unit_payload.vps.vps_video_parameter_set_id;
+        bitstream_parser_state->vps[vps_id] = nal_unit_payload.vps;
       }
+
       break;
       }
     case SPS_NUT:
@@ -219,6 +223,9 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       OptionalSps sps = H265SpsParser::ParseSps(bit_buffer);
       if (sps != absl::nullopt) {
         nal_unit_payload.sps = *sps;
+        uint32_t sps_id =
+            nal_unit_payload.sps.sps_seq_parameter_set_id;
+        bitstream_parser_state->sps[sps_id] = nal_unit_payload.sps;
       }
       break;
       }
@@ -228,6 +235,9 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       OptionalPps pps = H265PpsParser::ParsePps(bit_buffer);
       if (pps != absl::nullopt) {
         nal_unit_payload.pps = *pps;
+        uint32_t pps_id =
+            nal_unit_payload.pps.pps_pic_parameter_set_id;
+        bitstream_parser_state->pps[pps_id] = nal_unit_payload.pps;
       }
       break;
       }
