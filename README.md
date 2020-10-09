@@ -99,13 +99,79 @@ nal_unit {
 
 # Programmatic Integration Operation
 
-In order to integrate the parser in your C++ parser, take a look at
-`H265BitstreamParser::ParseBitstream()`. The function gets a generic
-binary string (`data` and `length`), (1) splits it into a vector of
-NAL units, (2) parses each of the NAL units, and (3) adds the parsed
-NAL unit to a vector of parser NAL units. If the parsed NAL unit has
-state that needs to be used to parse other NAL units (VPS, SPS, PPS),
-then it (4) stores the state into a `BitstreamParserState` object.
+There are 2 ways to integrate the parser in your C++ parser:
+
+## 1. Annex B H265 File Parsing
+If you just have a binary blob with Annex B format (e.g. you read
+a .265 file from a file, and want to convert the read blob into parsed
+NAL units), use the `H265BitstreamParser::ParseBitstream()` method.
+
+```
+// read your .265 file into the vector `buffer`
+std::vector<uint8_t> buffer(size);
+
+// create bitstream parser
+absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+
+// parse the file
+bitstream = h265nal::H265BitstreamParser::ParseBitstream(
+    buffer.data(), buffer.size());
+```
+
+The `H265BitstreamParser::ParseBitstream()` function receives a generic
+binary string (`data` and `length`) that you read from the file. It then:
+
+* (a) splits it into a vector of NAL units,
+* (b) parses each of the NAL units,
+* (c) adds the parsed NAL unit to a vector of parser NAL units.
+
+Note that, if the parsed NAL unit has state that needs to be used to parse
+other NAL units (VPS, SPS, PPS), it will be stored into the
+`BitstreamParserState` object that is passed around.
+
+
+## 2. RTP Packet Parsing
+If you want to just pass consecutive RTP packets (rfc7798 format), and get
+information on their contents, use the `H265RtpParser::ParseRtp` method.
+
+```
+// create bitstream parser state
+H265BitstreamParserState bitstream_parser_state;
+
+// parse packet(s)
+absl::optional<H265RtpParser::RtpState> rtp = H265RtpParser::ParseRtp(
+    buffer, arraysize(buffer),
+    &bitstream_parser_state);
+
+// packets will return the actual contents into `rtp`, and update the
+// bitstream parser state if the RTP packet contains a VPS/SPS/PPS.
+
+// check the main packet contents
+switch (rtp->nal_unit_header.nal_unit_type) {
+  case AP:
+    {
+    // an AP (Aggregation Packet) packet contains 2+ NAL Units
+    // number_of_packets := rtp->rtp_ap.nal_unit_payloads.size()
+    // packet_i := rtp->rtp_ap.nal_unit_payloads[i]
+    }
+  case FU:
+    {
+    // an FU (Fragmentation Units) packet contains a piece of a NAL unit
+    // has_start_of_packet := rtp->rtp_fu.s_bit
+    // internal_type := rtp->rtp_fu.fu_type
+    // packet := rtp->rtp_fu.nal_unit_payload
+    }
+  default:
+    {
+    // a packet containing a single NAL Unit
+    // header := rtp->rtp_single.nal_unit_header
+    // payload := rtp->rtp_single.nal_unit_payload
+    }
+}
+
+// access to the VPS/SPS/PPS map
+// e.g. bitstream_parser_state.sps[sps_id].pic_width_in_luma_samples
+```
 
 
 # Requirements
@@ -117,13 +183,15 @@ The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
 # TODO
 
 List of tasks:
-* add RTP H265 support (rfc7798)
-  * we should at least support single NAL unit, aggregation, and fragmentation
-    unit packets (not sure about paci)
 * add lacking parsers (e.g. SEI)
 * remove TODO entries from the code
 * move headers to separate `include/` file to allow easier programmatic
   integration.
+
+
+# Limitations
+
+* no support for PACI (rfc7798 Section 4.4.4)
 
 
 # License

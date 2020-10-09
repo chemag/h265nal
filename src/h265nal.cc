@@ -211,8 +211,10 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> buffer(size);
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
-  // create bitstream parser
+  // create bitstream parser state
   absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+
+  // parse the file
   bitstream = h265nal::H265BitstreamParser::ParseBitstream(
       buffer.data(), buffer.size());
   if (bitstream == absl::nullopt) {
