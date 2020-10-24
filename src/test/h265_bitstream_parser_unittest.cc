@@ -3,12 +3,11 @@
  */
 
 
-#include "h265_bitstream_parser.h"
-
+#include "rtc/third_party/h265nal/h265_bitstream_parser.h"
+#include "rtc/third_party/h265nal/h265_common.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"

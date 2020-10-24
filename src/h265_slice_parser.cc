@@ -14,7 +14,6 @@
 #include "h265_common.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265StRefPicSetParser::
@@ -178,7 +177,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   if (!slice_segment_header.dependent_slice_segment_flag) {
     slice_segment_header.num_extra_slice_header_bits =
         bitstream_parser_state->pps[pps_id].num_extra_slice_header_bits;
-    for (int i = 0; i < slice_segment_header.num_extra_slice_header_bits; i++) {
+    for (uint32_t i = 0; i < slice_segment_header.num_extra_slice_header_bits; i++) {
       // slice_reserved_flag[i]  u(1)
       if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
         return absl::nullopt;
@@ -278,7 +277,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           return absl::nullopt;
         }
 
-        for (int i = 0; i < slice_segment_header.num_long_term_sps +
+        for (uint32_t i = 0; i < slice_segment_header.num_long_term_sps +
              slice_segment_header.num_long_term_pics; i++) {
           if (i < slice_segment_header.num_long_term_sps) {
             if (slice_segment_header.num_long_term_ref_pics_sps > 1) {
@@ -608,7 +607,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         return absl::nullopt;
       }
 
-      for (int i = 0; i < slice_segment_header.num_entry_point_offsets; i++) {
+      for (uint32_t i = 0; i < slice_segment_header.num_entry_point_offsets; i++) {
         // entry_point_offset_minus1[i]  u(v)
         if (!bit_buffer->ReadBits(&bits_tmp,
             slice_segment_header.offset_len_minus1)) {
@@ -628,7 +627,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         &(slice_segment_header.slice_segment_header_extension_length))) {
       return absl::nullopt;
     }
-    for (int i = 0;
+    for (uint32_t i = 0;
          i < slice_segment_header.slice_segment_header_extension_length;
          i++) {
       // slice_segment_header_extension_data_byte[i]  u(8)
@@ -715,7 +714,7 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
         fdump_indent_level(outfp, indent_level);
         fprintf(outfp, "num_long_term_pics: %i", num_long_term_pics);
 
-        for (int i = 0; i < num_long_term_sps + num_long_term_pics; i++) {
+        for (uint32_t i = 0; i < num_long_term_sps + num_long_term_pics; i++) {
           if (i < num_long_term_sps) {
             if (num_long_term_ref_pics_sps > 1) {
               fdump_indent_level(outfp, indent_level);

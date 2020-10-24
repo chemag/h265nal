@@ -12,7 +12,6 @@
 
 #include "h265_common.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265StRefPicSetParser::
@@ -109,7 +108,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
       return absl::nullopt;
     }
 
-    for (int i = 0; i < st_ref_pic_set.num_negative_pics; i++) {
+    for (uint32_t i = 0; i < st_ref_pic_set.num_negative_pics; i++) {
       // delta_poc_s0_minus1[i] ue(v)
       if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
         return absl::nullopt;
@@ -123,7 +122,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
       st_ref_pic_set.used_by_curr_pic_s0_flag.push_back(bits_tmp);
     }
 
-    for (int i = 0; i < st_ref_pic_set.num_positive_pics; i++) {
+    for (uint32_t i = 0; i < st_ref_pic_set.num_positive_pics; i++) {
       // delta_poc_s1_minus1[i] ue(v)
       if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
         return absl::nullopt;
@@ -166,7 +165,7 @@ void H265StRefPicSetParser::StRefPicSetState::fdump(
 
 #if 0
     // TODO(chemag): add support for NumDeltaPocs
-    for (int j = 0; j <= NumDeltaPocs[RefRpsIdx]; j++) {
+    for (uint32_t j = 0; j <= NumDeltaPocs[RefRpsIdx]; j++) {
       // used_by_curr_pic_flag[j] u(1)
       if (!used_by_curr_pic_flag[j]) {
         // use_delta_flag[j] u(1)

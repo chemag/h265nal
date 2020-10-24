@@ -11,7 +11,6 @@
 
 #include "h265_common.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265ProfileInfoParser::ProfileInfoState>
@@ -67,7 +66,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
     return absl::nullopt;
   }
 
-  for (int i = 0; i < maxNumSubLayersMinus1; i++) {
+  for (uint32_t i = 0; i < maxNumSubLayersMinus1; i++) {
     // sub_layer_profile_present_flag[i]  u(1)
     if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
       return absl::nullopt;
@@ -82,7 +81,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   }
 
   if (maxNumSubLayersMinus1 > 0) {
-    for (int i = maxNumSubLayersMinus1; i < 8; i++) {
+    for (uint32_t i = maxNumSubLayersMinus1; i < 8; i++) {
       // reserved_zero_2bits[i]  u(2)
       if (!bit_buffer->ReadBits(&bits_tmp, 2)) {
         return absl::nullopt;
@@ -91,7 +90,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
     }
   }
 
-  for (int i = 0; i < maxNumSubLayersMinus1; i++) {
+  for (uint32_t i = 0; i < maxNumSubLayersMinus1; i++) {
     OptionalProfileInfo profile_info =
         H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
     if (profile_info != absl::nullopt) {
@@ -135,7 +134,7 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
     return absl::nullopt;
   }
   // for (j = 0; j < 32; j++)
-  for (int j = 0; j < 32; j++) {
+  for (uint32_t j = 0; j < 32; j++) {
     // profile_compatibility_flag[j]  u(1)
     if (!bit_buffer->ReadBits(&profile_info.profile_compatibility_flag[j], 1)) {
       return absl::nullopt;

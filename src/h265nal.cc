@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
            (options->infile == NULL) ? "null" : options->infile);
     printf("options->outfile = %s\n",
            (options->outfile == NULL) ? "null" : options->outfile);
-    for (int i = 0; i < options->nrem; ++i) {
+    for (uint32_t i = 0; i < options->nrem; ++i) {
       printf("options->rem[%i] = %s\n", i, options->rem[i]);
     }
   }
