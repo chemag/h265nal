@@ -49,10 +49,10 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
   RtpApState rtp_ap;
 
   // first read the common header
-  OptionalNalUnitHeader nal_unit_header =
+  OptionalNalUnitHeader nal_unit_header_common =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header != absl::nullopt) {
-    rtp_ap.header = *nal_unit_header;
+  if (nal_unit_header_common != absl::nullopt) {
+    rtp_ap.header = *nal_unit_header_common;
   }
 
   while (bit_buffer->RemainingBitCount() > 0) {
@@ -90,7 +90,7 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
 
   for (unsigned int i = 0; i < nal_unit_sizes.size(); ++i) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "nal_unit_size: %i", nal_unit_sizes[i]);
+    fprintf(outfp, "nal_unit_size: %u", nal_unit_sizes[i]);
 
     fdump_indent_level(outfp, indent_level);
     nal_unit_headers[i].fdump(outfp, indent_level);

@@ -14,7 +14,6 @@
 #include "h265_profile_tier_level_parser.h"
 #include "h265_vui_parameters_parser.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265ProfileTierLevelParser::
@@ -43,7 +42,6 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
 absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     rtc::BitBuffer* bit_buffer) {
-  uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
   // H265 PPS NAL Unit (pic_parameter_set_rbsp()) parser.
@@ -181,14 +179,14 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     }
 
     if (!pps.uniform_spacing_flag) {
-      for (int i = 0; i < pps.num_tile_columns_minus1; i++) {
+      for (uint32_t i = 0; i < pps.num_tile_columns_minus1; i++) {
         // column_width_minus1[i]  ue(v)
         if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
           return absl::nullopt;
         }
         pps.column_width_minus1.push_back(golomb_tmp);
       }
-      for (int i = 0; i < pps.num_tile_rows_minus1; i++) {
+      for (uint32_t i = 0; i < pps.num_tile_rows_minus1; i++) {
         // row_height_minus1[i]  ue(v)
         if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
           return absl::nullopt;

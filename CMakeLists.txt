@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 enable_testing()
 
-# Recurse into "src" and "webrtc" subdirectories.
+# Recurse into source code subdirectories.
 add_subdirectory(src)
 add_subdirectory(webrtc)
+add_subdirectory(test)

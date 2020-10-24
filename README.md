@@ -58,7 +58,7 @@ Total Test time (real) =   0.04 sec
 Or to test any of the unittests:
 
 ```
-$ ./src/h265_profile_tier_level_parser_unittest
+$ ./test/h265_profile_tier_level_parser_unittest
 Running main() from /builddir/build/BUILD/googletest-release-1.8.1/googletest/src/gtest_main.cc
 [==========] Running 1 test from 1 test case.
 [----------] Global test environment set-up.

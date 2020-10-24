@@ -15,7 +15,6 @@
 #include "h265_profile_tier_level_parser.h"
 #include "h265_vui_parameters_parser.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265ProfileTierLevelParser::
@@ -146,7 +145,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
      return absl::nullopt;
   }
 
-  for (int i = (sps.sps_sub_layer_ordering_info_present_flag ? 0 :
+  for (uint32_t i = (sps.sps_sub_layer_ordering_info_present_flag ? 0 :
                 sps.sps_max_sub_layers_minus1);
        i <= sps.sps_max_sub_layers_minus1; i++) {
     // sps_max_dec_pic_buffering_minus1[i]  ue(v)
@@ -270,7 +269,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     return absl::nullopt;
   }
 
-  for (int i = 0; i < sps.num_short_term_ref_pic_sets; i++) {
+  for (uint32_t i = 0; i < sps.num_short_term_ref_pic_sets; i++) {
     // st_ref_pic_set(i)
     OptionalStRefPicSet st_ref_pic_set =
         H265StRefPicSetParser::ParseStRefPicSet(
@@ -291,7 +290,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
       return absl::nullopt;
     }
 
-    for (int i = 0; i < sps.num_long_term_ref_pics_sps; i++) {
+    for (uint32_t i = 0; i < sps.num_long_term_ref_pics_sps; i++) {
       // lt_ref_pic_poc_lsb_sps[i] u(v)  log2_max_pic_order_cnt_lsb_minus4 + 4
       if (!bit_buffer->ReadBits(&bits_tmp,
           sps.log2_max_pic_order_cnt_lsb_minus4 + 4)) {
@@ -567,7 +566,7 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "num_short_term_ref_pic_sets: %i",
           num_short_term_ref_pic_sets);
 
-  for (int i = 0; i < num_short_term_ref_pic_sets; i++) {
+  for (uint32_t i = 0; i < num_short_term_ref_pic_sets; i++) {
     fdump_indent_level(outfp, indent_level);
     st_ref_pic_set[i].fdump(outfp, indent_level);
   }
@@ -673,21 +672,21 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   uint32_t CtbLog2SizeY = MinCbLog2SizeY +
       log2_diff_max_min_luma_coding_block_size;
   // Equation (7-12)
-  uint32_t MinCbSizeY = 1 << MinCbLog2SizeY;
+  // uint32_t MinCbSizeY = 1 << MinCbLog2SizeY;
   // Equation (7-13)
   uint32_t CtbSizeY = 1 << CtbLog2SizeY;
   // Equation (7-14)
-  uint32_t PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY;
+  // uint32_t PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY;
   // Equation (7-15)
   uint32_t PicWidthInCtbsY = static_cast<uint32_t>(std::ceil(
       pic_width_in_luma_samples / CtbSizeY));
   // Equation (7-16)
-  uint32_t PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY;
+  // uint32_t PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY;
   // Equation (7-17)
   uint32_t PicHeightInCtbsY = static_cast<uint32_t>(std::ceil(
       pic_height_in_luma_samples / CtbSizeY));
   // Equation (7-18)
-  uint32_t PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY;
+  // uint32_t PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY;
   // Equation (7-19)
   uint32_t PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
   // PicSizeInSamplesY = pic_width_in_luma_samples *

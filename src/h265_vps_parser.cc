@@ -12,7 +12,6 @@
 
 #include "h265_common.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265ProfileTierLevelParser::
@@ -95,7 +94,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     return absl::nullopt;
   }
 
-  for (int i = (vps.vps_sub_layer_ordering_info_present_flag ?
+  for (uint32_t i = (vps.vps_sub_layer_ordering_info_present_flag ?
        0 : vps.vps_max_sub_layers_minus1);
        i <= vps.vps_max_sub_layers_minus1; i++) {
     // vps_max_dec_pic_buffering_minus1[i]  ue(v)
@@ -125,9 +124,9 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     return absl::nullopt;
   }
 
-  for (int i = 1; i <= vps.vps_num_layer_sets_minus1; i++) {
+  for (uint32_t i = 1; i <= vps.vps_num_layer_sets_minus1; i++) {
     vps.layer_id_included_flag[i-1].emplace_back();
-    for (int j = 0; j <= vps.vps_max_layer_id; j++) {
+    for (uint32_t j = 0; j <= vps.vps_max_layer_id; j++) {
       // layer_id_included_flag[i][j]  u(1)
       vps.layer_id_included_flag[i-1].push_back(golomb_tmp);
     }
@@ -166,7 +165,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
       return absl::nullopt;
     }
 
-    for (int i = 0; i < vps.vps_num_hrd_parameters; i++) {
+    for (uint32_t i = 0; i < vps.vps_num_hrd_parameters; i++) {
       // hrd_layer_set_idx[i]  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
         return absl::nullopt;

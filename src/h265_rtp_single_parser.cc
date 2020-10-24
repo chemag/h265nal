@@ -13,7 +13,6 @@
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 #include "absl/types/optional.h"
-#include "rtc_base/bit_buffer.h"
 
 namespace {
 typedef absl::optional<h265nal::H265NalUnitHeaderParser::
