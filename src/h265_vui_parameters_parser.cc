@@ -38,6 +38,7 @@ H265VuiParametersParser::ParseVuiParameters(
 absl::optional<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(
     rtc::BitBuffer* bit_buffer) {
+  // uint32_t golomb_tmp;
 
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for

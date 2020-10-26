@@ -3,8 +3,8 @@
  */
 
 
-#include "rtc/third_party/h265nal/h265_bitstream_parser.h"
-#include "rtc/third_party/h265nal/h265_common.h"
+#include "../h265_bitstream_parser.h"
+#include "../h265_common.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 

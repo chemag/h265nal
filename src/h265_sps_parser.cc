@@ -672,17 +672,21 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   uint32_t CtbLog2SizeY = MinCbLog2SizeY +
       log2_diff_max_min_luma_coding_block_size;
   // Equation (7-12)
+  // uint32_t MinCbSizeY = 1 << MinCbLog2SizeY;
   // Equation (7-13)
   uint32_t CtbSizeY = 1 << CtbLog2SizeY;
   // Equation (7-14)
+  // uint32_t PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY;
   // Equation (7-15)
   uint32_t PicWidthInCtbsY = static_cast<uint32_t>(std::ceil(
       pic_width_in_luma_samples / CtbSizeY));
   // Equation (7-16)
+  // uint32_t PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY;
   // Equation (7-17)
   uint32_t PicHeightInCtbsY = static_cast<uint32_t>(std::ceil(
       pic_height_in_luma_samples / CtbSizeY));
   // Equation (7-18)
+  // uint32_t PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY;
   // Equation (7-19)
   uint32_t PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
   // PicSizeInSamplesY = pic_width_in_luma_samples *

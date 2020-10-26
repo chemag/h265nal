@@ -42,6 +42,7 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
 absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     rtc::BitBuffer* bit_buffer) {
+  // uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
   // H265 PPS NAL Unit (pic_parameter_set_rbsp()) parser.

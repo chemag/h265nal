@@ -23,6 +23,7 @@ typedef absl::optional<h265nal::H265NalUnitParser::NalUnitState>
 
 // The size of a full NALU start sequence {0 0 0 1}, used for the first NALU
 // of an access unit, and for SPS and PPS blocks.
+// const size_t kNaluLongStartSequenceSize = 4;
 // The size of a shortened NALU start sequence {0 0 1}, that may be used if
 // not the first NALU of an access unit or an SPS or PPS block.
 const size_t kNaluShortStartSequenceSize = 3;

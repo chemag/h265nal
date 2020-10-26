@@ -347,7 +347,7 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case RASL_N:
     case RASL_R:
       slice_segment_layer.fdump(outfp, indent_level);
-      [[fallthrough]];
+      break;
     case RSV_VCL_N10:
     case RSV_VCL_R11:
     case RSV_VCL_N12:
@@ -363,7 +363,7 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case IDR_N_LP:
     case CRA_NUT:
       slice_segment_layer.fdump(outfp, indent_level);
-      [[fallthrough]];
+      break;
     case RSV_IRAP_VCL22:
     case RSV_IRAP_VCL23:
       // reserved, IRAP pictures
