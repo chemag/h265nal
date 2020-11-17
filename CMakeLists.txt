@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 # https://cmake.org/cmake/help/v3.0/command/project.html
-project(h265nal VERSION 0.3)
+project(h265nal VERSION 0.4)
 
 # Abseil requires C++11
 set(CMAKE_CXX_STANDARD 11)
