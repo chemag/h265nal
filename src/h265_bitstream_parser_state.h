@@ -29,6 +29,11 @@ struct H265BitstreamParserState {
   std::map<uint32_t, struct H265SpsParser::SpsState> sps;
   // PPS state
   std::map<uint32_t, struct H265PpsParser::PpsState> pps;
+
+  // some accessors
+  absl::optional<struct H265VpsParser::VpsState> GetVps(uint32_t vps_id) const;
+  absl::optional<struct H265SpsParser::SpsState> GetSps(uint32_t sps_id) const;
+  absl::optional<struct H265PpsParser::PpsState> GetPps(uint32_t pps_id) const;
 };
 
 }  // namespace h265nal

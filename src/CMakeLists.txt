@@ -20,7 +20,7 @@ add_library(h265nal
     h265_rtp_single_parser.h h265_rtp_single_parser.cc
     h265_rtp_parser.h h265_rtp_parser.cc
     h265_slice_parser.h h265_slice_parser.cc
-    h265_bitstream_parser_state.h
+    h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
     h265_bitstream_parser.h h265_bitstream_parser.cc
     h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )
