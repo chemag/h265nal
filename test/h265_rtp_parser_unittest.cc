@@ -9,6 +9,7 @@
 #include <gmock/gmock.h>
 
 #include "h265_common.h"
+#include "h265_utils.h"
 #include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -149,6 +150,9 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
   auto &slice_segment_header =
       rtp_fu.nal_unit_payload.slice_segment_layer.slice_segment_header;
   EXPECT_EQ(13, slice_segment_header.slice_qp_delta);
+
+  EXPECT_EQ(47,
+            H265Utils::GetSliceQpY(*rtp_, &bitstream_parser_state));
 }
 
 }  // namespace h265nal

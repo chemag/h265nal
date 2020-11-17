@@ -139,8 +139,6 @@ TEST_F(H265RtpSingleParserTest, TestMultipleRtpPackets) {
       EXPECT_EQ(9, slice_header.slice_qp_delta);
       auto pps_id = slice_header.slice_pic_parameter_set_id;
       EXPECT_EQ(0, bitstream_parser_state.pps[pps_id].init_qp_minus26);
-      EXPECT_EQ(35,
-                H265Utils::GetSliceQpY(*rtp_single_, &bitstream_parser_state));
     }
 
     i += 1;
