@@ -8,6 +8,7 @@
 
 add_library(h265nal
     h265_common.h h265_common.cc
+    h265_utils.h h265_utils.cc
     h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
     h265_vps_parser.h h265_vps_parser.cc
     h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
