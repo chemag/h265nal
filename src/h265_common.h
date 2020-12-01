@@ -68,6 +68,9 @@ enum NalUnitType : uint8_t {
   FU = 49,
 };
 
+// Slice detector
+bool IsSliceSegment(uint32_t nal_unit_type);
+
 // Methods for parsing RBSP. See section 7.4.1 of the H265 spec.
 //
 // Decoding is simply a matter of finding any 00 00 03 sequence and removing

@@ -10,6 +10,32 @@
 
 namespace h265nal {
 
+bool IsSliceSegment(uint32_t nal_unit_type) {
+    // payload (Table 7-1, Section 7.4.2.2)
+  switch (nal_unit_type) {
+    case TRAIL_N:
+    case TRAIL_R:
+    case TSA_N:
+    case TSA_R:
+    case STSA_N:
+    case STSA_R:
+    case RADL_N:
+    case RADL_R:
+    case RASL_N:
+    case RASL_R:
+    case BLA_W_LP:
+    case BLA_W_RADL:
+    case BLA_N_LP:
+    case IDR_W_RADL:
+    case IDR_N_LP:
+    case CRA_NUT:
+      // slice_segment_layer_rbsp()
+      return true;
+      break;
+  }
+  return false;
+}
+
 std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length) {
   std::vector<uint8_t> out;
   out.reserve(length);

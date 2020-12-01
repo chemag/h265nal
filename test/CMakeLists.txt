@@ -16,6 +16,12 @@ add_executable(h265_profile_tier_level_parser_unittest h265_profile_tier_level_p
 add_test(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_unittest)
 #target_include_directories(h265_profile_tier_level_parser_unittest PUBLIC /usr/local/include ${CMAKE_CURRENT_SOURCE_DIR} webrtc)
 
+add_executable(h265_common_unittest h265_common_unittest.cc)
+add_test(h265_common_unittest h265_common_unittest)
+target_link_libraries(h265_common_unittest PUBLIC h265nal)
+target_link_libraries(h265_common_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
+target_link_libraries(h265_common_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
