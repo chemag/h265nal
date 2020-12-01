@@ -4,6 +4,7 @@
 
 
 #include "h265_bitstream_parser.h"
+#include "h265_bitstream_parser_state.h"
 
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -55,7 +56,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
       0xa1, 0x27, 0x35, 0xfb, 0xf3, 0xc7, 0xd4, 0x85,
       0x32, 0x37, 0x94, 0x09, 0xec, 0x10
   };
-  bitstream_ = H265BitstreamParser::ParseBitstream(buffer, arraysize(buffer));
+  // init the BitstreamParserState
+  H265BitstreamParserState bitstream_parser_state;
+
+  bitstream_ = H265BitstreamParser::ParseBitstream(
+      buffer, arraysize(buffer), &bitstream_parser_state);
   EXPECT_TRUE(bitstream_ != absl::nullopt);
 
   // check there are 4 NAL units

@@ -39,7 +39,9 @@ class H265BitstreamParser {
 
   // Unpack RBSP and parse bitstream state from the supplied buffer.
   static absl::optional<BitstreamState> ParseBitstream(
-      const uint8_t* data, size_t length);
+      const uint8_t* data, size_t length,
+      H265BitstreamParserState* bitstream_parser_state);
+
 
   struct NaluIndex {
     // Start index of NALU, including start sequence.

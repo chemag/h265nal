@@ -112,18 +112,22 @@ std::vector<uint8_t> buffer(size);
 
 // create bitstream parser
 absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+h265nal::H265BitstreamParserState bitstream_parser_state;
 
 // parse the file
 bitstream = h265nal::H265BitstreamParser::ParseBitstream(
-    buffer.data(), buffer.size());
+    buffer.data(), buffer.size(), &bitstream_parser_state);
 ```
 
 The `H265BitstreamParser::ParseBitstream()` function receives a generic
-binary string (`data` and `length`) that you read from the file. It then:
+binary string (`data` and `length`) that you read from the file, plus
+a `H265BitstreamParserState` object that keeps all the VPS/SPS/PPS it
+ever sees. It then:
 
 * (a) splits it into a vector of NAL units,
 * (b) parses each of the NAL units,
-* (c) adds the parsed NAL unit to a vector of parser NAL units.
+* (c) adds the parsed NAL unit to a vector of parser NAL units, and
+* (d) updates the input `H265BitstreamParserState` object if it sees any VPS/PPS/SPS.
 
 Note that, if the parsed NAL unit has state that needs to be used to parse
 other NAL units (VPS, SPS, PPS), it will be stored into the

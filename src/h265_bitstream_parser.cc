@@ -85,8 +85,11 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
 // the `bitstream` list (a `BitstreamState` object).
 // Function returns the said `bitstream` list.
 absl::optional<H265BitstreamParser::BitstreamState>
-H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
+H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
+    H265BitstreamParserState* bitstream_parser_state) {
   BitstreamState bitstream;
+  // start with the input parser state
+  bitstream.bitstream_parser_state = *bitstream_parser_state;
 
   // (1) split the input string into a vector of NAL units
   std::vector<NaluIndex> nalu_indices = FindNaluIndices(data, length);
@@ -106,6 +109,10 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length) {
       bitstream.nal_units.push_back(*nal_unit);
     }
   }
+
+  // copy the parser state to the output parameter
+  *bitstream_parser_state = bitstream.bitstream_parser_state;
+
   return OptionalBitstream(bitstream);
 }
 

@@ -213,10 +213,11 @@ int main(int argc, char **argv) {
 
   // create bitstream parser state
   absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+  h265nal::H265BitstreamParserState bitstream_parser_state;
 
   // parse the file
   bitstream = h265nal::H265BitstreamParser::ParseBitstream(
-      buffer.data(), buffer.size());
+      buffer.data(), buffer.size(), &bitstream_parser_state);
   if (bitstream == absl::nullopt) {
     // did not work
     fprintf(stderr, "Could not init h265 bitstream parser\n");
