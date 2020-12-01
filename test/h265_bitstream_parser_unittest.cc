@@ -10,6 +10,7 @@
 #include <gmock/gmock.h>
 
 #include "h265_common.h"
+#include "h265_utils.h"
 #include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -245,6 +246,37 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
       bitstream_->nal_units[0].nal_unit_header.nal_unit_type);
   EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.nuh_layer_id);
   EXPECT_EQ(1, bitstream_->nal_units[0].nal_unit_header.nuh_temporal_id_plus1);
+}
+
+TEST_F(H265BitstreamParserTest, TestMultipleBuffersGetSliceQpY) {
+  // init the BitstreamParserState
+  H265BitstreamParserState bitstream_parser_state;
+
+  std::vector<int32_t> slice_qp_y_vector;
+
+  // 0. parse buffer0
+  slice_qp_y_vector = H265Utils::GetSliceQpY(
+      buffer0, arraysize(buffer0), &bitstream_parser_state);
+  // check there is 1 QP_Y value
+  ASSERT_EQ(1, slice_qp_y_vector.size());
+  // check the value is right
+  EXPECT_EQ(35, slice_qp_y_vector[0]);
+
+  // 1. parse buffer1
+  slice_qp_y_vector = H265Utils::GetSliceQpY(
+      buffer1, arraysize(buffer1), &bitstream_parser_state);
+  // check there is 1 QP_Y value
+  ASSERT_EQ(1, slice_qp_y_vector.size());
+  // check the value is right
+  EXPECT_EQ(37, slice_qp_y_vector[0]);
+
+  // 2. parse buffer2
+  slice_qp_y_vector = H265Utils::GetSliceQpY(
+      buffer1, arraysize(buffer1), &bitstream_parser_state);
+  // check there is 1 QP_Y value
+  ASSERT_EQ(1, slice_qp_y_vector.size());
+  // check the value is right
+  EXPECT_EQ(37, slice_qp_y_vector[0]);
 }
 
 }  // namespace h265nal
