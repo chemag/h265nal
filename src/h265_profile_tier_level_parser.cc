@@ -4,6 +4,8 @@
 
 #include "h265_profile_tier_level_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -321,11 +323,11 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_14bit_constraint_flag: %i", max_14bit_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_33bits: %lu", reserved_zero_33bits);
+  fprintf(outfp, "reserved_zero_33bits: %" PRIu64 "", reserved_zero_33bits);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_34bits: %lu", reserved_zero_34bits);
+  fprintf(outfp, "reserved_zero_34bits: %" PRIu64 "", reserved_zero_34bits);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "reserved_zero_43bits: %lu", reserved_zero_43bits);
+  fprintf(outfp, "reserved_zero_43bits: %" PRIu64 "", reserved_zero_43bits);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "inbld_flag: %i", inbld_flag);
   fdump_indent_level(outfp, indent_level);

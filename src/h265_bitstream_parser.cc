@@ -41,8 +41,9 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
   // skip ahead to the next 3-byte sequence. 0s and 1s are relatively rare, so
   // this will skip the majority of reads/checks.
   std::vector<NaluIndex> sequences;
-  if (length < kNaluShortStartSequenceSize)
+  if (length < kNaluShortStartSequenceSize) {
     return sequences;
+  }
 
   const size_t end = length - kNaluShortStartSequenceSize;
   for (size_t i = 0; i < end;) {
