@@ -9,11 +9,9 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
-#include "rtc_base/bit_buffer.h"
-
 #include "h265_bitstream_parser_state.h"
 #include "h265_nal_unit_parser.h"
+#include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
 
@@ -42,7 +40,6 @@ class H265BitstreamParser {
       const uint8_t* data, size_t length,
       H265BitstreamParserState* bitstream_parser_state);
 
-
   struct NaluIndex {
     // Start index of NALU, including start sequence.
     size_t start_offset;
@@ -52,8 +49,8 @@ class H265BitstreamParser {
     size_t payload_size;
   };
   // Returns a vector of the NALU indices in the given buffer.
-  static std::vector<NaluIndex> FindNaluIndices(
-      const uint8_t* data, size_t length);
+  static std::vector<NaluIndex> FindNaluIndices(const uint8_t* data,
+                                                size_t length);
 };
 
 }  // namespace h265nal

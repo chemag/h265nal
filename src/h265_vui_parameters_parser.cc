@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_vui_parameters_parser.h"
 
 #include <stdio.h>
@@ -10,12 +9,12 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 
 namespace {
-typedef absl::optional<h265nal::H265VuiParametersParser::
-    VuiParametersState> OptionalVuiParameters;
+typedef absl::optional<h265nal::H265VuiParametersParser::VuiParametersState>
+    OptionalVuiParameters;
 }  // namespace
 
 namespace h265nal {
@@ -26,18 +25,15 @@ namespace h265nal {
 
 // Unpack RBSP and parse VUI Parameters state from the supplied buffer.
 absl::optional<H265VuiParametersParser::VuiParametersState>
-H265VuiParametersParser::ParseVuiParameters(
-    const uint8_t* data, size_t length) {
-
+H265VuiParametersParser::ParseVuiParameters(const uint8_t* data,
+                                            size_t length) {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseVuiParameters(&bit_buffer);
 }
 
-
 absl::optional<H265VuiParametersParser::VuiParametersState>
-H265VuiParametersParser::ParseVuiParameters(
-    rtc::BitBuffer* bit_buffer) {
+H265VuiParametersParser::ParseVuiParameters(rtc::BitBuffer* bit_buffer) {
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for
   // a complete description.
@@ -118,12 +114,12 @@ H265VuiParametersParser::ParseVuiParameters(
   if (vui.chroma_loc_info_present_flag) {
     // chroma_sample_loc_type_top_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(vui.chroma_sample_loc_type_top_field))) {
+            &(vui.chroma_sample_loc_type_top_field))) {
       return absl::nullopt;
     }
     // chroma_sample_loc_type_bottom_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(vui.chroma_sample_loc_type_bottom_field))) {
+            &(vui.chroma_sample_loc_type_bottom_field))) {
       return absl::nullopt;
     }
   }
@@ -186,7 +182,7 @@ H265VuiParametersParser::ParseVuiParameters(
     if (vui.vui_poc_proportional_to_timing_flag) {
       // vui_num_ticks_poc_diff_one_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-          &(vui.vui_num_ticks_poc_diff_one_minus1))) {
+              &(vui.vui_num_ticks_poc_diff_one_minus1))) {
         return absl::nullopt;
       }
     }
@@ -212,8 +208,8 @@ H265VuiParametersParser::ParseVuiParameters(
       return absl::nullopt;
     }
     // motion_vectors_over_pic_boundaries_flag  u(1)
-    if (!bit_buffer->ReadBits(
-        &(vui.motion_vectors_over_pic_boundaries_flag), 1)) {
+    if (!bit_buffer->ReadBits(&(vui.motion_vectors_over_pic_boundaries_flag),
+                              1)) {
       return absl::nullopt;
     }
     // restricted_ref_pic_lists_flag  u(1)
@@ -222,7 +218,7 @@ H265VuiParametersParser::ParseVuiParameters(
     }
     // min_spatial_segmentation_idc  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(vui.min_spatial_segmentation_idc))) {
+            &(vui.min_spatial_segmentation_idc))) {
       return absl::nullopt;
     }
     // max_bytes_per_pic_denom  ue(v)
@@ -235,12 +231,12 @@ H265VuiParametersParser::ParseVuiParameters(
     }
     // log2_max_mv_length_horizontal  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(vui.log2_max_mv_length_horizontal))) {
+            &(vui.log2_max_mv_length_horizontal))) {
       return absl::nullopt;
     }
     // log2_max_mv_length_vertical  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(vui.log2_max_mv_length_vertical))) {
+            &(vui.log2_max_mv_length_vertical))) {
       return absl::nullopt;
     }
   }
@@ -260,10 +256,10 @@ void H265VuiParametersParser::VuiParametersState::fdump(
     fprintf(outfp, "aspect_ratio_idc: %i", aspect_ratio_idc);
     fdump_indent_level(outfp, indent_level);
     if (aspect_ratio_idc == AR_EXTENDED_SAR) {
-    fprintf(outfp, "sar_width: %i", sar_width);
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sar_height: %i", sar_height);
-    fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "sar_width: %i", sar_width);
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "sar_height: %i", sar_height);
+      fdump_indent_level(outfp, indent_level);
     }
   }
   fprintf(outfp, "overscan_info_present_flag: %i", overscan_info_present_flag);

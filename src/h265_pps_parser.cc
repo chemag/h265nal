@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_pps_parser.h"
 
 #include <stdio.h>
@@ -10,18 +9,18 @@
 #include <cstdint>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_vui_parameters_parser.h"
-#include "absl/types/optional.h"
 
 namespace {
-typedef absl::optional<h265nal::H265ProfileTierLevelParser::
-    ProfileTierLevelState> OptionalProfileTierLevel;
-typedef absl::optional<h265nal::H265VuiParametersParser::
-    VuiParametersState> OptionalVuiParameters;
-typedef absl::optional<h265nal::H265PpsParser::
-    PpsState> OptionalPps;
+typedef absl::optional<
+    h265nal::H265ProfileTierLevelParser::ProfileTierLevelState>
+    OptionalProfileTierLevel;
+typedef absl::optional<h265nal::H265VuiParametersParser::VuiParametersState>
+    OptionalVuiParameters;
+typedef absl::optional<h265nal::H265PpsParser::PpsState> OptionalPps;
 }  // namespace
 
 namespace h265nal {
@@ -33,12 +32,10 @@ namespace h265nal {
 // Unpack RBSP and parse PPS state from the supplied buffer.
 absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     const uint8_t* data, size_t length) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParsePps(&bit_buffer);
 }
-
 
 absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     rtc::BitBuffer* bit_buffer) {
@@ -86,13 +83,13 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   // num_ref_idx_l0_default_active_minus1  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(pps.num_ref_idx_l0_default_active_minus1))) {
+          &(pps.num_ref_idx_l0_default_active_minus1))) {
     return absl::nullopt;
   }
 
   // num_ref_idx_l1_default_active_minus1  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(pps.num_ref_idx_l1_default_active_minus1))) {
+          &(pps.num_ref_idx_l1_default_active_minus1))) {
     return absl::nullopt;
   }
 
@@ -134,8 +131,8 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   }
 
   // pps_slice_chroma_qp_offsets_present_flag  u(1)
-  if (!bit_buffer->ReadBits(
-      &(pps.pps_slice_chroma_qp_offsets_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(&(pps.pps_slice_chroma_qp_offsets_present_flag),
+                            1)) {
     return absl::nullopt;
   }
 
@@ -196,15 +193,15 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     }
 
     // loop_filter_across_tiles_enabled_flag u(1)
-    if (!bit_buffer->ReadBits(
-        &(pps.loop_filter_across_tiles_enabled_flag), 1)) {
+    if (!bit_buffer->ReadBits(&(pps.loop_filter_across_tiles_enabled_flag),
+                              1)) {
       return absl::nullopt;
     }
   }
 
   // pps_loop_filter_across_slices_enabled_flag u(1)
-  if (!bit_buffer->ReadBits(
-      &(pps.pps_loop_filter_across_slices_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(&(pps.pps_loop_filter_across_slices_enabled_flag),
+                            1)) {
     return absl::nullopt;
   }
 
@@ -215,8 +212,8 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   if (pps.deblocking_filter_control_present_flag) {
     // deblocking_filter_override_enabled_flag u(1)
-    if (!bit_buffer->ReadBits(
-        &(pps.deblocking_filter_override_enabled_flag), 1)) {
+    if (!bit_buffer->ReadBits(&(pps.deblocking_filter_override_enabled_flag),
+                              1)) {
       return absl::nullopt;
     }
 
@@ -228,7 +225,7 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     if (!pps.pps_deblocking_filter_disabled_flag) {
       // pps_beta_offset_div2  se(v)
       if (!bit_buffer->ReadSignedExponentialGolomb(
-          &(pps.pps_beta_offset_div2))) {
+              &(pps.pps_beta_offset_div2))) {
         return absl::nullopt;
       }
 
@@ -258,13 +255,13 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   // log2_parallel_merge_level_minus2  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(pps.log2_parallel_merge_level_minus2))) {
+          &(pps.log2_parallel_merge_level_minus2))) {
     return absl::nullopt;
   }
 
   // slice_segment_header_extension_present_flag  u(1)
-  if (!bit_buffer->ReadBits(
-      &(pps.slice_segment_header_extension_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(&(pps.slice_segment_header_extension_present_flag),
+                            1)) {
     return absl::nullopt;
   }
 
@@ -434,7 +431,6 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "uniform_spacing_flag: %i", uniform_spacing_flag);
 
-
     if (!uniform_spacing_flag) {
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "column_width_minus1 {");
@@ -467,11 +463,11 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   if (deblocking_filter_control_present_flag) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "deblocking_filter_override_enabled_flag: %i",
-          deblocking_filter_override_enabled_flag);
+            deblocking_filter_override_enabled_flag);
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "pps_deblocking_filter_disabled_flag: %i",
-          pps_deblocking_filter_disabled_flag);
+            pps_deblocking_filter_disabled_flag);
 
     if (!pps_deblocking_filter_disabled_flag) {
       fdump_indent_level(outfp, indent_level);
@@ -505,8 +501,7 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
           slice_segment_header_extension_present_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "pps_extension_present_flag: %i",
-          pps_extension_present_flag);
+  fprintf(outfp, "pps_extension_present_flag: %i", pps_extension_present_flag);
 
   if (pps_extension_present_flag) {
     fdump_indent_level(outfp, indent_level);
@@ -535,8 +530,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   if (pps_multilayer_extension_flag) {
     // pps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for pps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented pps_multilayer_extension_flag() in "
-            "pps\n");
+    fprintf(stderr,
+            "error: unimplemented pps_multilayer_extension_flag() in pps\n");
   }
 
   if (pps_3d_extension_flag) {

@@ -2,29 +2,28 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_sps_parser.h"
 
 #include <stdio.h>
 
-#include <cstdint>
 #include <cmath>
+#include <cstdint>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_vui_parameters_parser.h"
-#include "absl/types/optional.h"
 
 namespace {
-typedef absl::optional<h265nal::H265ProfileTierLevelParser::
-    ProfileTierLevelState> OptionalProfileTierLevel;
-typedef absl::optional<h265nal::H265StRefPicSetParser::
-    StRefPicSetState> OptionalStRefPicSet;
-typedef absl::optional<h265nal::H265VuiParametersParser::
-    VuiParametersState> OptionalVuiParameters;
-typedef absl::optional<h265nal::H265SpsParser::
-    SpsState> OptionalSps;
+typedef absl::optional<
+    h265nal::H265ProfileTierLevelParser::ProfileTierLevelState>
+    OptionalProfileTierLevel;
+typedef absl::optional<h265nal::H265StRefPicSetParser::StRefPicSetState>
+    OptionalStRefPicSet;
+typedef absl::optional<h265nal::H265VuiParametersParser::VuiParametersState>
+    OptionalVuiParameters;
+typedef absl::optional<h265nal::H265SpsParser::SpsState> OptionalSps;
 }  // namespace
 
 namespace h265nal {
@@ -36,12 +35,10 @@ namespace h265nal {
 // Unpack RBSP and parse SPS state from the supplied buffer.
 absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     const uint8_t* data, size_t length) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSps(&bit_buffer);
 }
-
 
 absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     rtc::BitBuffer* bit_buffer) {
@@ -104,7 +101,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   // conformance_window_flag  u(1)
   if (!bit_buffer->ReadBits(&(sps.conformance_window_flag), 1)) {
-     return absl::nullopt;
+    return absl::nullopt;
   }
 
   if (sps.conformance_window_flag) {
@@ -136,17 +133,18 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   }
   // log2_max_pic_order_cnt_lsb_minus4  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.log2_max_pic_order_cnt_lsb_minus4))) {
+          &(sps.log2_max_pic_order_cnt_lsb_minus4))) {
     return absl::nullopt;
   }
   // sps_sub_layer_ordering_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(
-      &(sps.sps_sub_layer_ordering_info_present_flag), 1)) {
-     return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(sps.sps_sub_layer_ordering_info_present_flag),
+                            1)) {
+    return absl::nullopt;
   }
 
-  for (uint32_t i = (sps.sps_sub_layer_ordering_info_present_flag ? 0 :
-                sps.sps_max_sub_layers_minus1);
+  for (uint32_t i = (sps.sps_sub_layer_ordering_info_present_flag
+                         ? 0
+                         : sps.sps_max_sub_layers_minus1);
        i <= sps.sps_max_sub_layers_minus1; i++) {
     // sps_max_dec_pic_buffering_minus1[i]  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
@@ -167,49 +165,48 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   // log2_min_luma_coding_block_size_minus3  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.log2_min_luma_coding_block_size_minus3))) {
+          &(sps.log2_min_luma_coding_block_size_minus3))) {
     return absl::nullopt;
   }
 
   // log2_diff_max_min_luma_coding_block_size  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.log2_diff_max_min_luma_coding_block_size))) {
+          &(sps.log2_diff_max_min_luma_coding_block_size))) {
     return absl::nullopt;
   }
 
   // log2_min_luma_transform_block_size_minus2  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.log2_min_luma_transform_block_size_minus2))) {
+          &(sps.log2_min_luma_transform_block_size_minus2))) {
     return absl::nullopt;
   }
 
   // log2_diff_max_min_luma_transform_block_size  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.log2_diff_max_min_luma_transform_block_size))) {
+          &(sps.log2_diff_max_min_luma_transform_block_size))) {
     return absl::nullopt;
   }
 
   // max_transform_hierarchy_depth_inter  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.max_transform_hierarchy_depth_inter))) {
+          &(sps.max_transform_hierarchy_depth_inter))) {
     return absl::nullopt;
   }
 
   // max_transform_hierarchy_depth_intra  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-      &(sps.max_transform_hierarchy_depth_intra))) {
+          &(sps.max_transform_hierarchy_depth_intra))) {
     return absl::nullopt;
   }
 
   // scaling_list_enabled_flag  u(1)
   if (!bit_buffer->ReadBits(&(sps.scaling_list_enabled_flag), 1)) {
-     return absl::nullopt;
+    return absl::nullopt;
   }
 
   if (sps.scaling_list_enabled_flag) {
     // sps_scaling_list_data_present_flag  u(1)
-    if (!bit_buffer->ReadBits(
-        &(sps.sps_scaling_list_data_present_flag), 1)) {
+    if (!bit_buffer->ReadBits(&(sps.sps_scaling_list_data_present_flag), 1)) {
       return absl::nullopt;
     }
     if (sps.sps_scaling_list_data_present_flag) {
@@ -248,13 +245,13 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
     // log2_min_pcm_luma_coding_block_size_minus3  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(sps.log2_min_pcm_luma_coding_block_size_minus3))) {
+            &(sps.log2_min_pcm_luma_coding_block_size_minus3))) {
       return absl::nullopt;
     }
 
     // log2_diff_max_min_pcm_luma_coding_block_size  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(sps.log2_diff_max_min_pcm_luma_coding_block_size))) {
+            &(sps.log2_diff_max_min_pcm_luma_coding_block_size))) {
       return absl::nullopt;
     }
 
@@ -293,7 +290,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     for (uint32_t i = 0; i < sps.num_long_term_ref_pics_sps; i++) {
       // lt_ref_pic_poc_lsb_sps[i] u(v)  log2_max_pic_order_cnt_lsb_minus4 + 4
       if (!bit_buffer->ReadBits(&bits_tmp,
-          sps.log2_max_pic_order_cnt_lsb_minus4 + 4)) {
+                                sps.log2_max_pic_order_cnt_lsb_minus4 + 4)) {
         return absl::nullopt;
       }
       sps.lt_ref_pic_poc_lsb_sps.push_back(bits_tmp);
@@ -515,8 +512,7 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
           max_transform_hierarchy_depth_intra);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "scaling_list_enabled_flag: %i",
-          scaling_list_enabled_flag);
+  fprintf(outfp, "scaling_list_enabled_flag: %i", scaling_list_enabled_flag);
 
   if (scaling_list_enabled_flag) {
     fdump_indent_level(outfp, indent_level);
@@ -613,8 +609,7 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   }
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "sps_extension_present_flag: %i",
-          sps_extension_present_flag);
+  fprintf(outfp, "sps_extension_present_flag: %i", sps_extension_present_flag);
 
   if (sps_extension_present_flag) {
     fdump_indent_level(outfp, indent_level);
@@ -643,7 +638,8 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   if (sps_multilayer_extension_flag) {
     // sps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for sps_multilayer_extension()
-    fprintf(stderr, "error: unimplemented sps_multilayer_extension_flag() in "
+    fprintf(stderr,
+            "error: unimplemented sps_multilayer_extension_flag() in "
             "sps\n");
   }
 
@@ -669,8 +665,8 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   // Equation (7-10)
   uint32_t MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
   // Equation (7-11)
-  uint32_t CtbLog2SizeY = MinCbLog2SizeY +
-      log2_diff_max_min_luma_coding_block_size;
+  uint32_t CtbLog2SizeY =
+      MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
   // Equation (7-12)
   // uint32_t MinCbSizeY = 1 << MinCbLog2SizeY;
   // Equation (7-13)
@@ -678,13 +674,13 @@ uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   // Equation (7-14)
   // uint32_t PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY;
   // Equation (7-15)
-  uint32_t PicWidthInCtbsY = static_cast<uint32_t>(std::ceil(
-      pic_width_in_luma_samples / CtbSizeY));
+  uint32_t PicWidthInCtbsY =
+      static_cast<uint32_t>(std::ceil(pic_width_in_luma_samples / CtbSizeY));
   // Equation (7-16)
   // uint32_t PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY;
   // Equation (7-17)
-  uint32_t PicHeightInCtbsY = static_cast<uint32_t>(std::ceil(
-      pic_height_in_luma_samples / CtbSizeY));
+  uint32_t PicHeightInCtbsY =
+      static_cast<uint32_t>(std::ceil(pic_height_in_luma_samples / CtbSizeY));
   // Equation (7-18)
   // uint32_t PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY;
   // Equation (7-19)

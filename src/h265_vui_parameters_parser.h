@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {

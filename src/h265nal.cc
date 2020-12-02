@@ -2,22 +2,20 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <getopt.h>
 
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
+#include "absl/types/optional.h"
 #include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
-#include "absl/types/optional.h"
 #include "rtc_base/bit_buffer.h"
-
 
 extern int optind;
 
@@ -34,9 +32,8 @@ typedef struct arg_options {
   char *infile;
   char *outfile;
   int nrem;
-  char** rem;
+  char **rem;
 } arg_options;
-
 
 void usage(char *name) {
   fprintf(stderr, "usage: %s [options]\n", name);
@@ -54,7 +51,6 @@ void usage(char *name) {
   exit(-1);
 }
 
-
 // long options with no equivalent short option
 enum {
   QUIET_OPTION = CHAR_MAX + 1,
@@ -67,8 +63,7 @@ enum {
   VERSION_OPTION
 };
 
-
-arg_options *parse_args(int argc, char** argv) {
+arg_options *parse_args(int argc, char **argv) {
   int c;
   char *endptr;
   static arg_options options;
@@ -86,19 +81,18 @@ arg_options *parse_args(int argc, char** argv) {
 
   // long options
   static struct option longopts[] = {
-    // matching options to short options
-    {"debug", no_argument, NULL, 'd'},
-    // options without a short option
-    {"quiet", no_argument, NULL, QUIET_OPTION},
-    {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
-    {"noas-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
-    {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
-    {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
-    {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
-    {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
-    {"version", no_argument, NULL, VERSION_OPTION},
-    {NULL, 0, NULL, 0}
-  };
+      // matching options to short options
+      {"debug", no_argument, NULL, 'd'},
+      // options without a short option
+      {"quiet", no_argument, NULL, QUIET_OPTION},
+      {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
+      {"noas-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
+      {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
+      {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
+      {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
+      {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
+      {"version", no_argument, NULL, VERSION_OPTION},
+      {NULL, 0, NULL, 0}};
 
   // parse arguments
   while ((c = getopt_long(argc, argv, "d", longopts, &optindex)) != -1) {
@@ -172,7 +166,6 @@ arg_options *parse_args(int argc, char** argv) {
   return &options;
 }
 
-
 int main(int argc, char **argv) {
   arg_options *options;
 
@@ -198,7 +191,7 @@ int main(int argc, char **argv) {
 
   // read infile
   // TODO(chemag): read the infile incrementally
-  FILE* infp = fopen(options->infile, "rb");
+  FILE *infp = fopen(options->infile, "rb");
   if (infp == nullptr) {
     // did not work
     fprintf(stderr, "Could not open input file: \"%s\"\n", options->infile);
@@ -227,7 +220,7 @@ int main(int argc, char **argv) {
   bitstream->add_length = options->add_length;
 
   // get outfile file descriptor
-  FILE* outfp;
+  FILE *outfp;
   if (options->outfile == nullptr ||
       (strlen(options->outfile) == 1 && options->outfile[0] == '-')) {
     // use stdout

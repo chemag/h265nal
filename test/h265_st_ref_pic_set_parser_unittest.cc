@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_st_ref_pic_set_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -25,12 +24,10 @@ class H265StRefPicSetParserTest : public ::testing::Test {
 
 TEST_F(H265StRefPicSetParserTest, TestSampleStRefPicSet) {
   // st_ref_pic_set
-  const uint8_t buffer[] = {
-      0x5d
-  };
+  const uint8_t buffer[] = {0x5d};
 
-  st_ref_pic_set_ = H265StRefPicSetParser::ParseStRefPicSet(
-      buffer, arraysize(buffer), 0, 1);
+  st_ref_pic_set_ =
+      H265StRefPicSetParser::ParseStRefPicSet(buffer, arraysize(buffer), 0, 1);
   EXPECT_TRUE(st_ref_pic_set_ != absl::nullopt);
 
   EXPECT_EQ(1, st_ref_pic_set_->num_negative_pics);

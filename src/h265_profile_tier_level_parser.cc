@@ -9,14 +9,15 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 
 namespace {
 typedef absl::optional<h265nal::H265ProfileInfoParser::ProfileInfoState>
     OptionalProfileInfo;
-typedef absl::optional<h265nal::H265ProfileTierLevelParser::
-    ProfileTierLevelState> OptionalProfileTierLevel;
+typedef absl::optional<
+    h265nal::H265ProfileTierLevelParser::ProfileTierLevelState>
+    OptionalProfileTierLevel;
 }  // namespace
 
 namespace h265nal {
@@ -30,7 +31,6 @@ absl::optional<H265ProfileTierLevelParser::ProfileTierLevelState>
 H265ProfileTierLevelParser::ParseProfileTierLevel(
     const uint8_t* data, size_t length, const bool profilePresentFlag,
     const unsigned int maxNumSubLayersMinus1) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
@@ -54,8 +54,8 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   profile_tier_level.maxNumSubLayersMinus1 = maxNumSubLayersMinus1;
 
   if (profilePresentFlag) {
-    OptionalProfileInfo profile_info = H265ProfileInfoParser::ParseProfileInfo(
-        bit_buffer);
+    OptionalProfileInfo profile_info =
+        H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
     if (profile_info != absl::nullopt) {
       profile_tier_level.general = *profile_info;
     }
@@ -107,14 +107,12 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   return OptionalProfileTierLevel(profile_tier_level);
 }
 
-
 absl::optional<H265ProfileInfoParser::ProfileInfoState>
 H265ProfileInfoParser::ParseProfileInfo(const uint8_t* data, size_t length) {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseProfileInfo(&bit_buffer);
 }
-
 
 absl::optional<H265ProfileInfoParser::ProfileInfoState>
 H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
@@ -244,18 +242,17 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
   } else {
     // reserved_zero_43bits  u(43)
     if (!bit_buffer->ReadBits(&bits_tmp_hi, 11)) {
-        return absl::nullopt;
-      }
+      return absl::nullopt;
+    }
     if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
-        return absl::nullopt;
-      }
+      return absl::nullopt;
+    }
     profile_info.reserved_zero_43bits =
         ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
   }
   // The number of bits in this syntax structure is not affected by
   // this condition
-  if ((profile_info.profile_idc >= 1 &&
-       profile_info.profile_idc <= 5) ||
+  if ((profile_info.profile_idc >= 1 && profile_info.profile_idc <= 5) ||
       profile_info.profile_idc == 9 ||
       profile_info.profile_compatibility_flag[1] == 1 ||
       profile_info.profile_compatibility_flag[2] == 1 ||
@@ -277,8 +274,8 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
   return OptionalProfileInfo(profile_info);
 }
 
-void H265ProfileInfoParser::ProfileInfoState::fdump(
-    FILE* outfp, int indent_level) const {
+void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
+                                                    int indent_level) const {
   fprintf(outfp, "profile_space: %i", profile_space);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "tier_flag: %i", tier_flag);
@@ -295,20 +292,15 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "interlaced_source_flag: %i", interlaced_source_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "non_packed_constraint_flag: %i",
-          non_packed_constraint_flag);
+  fprintf(outfp, "non_packed_constraint_flag: %i", non_packed_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "frame_only_constraint_flag: %i",
-          frame_only_constraint_flag);
+  fprintf(outfp, "frame_only_constraint_flag: %i", frame_only_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "max_12bit_constraint_flag: %i",
-          max_12bit_constraint_flag);
+  fprintf(outfp, "max_12bit_constraint_flag: %i", max_12bit_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "max_10bit_constraint_flag: %i",
-          max_10bit_constraint_flag);
+  fprintf(outfp, "max_10bit_constraint_flag: %i", max_10bit_constraint_flag);
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "max_8bit_constraint_flag: %i",
-          max_8bit_constraint_flag);
+  fprintf(outfp, "max_8bit_constraint_flag: %i", max_8bit_constraint_flag);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_422chroma_constraint_flag: %i",
           max_422chroma_constraint_flag);

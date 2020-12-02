@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_st_ref_pic_set_parser.h"
 
 #include <stdio.h>
@@ -10,12 +9,12 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 
 namespace {
-typedef absl::optional<h265nal::H265StRefPicSetParser::
-    StRefPicSetState> OptionalStRefPicSet;
+typedef absl::optional<h265nal::H265StRefPicSetParser::StRefPicSetState>
+    OptionalStRefPicSet;
 }  // namespace
 
 namespace h265nal {
@@ -26,20 +25,18 @@ namespace h265nal {
 
 // Unpack RBSP and parse st_ref_pic_set state from the supplied buffer.
 absl::optional<H265StRefPicSetParser::StRefPicSetState>
-H265StRefPicSetParser::ParseStRefPicSet(
-    const uint8_t* data, size_t length,
-    uint32_t stRpsIdx, uint32_t num_short_term_ref_pic_sets) {
-
+H265StRefPicSetParser::ParseStRefPicSet(const uint8_t* data, size_t length,
+                                        uint32_t stRpsIdx,
+                                        uint32_t num_short_term_ref_pic_sets) {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseStRefPicSet(&bit_buffer, stRpsIdx, num_short_term_ref_pic_sets);
 }
 
-
 absl::optional<H265StRefPicSetParser::StRefPicSetState>
-H265StRefPicSetParser::ParseStRefPicSet(
-    rtc::BitBuffer* bit_buffer,
-    uint32_t stRpsIdx, uint32_t num_short_term_ref_pic_sets) {
+H265StRefPicSetParser::ParseStRefPicSet(rtc::BitBuffer* bit_buffer,
+                                        uint32_t stRpsIdx,
+                                        uint32_t num_short_term_ref_pic_sets) {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
@@ -54,7 +51,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
   if (stRpsIdx != 0) {
     // inter_ref_pic_set_prediction_flag  u(1)
     if (!bit_buffer->ReadBits(
-        &(st_ref_pic_set.inter_ref_pic_set_prediction_flag), 1)) {
+            &(st_ref_pic_set.inter_ref_pic_set_prediction_flag), 1)) {
       return absl::nullopt;
     }
   }
@@ -63,7 +60,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
     if (stRpsIdx == num_short_term_ref_pic_sets) {
       // delta_idx_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-          &(st_ref_pic_set.delta_idx_minus1))) {
+              &(st_ref_pic_set.delta_idx_minus1))) {
         return absl::nullopt;
       }
 
@@ -74,7 +71,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
       // abs_delta_rps_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-          &(st_ref_pic_set.abs_delta_rps_minus1))) {
+              &(st_ref_pic_set.abs_delta_rps_minus1))) {
         return absl::nullopt;
       }
 
@@ -98,13 +95,13 @@ H265StRefPicSetParser::ParseStRefPicSet(
   } else {
     // num_negative_pics  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(st_ref_pic_set.num_negative_pics))) {
+            &(st_ref_pic_set.num_negative_pics))) {
       return absl::nullopt;
     }
 
     // num_positive_pics  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-        &(st_ref_pic_set.num_positive_pics))) {
+            &(st_ref_pic_set.num_positive_pics))) {
       return absl::nullopt;
     }
 
@@ -140,8 +137,8 @@ H265StRefPicSetParser::ParseStRefPicSet(
   return OptionalStRefPicSet(st_ref_pic_set);
 }
 
-void H265StRefPicSetParser::StRefPicSetState::fdump(
-    FILE* outfp, int indent_level) const {
+void H265StRefPicSetParser::StRefPicSetState::fdump(FILE* outfp,
+                                                    int indent_level) const {
   fprintf(outfp, "st_ref_pic_set {");
   indent_level = indent_level_incr(indent_level);
 

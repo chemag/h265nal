@@ -2,17 +2,16 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_single_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_utils.h"
-#include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -32,9 +31,8 @@ TEST_F(H265RtpSingleParserTest, TestSampleVps) {
                             0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
                             0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
   H265BitstreamParserState bitstream_parser_state;
-  rtp_single_ = H265RtpSingleParser::ParseRtpSingle(
-      buffer, arraysize(buffer),
-      &bitstream_parser_state);
+  rtp_single_ = H265RtpSingleParser::ParseRtpSingle(buffer, arraysize(buffer),
+                                                    &bitstream_parser_state);
   EXPECT_TRUE(rtp_single_ != absl::nullopt);
 
   // check the header
@@ -83,10 +81,9 @@ TEST_F(H265RtpSingleParserTest, TestMultipleRtpPackets) {
   H265BitstreamParserState bitstream_parser_state;
   // parse packets one-by-one
   int i = 0;
-  for (const auto& buffer : vbuffer) {
+  for (const auto &buffer : vbuffer) {
     rtp_single_ = H265RtpSingleParser::ParseRtpSingle(
-        buffer.data(), buffer.size(),
-        &bitstream_parser_state);
+        buffer.data(), buffer.size(), &bitstream_parser_state);
     EXPECT_TRUE(rtp_single_ != absl::nullopt);
 
     // check the header

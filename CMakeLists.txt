@@ -10,7 +10,7 @@ project(h265nal VERSION 0.7)
 set(CMAKE_CXX_STANDARD 11)
 
 # set up clang-tidy
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-format-style='file'")
+set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-format-style='google'")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 enable_testing()

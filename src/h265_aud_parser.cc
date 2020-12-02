@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_aud_parser.h"
 
 #include <stdio.h>
@@ -10,12 +9,11 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 
 namespace {
-typedef absl::optional<h265nal::H265AudParser::
-    AudState> OptionalAud;
+typedef absl::optional<h265nal::H265AudParser::AudState> OptionalAud;
 }  // namespace
 
 namespace h265nal {
@@ -27,12 +25,10 @@ namespace h265nal {
 // Unpack RBSP and parse AUD state from the supplied buffer.
 absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
     const uint8_t* data, size_t length) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseAud(&bit_buffer);
 }
-
 
 absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
     rtc::BitBuffer* bit_buffer) {

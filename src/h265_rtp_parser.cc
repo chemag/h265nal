@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_parser.h"
 
 #include <stdio.h>
@@ -10,23 +9,20 @@
 #include <cstdint>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
-#include "absl/types/optional.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::
-    NalUnitHeaderState> OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::
-    NalUnitPayloadState> OptionalNalUnitPayload;
-typedef absl::optional<h265nal::H265RtpParser::
-    RtpState> OptionalRtp;
-typedef absl::optional<h265nal::H265RtpSingleParser::
-    RtpSingleState> OptionalRtpSingle;
-typedef absl::optional<h265nal::H265RtpApParser::
-    RtpApState> OptionalRtpAp;
-typedef absl::optional<h265nal::H265RtpFuParser::
-    RtpFuState> OptionalRtpFu;
+typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
+    OptionalNalUnitHeader;
+typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
+    OptionalNalUnitPayload;
+typedef absl::optional<h265nal::H265RtpParser::RtpState> OptionalRtp;
+typedef absl::optional<h265nal::H265RtpSingleParser::RtpSingleState>
+    OptionalRtpSingle;
+typedef absl::optional<h265nal::H265RtpApParser::RtpApState> OptionalRtpAp;
+typedef absl::optional<h265nal::H265RtpFuParser::RtpFuState> OptionalRtpFu;
 }  // namespace
 
 namespace h265nal {
@@ -36,18 +32,15 @@ namespace h265nal {
 // https://tools.ietf.org/html/rfc7798#section-4.4.1
 
 // Unpack RBSP and parse RTP NAL Unit state from the supplied buffer.
-absl::optional<H265RtpParser::RtpState>
-H265RtpParser::ParseRtp(
+absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseRtp(&bit_buffer, bitstream_parser_state);
 }
 
-absl::optional<H265RtpParser::RtpState>
-H265RtpParser::ParseRtp(
+absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
     rtc::BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state) {
   // H265 RTP NAL Unit pseudo-NAL Unit.
@@ -64,9 +57,7 @@ H265RtpParser::ParseRtp(
   if (rtp.nal_unit_header.nal_unit_type <= 47) {
     // rtp_single()
     OptionalRtpSingle rtp_single =
-        H265RtpSingleParser::ParseRtpSingle(
-            bit_buffer,
-            bitstream_parser_state);
+        H265RtpSingleParser::ParseRtpSingle(bit_buffer, bitstream_parser_state);
     if (rtp_single != absl::nullopt) {
       rtp.rtp_single = *rtp_single;
     }
@@ -74,9 +65,7 @@ H265RtpParser::ParseRtp(
   } else if (rtp.nal_unit_header.nal_unit_type == AP) {
     // rtp_ap()
     OptionalRtpAp rtp_ap =
-        H265RtpApParser::ParseRtpAp(
-            bit_buffer,
-            bitstream_parser_state);
+        H265RtpApParser::ParseRtpAp(bit_buffer, bitstream_parser_state);
     if (rtp_ap != absl::nullopt) {
       rtp.rtp_ap = *rtp_ap;
     }
@@ -84,9 +73,7 @@ H265RtpParser::ParseRtp(
   } else if (rtp.nal_unit_header.nal_unit_type == FU) {
     // rtp_fu()
     OptionalRtpFu rtp_fu =
-        H265RtpFuParser::ParseRtpFu(
-            bit_buffer,
-            bitstream_parser_state);
+        H265RtpFuParser::ParseRtpFu(bit_buffer, bitstream_parser_state);
     if (rtp_fu != absl::nullopt) {
       rtp.rtp_fu = *rtp_fu;
     }
@@ -95,8 +82,7 @@ H265RtpParser::ParseRtp(
   return OptionalRtp(rtp);
 }
 
-void H265RtpParser::RtpState::fdump(
-    FILE* outfp, int indent_level) const {
+void H265RtpParser::RtpState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "rtp {");
   indent_level = indent_level_incr(indent_level);
 

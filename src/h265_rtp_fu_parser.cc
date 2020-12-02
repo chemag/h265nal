@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_fu_parser.h"
 
 #include <stdio.h>
@@ -10,18 +9,17 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
-#include "h265_bitstream_parser_state.h"
-#include "h265_nal_unit_parser.h"
 #include "absl/types/optional.h"
+#include "h265_bitstream_parser_state.h"
+#include "h265_common.h"
+#include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::
-    NalUnitHeaderState> OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::
-    NalUnitPayloadState> OptionalNalUnitPayload;
-typedef absl::optional<h265nal::H265RtpFuParser::
-    RtpFuState> OptionalRtpFu;
+typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
+    OptionalNalUnitHeader;
+typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
+    OptionalNalUnitPayload;
+typedef absl::optional<h265nal::H265RtpFuParser::RtpFuState> OptionalRtpFu;
 }  // namespace
 
 namespace h265nal {
@@ -34,12 +32,10 @@ namespace h265nal {
 absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseRtpFu(&bit_buffer, bitstream_parser_state);
 }
-
 
 absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
     rtc::BitBuffer* bit_buffer,
@@ -72,8 +68,8 @@ absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
 
   // start of a fragmented NAL: keep reading
   OptionalNalUnitPayload nal_unit_payload =
-      H265NalUnitPayloadParser::ParseNalUnitPayload(
-      bit_buffer, rtp_fu.fu_type, bitstream_parser_state);
+      H265NalUnitPayloadParser::ParseNalUnitPayload(bit_buffer, rtp_fu.fu_type,
+                                                    bitstream_parser_state);
   if (nal_unit_payload != absl::nullopt) {
     rtp_fu.nal_unit_payload = *nal_unit_payload;
   }

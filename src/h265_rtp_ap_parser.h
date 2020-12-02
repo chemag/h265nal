@@ -9,10 +9,8 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
-#include "rtc_base/bit_buffer.h"
-
 #include "h265_nal_unit_parser.h"
+#include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
 
@@ -38,11 +36,11 @@ class H265RtpApParser {
   };
 
   // Unpack RBSP and parse RTP AP state from the supplied buffer.
-  static absl::optional<RtpApState>
-      ParseRtpAp(const uint8_t* data, size_t length,
+  static absl::optional<RtpApState> ParseRtpAp(
+      const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state);
-  static absl::optional<RtpApState>
-      ParseRtpAp(rtc::BitBuffer* bit_buffer,
+  static absl::optional<RtpApState> ParseRtpAp(
+      rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state);
 };
 

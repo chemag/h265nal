@@ -9,10 +9,8 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
-#include "rtc_base/bit_buffer.h"
-
 #include "h265_profile_tier_level_parser.h"
+#include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
 

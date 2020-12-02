@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_single_parser.h"
 
 #include <stdio.h>
@@ -10,17 +9,17 @@
 #include <cstdint>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
-#include "absl/types/optional.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::
-    NalUnitHeaderState> OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::
-    NalUnitPayloadState> OptionalNalUnitPayload;
-typedef absl::optional<h265nal::H265RtpSingleParser::
-    RtpSingleState> OptionalRtpSingle;
+typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
+    OptionalNalUnitHeader;
+typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
+    OptionalNalUnitPayload;
+typedef absl::optional<h265nal::H265RtpSingleParser::RtpSingleState>
+    OptionalRtpSingle;
 }  // namespace
 
 namespace h265nal {
@@ -34,7 +33,6 @@ absl::optional<H265RtpSingleParser::RtpSingleState>
 H265RtpSingleParser::ParseRtpSingle(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseRtpSingle(&bit_buffer, bitstream_parser_state);
@@ -66,8 +64,8 @@ H265RtpSingleParser::ParseRtpSingle(
   return OptionalRtpSingle(rtp_single);
 }
 
-void H265RtpSingleParser::RtpSingleState::fdump(
-    FILE* outfp, int indent_level) const {
+void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
+                                                int indent_level) const {
   fprintf(outfp, "rtp_single {");
   indent_level = indent_level_incr(indent_level);
 

@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_ap_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -49,9 +48,8 @@ TEST_F(H265RtpApParserTest, TestSampleAUD) {
     0x10, 0x80
   };
   H265BitstreamParserState bitstream_parser_state;
-  rtp_ap_ = H265RtpApParser::ParseRtpAp(
-      buffer, arraysize(buffer),
-      &bitstream_parser_state);
+  rtp_ap_ = H265RtpApParser::ParseRtpAp(buffer, arraysize(buffer),
+                                        &bitstream_parser_state);
   EXPECT_TRUE(rtp_ap_ != absl::nullopt);
 
   // check the common header

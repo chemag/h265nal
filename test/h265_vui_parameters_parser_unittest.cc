@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_vui_parameters_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -28,8 +27,8 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
   const uint8_t buffer[] = {
       0x2b, 0x05, 0x06, 0x06, 0x02, 0xed, 0x0a, 0x12
   };
-  vui_parameters_ = H265VuiParametersParser::ParseVuiParameters(
-      buffer, arraysize(buffer));
+  vui_parameters_ =
+      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer));
   EXPECT_TRUE(vui_parameters_ != absl::nullopt);
 
   EXPECT_EQ(0, vui_parameters_->aspect_ratio_info_present_flag);

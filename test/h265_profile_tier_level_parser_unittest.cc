@@ -10,8 +10,8 @@
 
 #include "h265_profile_tier_level_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
@@ -28,9 +28,11 @@ class H265ProfileTierLevelParserTest : public ::testing::Test {
 };
 
 TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
-  const uint8_t buffer[] = {0x01, 0x60, 0x00, 0x00, 0x03, 0x00, 0xb0, 0x00,
-                            0x00, 0x03, 0x00, 0x00, 0x03, 0x00, 0x5d, 0xac,
-                            0x59};
+  const uint8_t buffer[] = {
+      0x01, 0x60, 0x00, 0x00, 0x03, 0x00, 0xb0, 0x00,
+      0x00, 0x03, 0x00, 0x00, 0x03, 0x00, 0x5d, 0xac,
+      0x59
+  };
   ptls_ = H265ProfileTierLevelParser::ParseProfileTierLevel(
       buffer, arraysize(buffer), true, 0);
   EXPECT_TRUE(ptls_ != absl::nullopt);
@@ -38,11 +40,10 @@ TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
   EXPECT_EQ(0, ptls_->general.tier_flag);
   EXPECT_EQ(1, ptls_->general.profile_idc);
   EXPECT_THAT(ptls_->general.profile_compatibility_flag,
-              ::testing::ElementsAreArray(
-              {0, 1, 1, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0}));
+              ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0}));
   EXPECT_EQ(1, ptls_->general.progressive_source_flag);
   EXPECT_EQ(0, ptls_->general.interlaced_source_flag);
   EXPECT_EQ(1, ptls_->general.non_packed_constraint_flag);

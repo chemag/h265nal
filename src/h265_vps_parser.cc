@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_vps_parser.h"
 
 #include <stdio.h>
@@ -10,14 +9,14 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 
 namespace {
-typedef absl::optional<h265nal::H265ProfileTierLevelParser::
-    ProfileTierLevelState> OptionalProfileTierLevel;
-typedef absl::optional<h265nal::H265VpsParser::
-    VpsState> OptionalVps;
+typedef absl::optional<
+    h265nal::H265ProfileTierLevelParser::ProfileTierLevelState>
+    OptionalProfileTierLevel;
+typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
 }  // namespace
 
 namespace h265nal {
@@ -29,12 +28,10 @@ namespace h265nal {
 // Unpack RBSP and parse VPS state from the supplied buffer.
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     const uint8_t* data, size_t length) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseVps(&bit_buffer);
 }
-
 
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     rtc::BitBuffer* bit_buffer) {
@@ -94,8 +91,9 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     return absl::nullopt;
   }
 
-  for (uint32_t i = (vps.vps_sub_layer_ordering_info_present_flag ?
-       0 : vps.vps_max_sub_layers_minus1);
+  for (uint32_t i = (vps.vps_sub_layer_ordering_info_present_flag
+                         ? 0
+                         : vps.vps_max_sub_layers_minus1);
        i <= vps.vps_max_sub_layers_minus1; i++) {
     // vps_max_dec_pic_buffering_minus1[i]  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
@@ -125,10 +123,10 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   for (uint32_t i = 1; i <= vps.vps_num_layer_sets_minus1; i++) {
-    vps.layer_id_included_flag[i-1].emplace_back();
+    vps.layer_id_included_flag[i - 1].emplace_back();
     for (uint32_t j = 0; j <= vps.vps_max_layer_id; j++) {
       // layer_id_included_flag[i][j]  u(1)
-      vps.layer_id_included_flag[i-1].push_back(golomb_tmp);
+      vps.layer_id_included_flag[i - 1].push_back(golomb_tmp);
     }
   }
 
@@ -156,7 +154,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     if (vps.vps_poc_proportional_to_timing_flag) {
       // vps_num_ticks_poc_diff_one_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-          &(vps.vps_num_ticks_poc_diff_one_minus1))) {
+              &(vps.vps_num_ticks_poc_diff_one_minus1))) {
         return absl::nullopt;
       }
     }
@@ -209,8 +207,7 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_video_parameter_set_id: %i",
-          vps_video_parameter_set_id);
+  fprintf(outfp, "vps_video_parameter_set_id: %i", vps_video_parameter_set_id);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "vps_base_layer_internal_flag: %i",
@@ -224,8 +221,7 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "vps_max_layers_minus1: %i", vps_max_layers_minus1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_max_sub_layers_minus1: %i",
-          vps_max_sub_layers_minus1);
+  fprintf(outfp, "vps_max_sub_layers_minus1: %i", vps_max_sub_layers_minus1);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "vps_temporal_id_nesting_flag: %i",
@@ -267,8 +263,7 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "vps_max_layer_id: %i", vps_max_layer_id);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "vps_num_layer_sets_minus1: %i",
-          vps_num_layer_sets_minus1);
+  fprintf(outfp, "vps_num_layer_sets_minus1: %i", vps_num_layer_sets_minus1);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "layer_id_included_flag {");

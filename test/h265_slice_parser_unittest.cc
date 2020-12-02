@@ -2,18 +2,17 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_slice_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
-#include "h265_bitstream_parser_state.h"
-#include "h265_vps_parser.h"
-#include "h265_sps_parser.h"
-#include "h265_pps_parser.h"
 #include "absl/types/optional.h"
+#include "h265_bitstream_parser_state.h"
+#include "h265_common.h"
+#include "h265_pps_parser.h"
+#include "h265_sps_parser.h"
+#include "h265_vps_parser.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 

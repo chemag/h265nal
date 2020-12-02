@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_aud_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -24,9 +23,7 @@ class H265AudParserTest : public ::testing::Test {
 };
 
 TEST_F(H265AudParserTest, TestSampleAUD) {
-  const uint8_t buffer[] = {
-      0xff
-  };
+  const uint8_t buffer[] = {0xff};
   aud_ = H265AudParser::ParseAud(buffer, arraysize(buffer));
   EXPECT_TRUE(aud_ != absl::nullopt);
 

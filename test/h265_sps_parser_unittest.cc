@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_sps_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -44,11 +43,10 @@ TEST_F(H265SpsParserTest, TestSampleSPS) {
   EXPECT_EQ(0, sps_->profile_tier_level.general.tier_flag);
   EXPECT_EQ(1, sps_->profile_tier_level.general.profile_idc);
   EXPECT_THAT(sps_->profile_tier_level.general.profile_compatibility_flag,
-              ::testing::ElementsAreArray(
-              {0, 1, 1, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0,
-               0, 0, 0, 0, 0, 0, 0, 0}));
+              ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0}));
   EXPECT_EQ(1, sps_->profile_tier_level.general.progressive_source_flag);
   EXPECT_EQ(0, sps_->profile_tier_level.general.interlaced_source_flag);
   EXPECT_EQ(1, sps_->profile_tier_level.general.non_packed_constraint_flag);
@@ -90,8 +88,7 @@ TEST_F(H265SpsParserTest, TestSampleSPS) {
   EXPECT_EQ(1, sps_->sps_sub_layer_ordering_info_present_flag);
   EXPECT_THAT(sps_->sps_max_dec_pic_buffering_minus1,
               ::testing::ElementsAreArray({1}));
-  EXPECT_THAT(sps_->sps_max_num_reorder_pics,
-              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(sps_->sps_max_num_reorder_pics, ::testing::ElementsAreArray({0}));
   EXPECT_THAT(sps_->sps_max_latency_increase_plus1,
               ::testing::ElementsAreArray({0}));
   EXPECT_EQ(0, sps_->log2_min_luma_coding_block_size_minus3);

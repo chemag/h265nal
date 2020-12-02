@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_ap_parser.h"
 
 #include <stdio.h>
@@ -10,19 +9,18 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
-#include "h265_bitstream_parser_state.h"
-#include "h265_nal_unit_parser.h"
 #include "absl/types/optional.h"
+#include "h265_bitstream_parser_state.h"
+#include "h265_common.h"
+#include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::
-    NalUnitHeaderState> OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::
-    NalUnitPayloadState> OptionalNalUnitPayload;
-typedef absl::optional<h265nal::H265RtpApParser::
-    RtpApState> OptionalRtpAp;
+typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
+    OptionalNalUnitHeader;
+typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
+    OptionalNalUnitPayload;
+typedef absl::optional<h265nal::H265RtpApParser::RtpApState> OptionalRtpAp;
 }  // namespace
 
 namespace h265nal {
@@ -35,12 +33,10 @@ namespace h265nal {
 absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) {
-
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseRtpAp(&bit_buffer, bitstream_parser_state);
 }
-
 
 absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     rtc::BitBuffer* bit_buffer,
@@ -73,7 +69,7 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     // NALU payload
     OptionalNalUnitPayload nal_unit_payload =
         H265NalUnitPayloadParser::ParseNalUnitPayload(
-        bit_buffer, nal_unit_header->nal_unit_type, bitstream_parser_state);
+            bit_buffer, nal_unit_header->nal_unit_type, bitstream_parser_state);
     if (nal_unit_payload != absl::nullopt) {
       rtp_ap.nal_unit_payloads.push_back(*nal_unit_payload);
     }

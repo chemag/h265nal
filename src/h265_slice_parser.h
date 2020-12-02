@@ -9,19 +9,13 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
-#include "rtc_base/bit_buffer.h"
-
 #include "h265_bitstream_parser_state.h"
 #include "h265_st_ref_pic_set_parser.h"
+#include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
 
-enum SliceType : uint8_t {
-  SliceType_B = 0,
-  SliceType_P = 1,
-  SliceType_I = 2
-};
+enum SliceType : uint8_t { SliceType_B = 0, SliceType_P = 1, SliceType_I = 2 };
 
 // A class for parsing out a slice segment header data from
 // an H265 NALU.

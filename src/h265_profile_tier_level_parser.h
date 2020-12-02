@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "absl/types/optional.h"
-
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -54,8 +53,8 @@ class H265ProfileInfoParser {
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
-  static absl::optional<ProfileInfoState> ParseProfileInfo(
-      const uint8_t* data, size_t length);
+  static absl::optional<ProfileInfoState> ParseProfileInfo(const uint8_t* data,
+                                                           size_t length);
   static absl::optional<ProfileInfoState> ParseProfileInfo(
       rtc::BitBuffer* bit_buffer);
 };

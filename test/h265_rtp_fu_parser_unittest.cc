@@ -2,14 +2,13 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_rtp_fu_parser.h"
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "h265_common.h"
 #include "absl/types/optional.h"
+#include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -32,9 +31,8 @@ TEST_F(H265RtpFuParserTest, TestSampleStart) {
     0x58, 0x24, 0x68, 0xe0
   };
   H265BitstreamParserState bitstream_parser_state;
-  rtp_fu_ = H265RtpFuParser::ParseRtpFu(
-      buffer, arraysize(buffer),
-      &bitstream_parser_state);
+  rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
+                                        &bitstream_parser_state);
   EXPECT_TRUE(rtp_fu_ != absl::nullopt);
 
   // check the common header
@@ -58,9 +56,8 @@ TEST_F(H265RtpFuParserTest, TestSampleMiddle) {
     0x3c, 0xa7, 0x20, 0xe8, 0x05, 0x9a, 0xfe, 0x6b
   };
   H265BitstreamParserState bitstream_parser_state;
-  rtp_fu_ = H265RtpFuParser::ParseRtpFu(
-      buffer, arraysize(buffer),
-      &bitstream_parser_state);
+  rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
+                                        &bitstream_parser_state);
   EXPECT_TRUE(rtp_fu_ != absl::nullopt);
 
   // check the common header
@@ -84,9 +81,8 @@ TEST_F(H265RtpFuParserTest, TestSampleEnd) {
     0x5b, 0x95, 0x02, 0x79, 0xc3, 0xb7, 0x47, 0x16
   };
   H265BitstreamParserState bitstream_parser_state;
-  rtp_fu_ = H265RtpFuParser::ParseRtpFu(
-      buffer, arraysize(buffer),
-      &bitstream_parser_state);
+  rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
+                                        &bitstream_parser_state);
   EXPECT_TRUE(rtp_fu_ != absl::nullopt);
 
   // check the common header

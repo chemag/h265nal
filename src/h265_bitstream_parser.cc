@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_bitstream_parser.h"
 
 #include <stdio.h>
@@ -10,14 +9,14 @@
 #include <cstdint>
 #include <vector>
 
-#include "h265_common.h"
-#include "h265_bitstream_parser_state.h"
-#include "h265_nal_unit_parser.h"
 #include "absl/types/optional.h"
+#include "h265_bitstream_parser_state.h"
+#include "h265_common.h"
+#include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265BitstreamParser::
-    BitstreamState> OptionalBitstream;
+typedef absl::optional<h265nal::H265BitstreamParser::BitstreamState>
+    OptionalBitstream;
 typedef absl::optional<h265nal::H265NalUnitParser::NalUnitState>
     OptionalNalUnit;
 
@@ -28,7 +27,6 @@ typedef absl::optional<h265nal::H265NalUnitParser::NalUnitState>
 // not the first NALU of an access unit or an SPS or PPS block.
 const size_t kNaluShortStartSequenceSize = 3;
 }  // namespace
-
 
 namespace h265nal {
 
@@ -77,7 +75,6 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
   return sequences;
 }
 
-
 // Parse a raw (RBSP) buffer with explicit NAL unit separator (3- or 4-byte
 // sequence start code prefix). Function splits the stream in NAL units,
 // and then parses each NAL unit. For that, it unpacks the RBSP inside
@@ -85,7 +82,8 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
 // the `bitstream` list (a `BitstreamState` object).
 // Function returns the said `bitstream` list.
 absl::optional<H265BitstreamParser::BitstreamState>
-H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
+H265BitstreamParser::ParseBitstream(
+    const uint8_t* data, size_t length,
     H265BitstreamParserState* bitstream_parser_state) {
   BitstreamState bitstream;
   // start with the input parser state
@@ -98,8 +96,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   for (const NaluIndex& nalu_index : nalu_indices) {
     // (2) parse the NAL units
     OptionalNalUnit nal_unit = H265NalUnitParser::ParseNalUnit(
-        &data[nalu_index.payload_start_offset],
-        nalu_index.payload_size, &(bitstream.bitstream_parser_state));
+        &data[nalu_index.payload_start_offset], nalu_index.payload_size,
+        &(bitstream.bitstream_parser_state));
     if (nal_unit != absl::nullopt) {
       // store the offset
       nal_unit->offset = nalu_index.payload_start_offset;
@@ -116,8 +114,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   return OptionalBitstream(bitstream);
 }
 
-void H265BitstreamParser::BitstreamState::fdump(
-    FILE* outfp, int indent_level) const {
+void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
+                                                int indent_level) const {
   for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
     nal_unit.fdump(outfp, indent_level, add_offset, add_length);
     fprintf(outfp, "\n");

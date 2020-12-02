@@ -11,7 +11,6 @@
 
 #include "rtc_base/bit_buffer.h"
 
-
 namespace h265nal {
 
 enum NalUnitType : uint8_t {
@@ -79,7 +78,7 @@ bool IsSliceSegment(uint32_t nal_unit_type);
 // Remove any emulation byte escaping from a buffer. This is needed for
 // byte-stream format packetization (e.g. Annex B data), but not for
 // packet-stream format packetization (e.g. RTP payloads).
-std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length);
+std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length);
 
 // Syntax functions and descriptors) (Section 7.2)
 bool byte_aligned(rtc::BitBuffer *bit_buffer);
@@ -89,6 +88,6 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer);
 // fdump() indentation help
 int indent_level_incr(int indent_level);
 int indent_level_decr(int indent_level);
-void fdump_indent_level(FILE* outfp, int indent_level);
+void fdump_indent_level(FILE *outfp, int indent_level);
 
 }  // namespace h265nal

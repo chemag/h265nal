@@ -2,7 +2,6 @@
  *  Copyright (c) Facebook, Inc. and its affiliates.
  */
 
-
 #include "h265_utils.h"
 
 #include <stdio.h>
@@ -10,18 +9,17 @@
 #include <cstdint>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "h265_bitstream_parser.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_rtp_parser.h"
-#include "absl/types/optional.h"
 
 namespace h265nal {
 
 namespace {
 typedef absl::optional<int32_t> OptionalInt32_t;
 }  // namespace
-
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
 // You can find it on this page:
@@ -30,8 +28,7 @@ typedef absl::optional<int32_t> OptionalInt32_t;
 // Calculate Luminance Slice QP values from slice header and PPS.
 namespace {
 // internal function
-absl::optional<int32_t>
-GetSliceQpYInternal(
+absl::optional<int32_t> GetSliceQpYInternal(
     uint32_t nal_unit_type,
     const struct H265NalUnitPayloadParser::NalUnitPayloadState* payload,
     const H265BitstreamParserState* bitstream_parser_state) {
@@ -41,7 +38,7 @@ GetSliceQpYInternal(
   }
 
   // check some values
-  auto &slice_header = payload->slice_segment_layer.slice_segment_header;
+  auto& slice_header = payload->slice_segment_layer.slice_segment_header;
   auto pps_id = slice_header.slice_pic_parameter_set_id;
   auto slice_qp_delta = slice_header.slice_qp_delta;
 
@@ -59,9 +56,7 @@ GetSliceQpYInternal(
 }
 }  // namespace
 
-
-absl::optional<int32_t>
-H265Utils::GetSliceQpY(
+absl::optional<int32_t> H265Utils::GetSliceQpY(
     const H265RtpParser::RtpState rtp,
     const H265BitstreamParserState* bitstream_parser_state) {
   // get the actual NAL header (not the RTP one)
@@ -93,9 +88,7 @@ H265Utils::GetSliceQpY(
   return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
 }
 
-
-std::vector<int32_t>
-H265Utils::GetSliceQpY(
+std::vector<int32_t> H265Utils::GetSliceQpY(
     const uint8_t* data, size_t length,
     H265BitstreamParserState* bitstream_parser_state) {
   std::vector<int32_t> slice_qp_y_vector;
@@ -111,8 +104,8 @@ H265Utils::GetSliceQpY(
     const struct H265NalUnitPayloadParser::NalUnitPayloadState& payload =
         nal_unit.nal_unit_payload;
     // get the slice QP_Y value
-    auto slice_qp_y_value = GetSliceQpYInternal(nal_unit_type, &payload,
-                                                bitstream_parser_state);
+    auto slice_qp_y_value =
+        GetSliceQpYInternal(nal_unit_type, &payload, bitstream_parser_state);
     if (slice_qp_y_value != absl::nullopt) {
       slice_qp_y_vector.push_back(*slice_qp_y_value);
     }

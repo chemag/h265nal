@@ -11,7 +11,7 @@
 namespace h265nal {
 
 bool IsSliceSegment(uint32_t nal_unit_type) {
-    // payload (Table 7-1, Section 7.4.2.2)
+  // payload (Table 7-1, Section 7.4.2.2)
   switch (nal_unit_type) {
     case TRAIL_N:
     case TRAIL_R:
@@ -36,7 +36,7 @@ bool IsSliceSegment(uint32_t nal_unit_type) {
   return false;
 }
 
-std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length) {
+std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
   std::vector<uint8_t> out;
   out.reserve(length);
 
@@ -120,7 +120,7 @@ int indent_level_decr(int indent_level) {
   return (indent_level == -1) ? -1 : (indent_level - 1);
 }
 
-void fdump_indent_level(FILE* outfp, int indent_level) {
+void fdump_indent_level(FILE *outfp, int indent_level) {
   if (indent_level == -1) {
     // no indent
     fprintf(outfp, " ");
