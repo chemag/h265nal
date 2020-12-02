@@ -67,7 +67,7 @@ H265Utils::GetSliceQpY(
   // get the actual NAL header (not the RTP one)
   const struct H265NalUnitHeaderParser::NalUnitHeaderState* header;
   const struct H265NalUnitPayloadParser::NalUnitPayloadState* payload;
-  uint32_t nal_unit_type;
+  uint32_t nal_unit_type = 0;
   if (rtp.nal_unit_header.nal_unit_type <= 47) {
     header = &(rtp.rtp_single.nal_unit_header);
     nal_unit_type = header->nal_unit_type;
@@ -85,6 +85,9 @@ H265Utils::GetSliceQpY(
     }
     nal_unit_type = rtp.rtp_fu.fu_type;
     payload = &(rtp.rtp_fu.nal_unit_payload);
+  } else {
+    // invalid value
+    return absl::nullopt;
   }
   // get the slice QP_Y value
   return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
