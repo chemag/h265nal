@@ -21,9 +21,9 @@ class H265Utils {
   static absl::optional<int32_t> GetSliceQpY(
       const H265RtpParser::RtpState rtp,
       const H265BitstreamParserState* bitstream_parser_state);
-  static std::vector<int32_t> GetSliceQpY(
-      const uint8_t* data, size_t length,
-      H265BitstreamParserState* bitstream_parser_state);
+  static void GetSliceQpY(const uint8_t* data, size_t length,
+                          H265BitstreamParserState* bitstream_parser_state,
+                          std::vector<int32_t>* slice_qp_y_vector);
 };
 
 }  // namespace h265nal

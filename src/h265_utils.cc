@@ -88,10 +88,10 @@ absl::optional<int32_t> H265Utils::GetSliceQpY(
   return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
 }
 
-std::vector<int32_t> H265Utils::GetSliceQpY(
-    const uint8_t* data, size_t length,
-    H265BitstreamParserState* bitstream_parser_state) {
-  std::vector<int32_t> slice_qp_y_vector;
+void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
+                            H265BitstreamParserState* bitstream_parser_state,
+                            std::vector<int32_t>* slice_qp_y_vector) {
+  slice_qp_y_vector->clear();
 
   // parse the incoming bitstream
   absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream_state;
@@ -107,10 +107,9 @@ std::vector<int32_t> H265Utils::GetSliceQpY(
     auto slice_qp_y_value =
         GetSliceQpYInternal(nal_unit_type, &payload, bitstream_parser_state);
     if (slice_qp_y_value != absl::nullopt) {
-      slice_qp_y_vector.push_back(*slice_qp_y_value);
+      slice_qp_y_vector->push_back(*slice_qp_y_value);
     }
   }
-  return slice_qp_y_vector;
 }
 
 }  // namespace h265nal

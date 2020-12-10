@@ -251,31 +251,30 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffersGetSliceQpY) {
   // init the BitstreamParserState
   H265BitstreamParserState bitstream_parser_state;
 
-  std::vector<int32_t> slice_qp_y_vector;
-
   // 0. parse buffer0
-  slice_qp_y_vector = H265Utils::GetSliceQpY(buffer0, arraysize(buffer0),
-                                             &bitstream_parser_state);
+  std::vector<int32_t> slice_qp_y_vector;
+  H265Utils::GetSliceQpY(buffer0, arraysize(buffer0), &bitstream_parser_state,
+                         &slice_qp_y_vector);
   // check there is 1 QP_Y value
   ASSERT_EQ(1, slice_qp_y_vector.size());
   // check the value is right
   EXPECT_EQ(35, slice_qp_y_vector[0]);
 
   // 1. parse buffer1
-  slice_qp_y_vector = H265Utils::GetSliceQpY(buffer1, arraysize(buffer1),
-                                             &bitstream_parser_state);
+  H265Utils::GetSliceQpY(buffer1, arraysize(buffer1), &bitstream_parser_state,
+                         &slice_qp_y_vector);
   // check there is 1 QP_Y value
   ASSERT_EQ(1, slice_qp_y_vector.size());
   // check the value is right
   EXPECT_EQ(37, slice_qp_y_vector[0]);
 
   // 2. parse buffer2
-  slice_qp_y_vector = H265Utils::GetSliceQpY(buffer1, arraysize(buffer1),
-                                             &bitstream_parser_state);
+  H265Utils::GetSliceQpY(buffer2, arraysize(buffer2), &bitstream_parser_state,
+                         &slice_qp_y_vector);
   // check there is 1 QP_Y value
   ASSERT_EQ(1, slice_qp_y_vector.size());
   // check the value is right
-  EXPECT_EQ(37, slice_qp_y_vector[0]);
+  EXPECT_EQ(42, slice_qp_y_vector[0]);
 }
 
 }  // namespace h265nal
