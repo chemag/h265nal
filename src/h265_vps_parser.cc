@@ -117,9 +117,28 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   if (!bit_buffer->ReadBits(&(vps.vps_max_layer_id), 6)) {
     return absl::nullopt;
   }
+  // Page 74: "vps_max_layer_id shall be less than 63 in bitstreams conforming
+  // to this version of this Specification."
+  if (vps.vps_max_layer_id >= 63) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: vps.vps_max_layer_id value too large: %i\n",
+            vps.vps_max_layer_id);
+#endif  // FPRINT_ERRORS
+    return absl::nullopt;
+  }
+
 
   // vps_num_layer_sets_minus1  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(&(vps.vps_num_layer_sets_minus1))) {
+    return absl::nullopt;
+  }
+  // Page 74: "The value of vps_num_layer_sets_minus1 shall be in the range of
+  // 0 to 1023, inclusive."
+  if (vps.vps_num_layer_sets_minus1 > 1023) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: vps.vps_num_layer_sets_minus1 value too large: %i\n",
+            vps.vps_num_layer_sets_minus1);
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
