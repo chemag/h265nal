@@ -88,8 +88,6 @@ H265BitstreamParser::ParseBitstream(
     const uint8_t* data, size_t length,
     H265BitstreamParserState* bitstream_parser_state) noexcept {
   BitstreamState bitstream;
-  // start with the input parser state
-  bitstream.bitstream_parser_state = *bitstream_parser_state;
 
   // (1) split the input string into a vector of NAL units
   std::vector<NaluIndex> nalu_indices = FindNaluIndices(data, length);
@@ -99,7 +97,7 @@ H265BitstreamParser::ParseBitstream(
     // (2) parse the NAL units
     OptionalNalUnit nal_unit = H265NalUnitParser::ParseNalUnit(
         &data[nalu_index.payload_start_offset], nalu_index.payload_size,
-        &(bitstream.bitstream_parser_state));
+        bitstream_parser_state);
     if (nal_unit != absl::nullopt) {
       // store the offset
       nal_unit->offset = nalu_index.payload_start_offset;
@@ -109,9 +107,6 @@ H265BitstreamParser::ParseBitstream(
       bitstream.nal_units.push_back(*nal_unit);
     }
   }
-
-  // copy the parser state to the output parameter
-  *bitstream_parser_state = bitstream.bitstream_parser_state;
 
   return OptionalBitstream(bitstream);
 }

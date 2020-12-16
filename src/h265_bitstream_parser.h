@@ -32,9 +32,6 @@ class H265BitstreamParser {
     bool add_length;
     // NAL units
     std::vector<struct H265NalUnitParser::NalUnitState> nal_units;
-
-    // bitstream parser state
-    struct H265BitstreamParserState bitstream_parser_state;
   };
 
   // Unpack RBSP and parse bitstream state from the supplied buffer.
