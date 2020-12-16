@@ -13,7 +13,9 @@
 #include "h265_bitstream_parser.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
+#ifdef RTP_DEFINE
 #include "h265_rtp_parser.h"
+#endif  // RTP_DEFINE
 
 namespace h265nal {
 
@@ -56,6 +58,7 @@ absl::optional<int32_t> GetSliceQpYInternal(
 }
 }  // namespace
 
+#ifdef RTP_DEFINE
 absl::optional<int32_t> H265Utils::GetSliceQpY(
     const H265RtpParser::RtpState rtp,
     const H265BitstreamParserState* bitstream_parser_state) {
@@ -87,6 +90,7 @@ absl::optional<int32_t> H265Utils::GetSliceQpY(
   // get the slice QP_Y value
   return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
 }
+#endif  // RTP_DEFINE
 
 void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
                             H265BitstreamParserState* bitstream_parser_state,

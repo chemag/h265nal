@@ -115,6 +115,7 @@ H265BitstreamParser::ParseBitstream(
   return OptionalBitstream(bitstream);
 }
 
+#ifdef FDUMP_DEFINE
 void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
   for (const struct H265NalUnitParser::NalUnitState& nal_unit : nal_units) {
@@ -122,5 +123,6 @@ void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
     fprintf(outfp, "\n");
   }
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

@@ -137,6 +137,7 @@ H265StRefPicSetParser::ParseStRefPicSet(rtc::BitBuffer* bit_buffer,
   return OptionalStRefPicSet(st_ref_pic_set);
 }
 
+#ifdef FDUMP_DEFINE
 void H265StRefPicSetParser::StRefPicSetState::fdump(FILE* outfp,
                                                     int indent_level) const {
   fprintf(outfp, "st_ref_pic_set {");
@@ -210,5 +211,6 @@ void H265StRefPicSetParser::StRefPicSetState::fdump(FILE* outfp,
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

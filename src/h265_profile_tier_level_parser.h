@@ -25,7 +25,9 @@ class H265ProfileInfoParser {
     ProfileInfoState() = default;
     ProfileInfoState(const ProfileInfoState&) = default;
     ~ProfileInfoState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     uint32_t profile_space = 0;
     uint32_t tier_flag = 0;

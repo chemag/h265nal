@@ -202,6 +202,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   return OptionalVps(vps);
 }
 
+#ifdef FDUMP_DEFINE
 void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "vps {");
   indent_level = indent_level_incr(indent_level);
@@ -324,5 +325,6 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

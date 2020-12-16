@@ -64,6 +64,7 @@ H265RtpSingleParser::ParseRtpSingle(
   return OptionalRtpSingle(rtp_single);
 }
 
+#ifdef FDUMP_DEFINE
 void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
                                                 int indent_level) const {
   fprintf(outfp, "rtp_single {");
@@ -81,5 +82,6 @@ void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

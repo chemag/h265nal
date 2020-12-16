@@ -24,7 +24,9 @@ class H265VpsParser {
     VpsState() = default;
     VpsState(const VpsState&) = default;
     ~VpsState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     uint32_t vps_video_parameter_set_id = 0;
     uint32_t vps_base_layer_internal_flag = 0;

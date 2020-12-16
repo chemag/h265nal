@@ -85,9 +85,11 @@ bool byte_aligned(rtc::BitBuffer *bit_buffer);
 bool more_rbsp_data(rtc::BitBuffer *bit_buffer);
 bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer);
 
+#if defined(FDUMP_DEFINE)
 // fdump() indentation help
 int indent_level_incr(int indent_level);
 int indent_level_decr(int indent_level);
 void fdump_indent_level(FILE *outfp, int indent_level);
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

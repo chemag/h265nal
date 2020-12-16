@@ -22,7 +22,9 @@ class H265RtpApParser {
     RtpApState() = default;
     RtpApState(const RtpApState&) = default;
     ~RtpApState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     // common header
     struct H265NalUnitHeaderParser::NalUnitHeaderState header;

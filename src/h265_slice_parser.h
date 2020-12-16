@@ -27,7 +27,9 @@ class H265SliceSegmentHeaderParser {
     SliceSegmentHeaderState() = default;
     SliceSegmentHeaderState(const SliceSegmentHeaderState&) = default;
     ~SliceSegmentHeaderState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     // input parameters
     uint32_t nal_unit_type = 0;

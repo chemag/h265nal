@@ -77,6 +77,7 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
   return OptionalRtpAp(rtp_ap);
 }
 
+#ifdef FDUMP_DEFINE
 void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "rtp_ap {");
   indent_level = indent_level_incr(indent_level);
@@ -100,5 +101,6 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

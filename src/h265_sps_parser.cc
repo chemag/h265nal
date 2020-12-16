@@ -400,6 +400,7 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   return OptionalSps(sps);
 }
 
+#ifdef FDUMP_DEFINE
 void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "sps {");
   indent_level = indent_level_incr(indent_level);
@@ -659,6 +660,7 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
   // PicSizeInCtbsY support (page 77)

@@ -23,7 +23,9 @@ class H265StRefPicSetParser {
     StRefPicSetState() = default;
     StRefPicSetState(const StRefPicSetState&) = default;
     ~StRefPicSetState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     // input parameters
     uint32_t stRpsIdx = 0;

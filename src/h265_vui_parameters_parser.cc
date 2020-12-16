@@ -244,6 +244,7 @@ H265VuiParametersParser::ParseVuiParameters(rtc::BitBuffer* bit_buffer) {
   return OptionalVuiParameters(vui);
 }
 
+#ifdef FDUMP_DEFINE
 void H265VuiParametersParser::VuiParametersState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "vui_parameters {");
@@ -377,5 +378,6 @@ void H265VuiParametersParser::VuiParametersState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

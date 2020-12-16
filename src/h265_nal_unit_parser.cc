@@ -266,6 +266,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
   return OptionalNalUnitPayload(nal_unit_payload);
 }
 
+#ifdef FDUMP_DEFINE
 void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
                                             bool add_offset,
                                             bool add_length) const {
@@ -296,7 +297,9 @@ void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
+#ifdef FDUMP_DEFINE
 void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "nal_unit_header {");
@@ -313,7 +316,9 @@ void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
+#ifdef FDUMP_DEFINE
 void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     FILE* outfp, int indent_level, uint32_t nal_unit_type) const {
   fprintf(outfp, "nal_unit_payload {");
@@ -408,5 +413,6 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

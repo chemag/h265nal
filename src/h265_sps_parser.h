@@ -26,7 +26,9 @@ class H265SpsParser {
     SpsState() = default;
     SpsState(const SpsState&) = default;
     ~SpsState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     uint32_t sps_video_parameter_set_id = 0;
     uint32_t sps_max_sub_layers_minus1 = 0;

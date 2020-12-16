@@ -276,6 +276,7 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) {
   return OptionalProfileInfo(profile_info);
 }
 
+#ifdef FDUMP_DEFINE
 void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
                                                     int indent_level) const {
   fprintf(outfp, "profile_space: %i", profile_space);
@@ -407,5 +408,6 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

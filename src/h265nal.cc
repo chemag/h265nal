@@ -169,6 +169,11 @@ arg_options *parse_args(int argc, char **argv) {
 int main(int argc, char **argv) {
   arg_options *options;
 
+#ifdef SMALL_FOOTPRINT
+  printf("h265nal: small footprint version\n");
+#else
+  printf("h265nal: original version\n");
+#endif
   // parse args
   options = parse_args(argc, argv);
   if (options == nullptr) {
@@ -219,6 +224,7 @@ int main(int argc, char **argv) {
   bitstream->add_offset = options->add_offset;
   bitstream->add_length = options->add_length;
 
+#ifdef FDUMP_DEFINE
   // get outfile file descriptor
   FILE *outfp;
   if (options->outfile == nullptr ||
@@ -236,6 +242,7 @@ int main(int argc, char **argv) {
 
   int indent_level = (options->as_one_line) ? -1 : 0;
   bitstream->fdump(outfp, indent_level);
+#endif  // FDUMP_DEFINE
 
   return 0;
 }

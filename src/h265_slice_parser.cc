@@ -68,6 +68,7 @@ H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
   return OptionalSliceSegmentLayer(slice_segment_layer);
 }
 
+#ifdef FDUMP_DEFINE
 void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "slice_segment_layer {");
@@ -83,6 +84,7 @@ void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 // Unpack RBSP and parse slice segment header state from the supplied buffer.
 absl::optional<H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
@@ -636,6 +638,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   return OptionslSliceSegmentHeader(slice_segment_header);
 }
 
+#ifdef FDUMP_DEFINE
 void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "slice_segment_header {");
@@ -916,5 +919,6 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

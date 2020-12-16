@@ -339,6 +339,7 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   return OptionalPps(pps);
 }
 
+#ifdef FDUMP_DEFINE
 void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "pps {");
   indent_level = indent_level_incr(indent_level);
@@ -550,5 +551,6 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

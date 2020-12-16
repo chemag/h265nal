@@ -6,25 +6,54 @@
 # we will use those link directories when building `main`
 #target_link_libraries(main LINK_PUBLIC webrtc)
 
-add_library(h265nal
-    h265_common.h h265_common.cc
-    h265_utils.h h265_utils.cc
-    h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
-    h265_vps_parser.h h265_vps_parser.cc
-    h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
-    h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
-    h265_sps_parser.h h265_sps_parser.cc
-    h265_pps_parser.h h265_pps_parser.cc
-    h265_aud_parser.h h265_aud_parser.cc
-    h265_rtp_ap_parser.h h265_rtp_ap_parser.cc
-    h265_rtp_fu_parser.h h265_rtp_fu_parser.cc
-    h265_rtp_single_parser.h h265_rtp_single_parser.cc
-    h265_rtp_parser.h h265_rtp_parser.cc
-    h265_slice_parser.h h265_slice_parser.cc
-    h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
-    h265_bitstream_parser.h h265_bitstream_parser.cc
-    h265_nal_unit_parser.h h265_nal_unit_parser.cc
+option(H265NAL_SMALL_FOOTPRINT, "xmall footprint build")
+
+if(H265NAL_SMALL_FOOTPRINT)
+  message(STATUS "src: small footprint selected")
+  add_compile_definitions(SMALL_FOOTPRINT)
+else()
+  message(STATUS "src: normal footprint selected")
+  add_compile_definitions(FDUMP_DEFINE)
+  add_compile_definitions(RTP_DEFINE)
+endif()
+
+if(H265NAL_SMALL_FOOTPRINT)
+  add_library(h265nal
+      h265_common.h h265_common.cc
+      h265_utils.h h265_utils.cc
+      h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
+      h265_vps_parser.h h265_vps_parser.cc
+      h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
+      h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
+      h265_sps_parser.h h265_sps_parser.cc
+      h265_pps_parser.h h265_pps_parser.cc
+      h265_aud_parser.h h265_aud_parser.cc
+      h265_slice_parser.h h265_slice_parser.cc
+      h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
+      h265_bitstream_parser.h h265_bitstream_parser.cc
+      h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )
+else()
+  add_library(h265nal
+      h265_common.h h265_common.cc
+      h265_utils.h h265_utils.cc
+      h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
+      h265_vps_parser.h h265_vps_parser.cc
+      h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
+      h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
+      h265_sps_parser.h h265_sps_parser.cc
+      h265_pps_parser.h h265_pps_parser.cc
+      h265_aud_parser.h h265_aud_parser.cc
+      h265_rtp_ap_parser.h h265_rtp_ap_parser.cc
+      h265_rtp_fu_parser.h h265_rtp_fu_parser.cc
+      h265_rtp_single_parser.h h265_rtp_single_parser.cc
+      h265_rtp_parser.h h265_rtp_parser.cc
+      h265_slice_parser.h h265_slice_parser.cc
+      h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
+      h265_bitstream_parser.h h265_bitstream_parser.cc
+      h265_nal_unit_parser.h h265_nal_unit_parser.cc
+)
+endif()
 target_include_directories(h265nal PUBLIC ../webrtc)
 target_link_libraries(h265nal PUBLIC webrtc)
 

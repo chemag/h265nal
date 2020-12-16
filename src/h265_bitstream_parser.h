@@ -24,7 +24,9 @@ class H265BitstreamParser {
     BitstreamState() = default;
     BitstreamState(const BitstreamState&) = default;
     ~BitstreamState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     bool add_offset;
     bool add_length;

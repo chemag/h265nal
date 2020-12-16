@@ -112,6 +112,7 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
   return true;
 }
 
+#if defined(FDUMP_DEFINE)
 int indent_level_incr(int indent_level) {
   return (indent_level == -1) ? -1 : (indent_level + 1);
 }
@@ -129,5 +130,6 @@ void fdump_indent_level(FILE *outfp, int indent_level) {
   fprintf(outfp, "\n");
   fprintf(outfp, "%*s", 2 * indent_level, "");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal

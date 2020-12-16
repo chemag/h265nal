@@ -44,8 +44,9 @@ class H265VuiParametersParser {
     VuiParametersState() = default;
     VuiParametersState(const VuiParametersState&) = default;
     ~VuiParametersState() = default;
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
-
+#endif  // FDUMP_DEFINE
     uint32_t aspect_ratio_info_present_flag = 0;
     uint32_t aspect_ratio_idc = 0;
     uint32_t sar_width = 0;

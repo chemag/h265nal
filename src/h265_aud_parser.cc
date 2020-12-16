@@ -47,6 +47,7 @@ absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
   return OptionalAud(aud);
 }
 
+#ifdef FDUMP_DEFINE
 void H265AudParser::AudState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "aud {");
   indent_level = indent_level_incr(indent_level);
@@ -58,5 +59,6 @@ void H265AudParser::AudState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
 }
+#endif  // FDUMP_DEFINE
 
 }  // namespace h265nal
