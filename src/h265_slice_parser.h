@@ -117,10 +117,10 @@ class H265SliceSegmentHeaderParser {
   // Unpack RBSP and parse slice state from the supplied buffer.
   static absl::optional<SliceSegmentHeaderState> ParseSliceSegmentHeader(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<SliceSegmentHeaderState> ParseSliceSegmentHeader(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 // A class for parsing out a slice segment layer data from
@@ -148,10 +148,10 @@ class H265SliceSegmentLayerParser {
   // Unpack RBSP and parse slice state from the supplied buffer.
   static absl::optional<SliceSegmentLayerState> ParseSliceSegmentLayer(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<SliceSegmentLayerState> ParseSliceSegmentLayer(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 }  // namespace h265nal

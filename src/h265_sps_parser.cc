@@ -34,14 +34,14 @@ namespace h265nal {
 
 // Unpack RBSP and parse SPS state from the supplied buffer.
 absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
-    const uint8_t* data, size_t length) {
+    const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSps(&bit_buffer);
 }
 
 absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
-    rtc::BitBuffer* bit_buffer) {
+    rtc::BitBuffer* bit_buffer) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 

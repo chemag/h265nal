@@ -55,10 +55,10 @@ class H265ProfileInfoParser {
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
-  static absl::optional<ProfileInfoState> ParseProfileInfo(const uint8_t* data,
-                                                           size_t length);
   static absl::optional<ProfileInfoState> ParseProfileInfo(
-      rtc::BitBuffer* bit_buffer);
+      const uint8_t* data, size_t length) noexcept;
+  static absl::optional<ProfileInfoState> ParseProfileInfo(
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 // A class for parsing out a video sequence parameter set (profile_tier_level)
@@ -91,10 +91,10 @@ class H265ProfileTierLevelParser {
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
   static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
       const uint8_t* data, size_t length, const bool profilePresentFlag,
-      const unsigned int maxNumSubLayersMinus1);
+      const unsigned int maxNumSubLayersMinus1) noexcept;
   static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
       rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
-      const unsigned int maxNumSubLayersMinus1);
+      const unsigned int maxNumSubLayersMinus1) noexcept;
 };
 
 }  // namespace h265nal

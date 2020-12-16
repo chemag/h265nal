@@ -25,18 +25,18 @@ namespace h265nal {
 
 // Unpack RBSP and parse st_ref_pic_set state from the supplied buffer.
 absl::optional<H265StRefPicSetParser::StRefPicSetState>
-H265StRefPicSetParser::ParseStRefPicSet(const uint8_t* data, size_t length,
-                                        uint32_t stRpsIdx,
-                                        uint32_t num_short_term_ref_pic_sets) {
+H265StRefPicSetParser::ParseStRefPicSet(
+    const uint8_t* data, size_t length, uint32_t stRpsIdx,
+    uint32_t num_short_term_ref_pic_sets) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseStRefPicSet(&bit_buffer, stRpsIdx, num_short_term_ref_pic_sets);
 }
 
 absl::optional<H265StRefPicSetParser::StRefPicSetState>
-H265StRefPicSetParser::ParseStRefPicSet(rtc::BitBuffer* bit_buffer,
-                                        uint32_t stRpsIdx,
-                                        uint32_t num_short_term_ref_pic_sets) {
+H265StRefPicSetParser::ParseStRefPicSet(
+    rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
+    uint32_t num_short_term_ref_pic_sets) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 

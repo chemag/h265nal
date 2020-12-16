@@ -30,8 +30,9 @@ class H265AudParser {
   };
 
   // Unpack RBSP and parse AUD state from the supplied buffer.
-  static absl::optional<AudState> ParseAud(const uint8_t* data, size_t length);
-  static absl::optional<AudState> ParseAud(rtc::BitBuffer* bit_buffer);
+  static absl::optional<AudState> ParseAud(const uint8_t* data,
+                                           size_t length) noexcept;
+  static absl::optional<AudState> ParseAud(rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

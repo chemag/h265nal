@@ -81,8 +81,9 @@ class H265PpsParser {
   };
 
   // Unpack RBSP and parse PPS state from the supplied buffer.
-  static absl::optional<PpsState> ParsePps(const uint8_t* data, size_t length);
-  static absl::optional<PpsState> ParsePps(rtc::BitBuffer* bit_buffer);
+  static absl::optional<PpsState> ParsePps(const uint8_t* data,
+                                           size_t length) noexcept;
+  static absl::optional<PpsState> ParsePps(rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

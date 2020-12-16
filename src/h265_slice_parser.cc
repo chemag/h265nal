@@ -35,7 +35,7 @@ namespace h265nal {
 absl::optional<H265SliceSegmentLayerParser::SliceSegmentLayerState>
 H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
     const uint8_t* data, size_t length, uint32_t nal_unit_type,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSliceSegmentLayer(&bit_buffer, nal_unit_type,
@@ -45,7 +45,7 @@ H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
 absl::optional<H265SliceSegmentLayerParser::SliceSegmentLayerState>
 H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
     rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 slice segment layer (slice_segment_layer_rbsp()) NAL Unit.
   // Section 7.3.2.9 ("Slice segment layer RBSP syntax") of the H.265
   // standard for a complete description.
@@ -90,7 +90,7 @@ void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
 absl::optional<H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
 H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     const uint8_t* data, size_t length, uint32_t nal_unit_type,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSliceSegmentHeader(&bit_buffer, nal_unit_type,
@@ -100,7 +100,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 absl::optional<H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
 H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 

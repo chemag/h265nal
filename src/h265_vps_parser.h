@@ -56,8 +56,9 @@ class H265VpsParser {
   };
 
   // Unpack RBSP and parse VPS state from the supplied buffer.
-  static absl::optional<VpsState> ParseVps(const uint8_t* data, size_t length);
-  static absl::optional<VpsState> ParseVps(rtc::BitBuffer* bit_buffer);
+  static absl::optional<VpsState> ParseVps(const uint8_t* data,
+                                           size_t length) noexcept;
+  static absl::optional<VpsState> ParseVps(rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

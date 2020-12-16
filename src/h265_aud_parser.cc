@@ -24,14 +24,14 @@ namespace h265nal {
 
 // Unpack RBSP and parse AUD state from the supplied buffer.
 absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
-    const uint8_t* data, size_t length) {
+    const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseAud(&bit_buffer);
 }
 
 absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
-    rtc::BitBuffer* bit_buffer) {
+    rtc::BitBuffer* bit_buffer) noexcept {
   // H265 AUD NAL Unit (access_unit_delimiter_rbsp()) parser.
   // Section 7.3.2.5 ("Access unit delimiter RBSP syntax") of the H.265
   // standard for a complete description.

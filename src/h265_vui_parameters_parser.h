@@ -91,9 +91,9 @@ class H265VuiParametersParser {
 
   // Unpack RBSP and parse VIU Parameters state from the supplied buffer.
   static absl::optional<VuiParametersState> ParseVuiParameters(
-      const uint8_t* data, size_t length);
+      const uint8_t* data, size_t length) noexcept;
   static absl::optional<VuiParametersState> ParseVuiParameters(
-      rtc::BitBuffer* bit_buffer);
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

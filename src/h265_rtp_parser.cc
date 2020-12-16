@@ -34,7 +34,7 @@ namespace h265nal {
 // Unpack RBSP and parse RTP NAL Unit state from the supplied buffer.
 absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
     const uint8_t* data, size_t length,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseRtp(&bit_buffer, bitstream_parser_state);
@@ -42,7 +42,7 @@ absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
 
 absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
     rtc::BitBuffer* bit_buffer,
-    struct H265BitstreamParserState* bitstream_parser_state) {
+    struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 RTP NAL Unit pseudo-NAL Unit.
   RtpState rtp;
 

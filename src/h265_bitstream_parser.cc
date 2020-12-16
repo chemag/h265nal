@@ -35,7 +35,8 @@ namespace h265nal {
 // http://www.itu.int/rec/T-REC-H.265
 
 std::vector<H265BitstreamParser::NaluIndex>
-H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
+H265BitstreamParser::FindNaluIndices(const uint8_t* data,
+                                     size_t length) noexcept {
   // This is sorta like Boyer-Moore, but with only the first optimization step:
   // given a 3-byte sequence we're looking at, if the 3rd byte isn't 1 or 0,
   // skip ahead to the next 3-byte sequence. 0s and 1s are relatively rare, so
@@ -85,7 +86,7 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data, size_t length) {
 absl::optional<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(
     const uint8_t* data, size_t length,
-    H265BitstreamParserState* bitstream_parser_state) {
+    H265BitstreamParserState* bitstream_parser_state) noexcept {
   BitstreamState bitstream;
   // start with the input parser state
   bitstream.bitstream_parser_state = *bitstream_parser_state;

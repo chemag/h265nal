@@ -34,10 +34,10 @@ class H265RtpSingleParser {
   // Unpack RBSP and parse RTP Single NAL Unit state from the supplied buffer.
   static absl::optional<RtpSingleState> ParseRtpSingle(
       const uint8_t* data, size_t length,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<RtpSingleState> ParseRtpSingle(
       rtc::BitBuffer* bit_buffer,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 }  // namespace h265nal

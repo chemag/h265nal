@@ -40,10 +40,10 @@ class H265RtpApParser {
   // Unpack RBSP and parse RTP AP state from the supplied buffer.
   static absl::optional<RtpApState> ParseRtpAp(
       const uint8_t* data, size_t length,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<RtpApState> ParseRtpAp(
       rtc::BitBuffer* bit_buffer,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 }  // namespace h265nal

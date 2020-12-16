@@ -27,14 +27,14 @@ namespace h265nal {
 
 // Unpack RBSP and parse VPS state from the supplied buffer.
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
-    const uint8_t* data, size_t length) {
+    const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseVps(&bit_buffer);
 }
 
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
-    rtc::BitBuffer* bit_buffer) {
+    rtc::BitBuffer* bit_buffer) noexcept {
   uint32_t golomb_tmp;
 
   // H265 VPS (video_parameter_set_rbsp()) NAL Unit.

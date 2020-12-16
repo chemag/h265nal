@@ -26,14 +26,15 @@ namespace h265nal {
 // Unpack RBSP and parse VUI Parameters state from the supplied buffer.
 absl::optional<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(const uint8_t* data,
-                                            size_t length) {
+                                            size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseVuiParameters(&bit_buffer);
 }
 
 absl::optional<H265VuiParametersParser::VuiParametersState>
-H265VuiParametersParser::ParseVuiParameters(rtc::BitBuffer* bit_buffer) {
+H265VuiParametersParser::ParseVuiParameters(
+    rtc::BitBuffer* bit_buffer) noexcept {
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for
   // a complete description.

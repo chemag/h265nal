@@ -40,7 +40,7 @@ class H265BitstreamParser {
   // Unpack RBSP and parse bitstream state from the supplied buffer.
   static absl::optional<BitstreamState> ParseBitstream(
       const uint8_t* data, size_t length,
-      H265BitstreamParserState* bitstream_parser_state);
+      H265BitstreamParserState* bitstream_parser_state) noexcept;
 
   struct NaluIndex {
     // Start index of NALU, including start sequence.
@@ -52,7 +52,7 @@ class H265BitstreamParser {
   };
   // Returns a vector of the NALU indices in the given buffer.
   static std::vector<NaluIndex> FindNaluIndices(const uint8_t* data,
-                                                size_t length);
+                                                size_t length) noexcept;
 };
 
 }  // namespace h265nal

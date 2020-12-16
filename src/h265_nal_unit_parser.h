@@ -38,9 +38,9 @@ class H265NalUnitHeaderParser {
 
   // Unpack RBSP and parse NAL unit header state from the supplied buffer.
   static absl::optional<NalUnitHeaderState> ParseNalUnitHeader(
-      const uint8_t* data, size_t length);
+      const uint8_t* data, size_t length) noexcept;
   static absl::optional<NalUnitHeaderState> ParseNalUnitHeader(
-      rtc::BitBuffer* bit_buffer);
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 // A class for parsing out an H265 NAL Unit Payload.
@@ -67,10 +67,10 @@ class H265NalUnitPayloadParser {
   // Unpack RBSP and parse NAL unit payload state from the supplied buffer.
   static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 // A class for parsing out an H265 NAL Unit.
@@ -97,10 +97,10 @@ class H265NalUnitParser {
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
   static absl::optional<NalUnitState> ParseNalUnit(
       const uint8_t* data, size_t length,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static absl::optional<NalUnitState> ParseNalUnit(
       rtc::BitBuffer* bit_buffer,
-      struct H265BitstreamParserState* bitstream_parser_state);
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 }  // namespace h265nal
