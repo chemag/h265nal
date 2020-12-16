@@ -35,6 +35,7 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
 
 absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     rtc::BitBuffer* bit_buffer) noexcept {
+  uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
   // H265 VPS (video_parameter_set_rbsp()) NAL Unit.
@@ -123,10 +124,13 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   for (uint32_t i = 1; i <= vps.vps_num_layer_sets_minus1; i++) {
-    vps.layer_id_included_flag[i - 1].emplace_back();
+    vps.layer_id_included_flag.emplace_back();
     for (uint32_t j = 0; j <= vps.vps_max_layer_id; j++) {
       // layer_id_included_flag[i][j]  u(1)
-      vps.layer_id_included_flag[i - 1].push_back(golomb_tmp);
+      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+        return absl::nullopt;
+      }
+      vps.layer_id_included_flag[i - 1].push_back(bits_tmp);
     }
   }
 
