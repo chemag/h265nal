@@ -15,6 +15,7 @@ else()
   message(STATUS "src: normal footprint selected")
   add_compile_definitions(FDUMP_DEFINE)
   add_compile_definitions(RTP_DEFINE)
+  add_compile_definitions(FPRINT_ERRORS)
 endif()
 
 if(H265NAL_SMALL_FOOTPRINT)

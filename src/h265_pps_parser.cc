@@ -244,7 +244,9 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps.pps_scaling_list_data_present_flag) {
     // scaling_list_data()
     // TODO(chemag): add support for scaling_list_data()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
@@ -300,28 +302,36 @@ absl::optional<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps.pps_range_extension_flag) {
     // pps_range_extension()
     // TODO(chemag): add support for pps_range_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
   if (pps.pps_multilayer_extension_flag) {
     // pps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for pps_multilayer_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented pps_multilayer_extension() in pps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
   if (pps.pps_3d_extension_flag) {
     // pps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for pps_3d_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented pps_3d_extension() in pps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
   if (pps.pps_scc_extension_flag) {
     // pps_scc_extension()
     // TODO(chemag): add support for pps_scc_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented pps_scc_extension() in pps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 

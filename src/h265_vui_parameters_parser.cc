@@ -193,7 +193,9 @@ H265VuiParametersParser::ParseVuiParameters(rtc::BitBuffer* bit_buffer) {
     if (vui.vui_hrd_parameters_present_flag) {
       // hrd_parameters( 1, sps_max_sub_layers_minus1 )
       // TODO(chemag): add support for hrd_parameters()
+#ifdef FPRINT_ERRORS
       fprintf(stderr, "error: unimplemented hrd_parameters in vui\n");
+#endif  // FPRINT_ERRORS
       return absl::nullopt;
     }
   }

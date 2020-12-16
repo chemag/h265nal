@@ -212,7 +212,9 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (sps.sps_scaling_list_data_present_flag) {
       // scaling_list_data()
       // TODO(chemag): add support for scaling_list_data()
+#ifdef FPRINT_ERRORS
       fprintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
+#endif  // FPRINT_ERRORS
       return absl::nullopt;
     }
   }
@@ -362,27 +364,35 @@ absl::optional<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (sps.sps_range_extension_flag) {
     // sps_range_extension()
     // TODO(chemag): add support for sps_range_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented sps_range_extension() in sps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
   if (sps.sps_multilayer_extension_flag) {
     // sps_multilayer_extension() // specified in Annex F
     // TODO(chemag): add support for sps_multilayer_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented sps_multilayer_extension() in sps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
   if (sps.sps_3d_extension_flag) {
     // sps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for sps_3d_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented sps_3d_extension() in sps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 
   if (sps.sps_scc_extension_flag) {
     // sps_scc_extension()
     // TODO(chemag): add support for sps_scc_extension()
+#ifdef FPRINT_ERRORS
     fprintf(stderr, "error: unimplemented sps_scc_extension() in sps\n");
+#endif  // FPRINT_ERRORS
     return absl::nullopt;
   }
 

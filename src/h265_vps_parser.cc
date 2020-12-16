@@ -179,7 +179,9 @@ absl::optional<H265VpsParser::VpsState> H265VpsParser::ParseVps(
       }
       // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
       // TODO(chemag): add support for hrd_parameters()
+#ifdef FPRINT_ERRORS
       fprintf(stderr, "error: unimplemented hrd_parameters in vps\n");
+#endif  // FPRINT_ERRORS
       return absl::nullopt;
     }
   }
