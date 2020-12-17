@@ -104,7 +104,7 @@ H265BitstreamParser::ParseBitstream(
       nal_unit->length = nalu_index.payload_size;
 
       // (3) add the NAL unit to the vector
-      bitstream.nal_units.push_back(*nal_unit);
+      bitstream.nal_units.push_back(std::move(*nal_unit));
     }
   }
 
