@@ -7,9 +7,9 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
@@ -19,9 +19,6 @@
 
 namespace h265nal {
 
-namespace {
-typedef absl::optional<int32_t> OptionalInt32_t;
-}  // namespace
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
 // You can find it on this page:
@@ -30,14 +27,14 @@ typedef absl::optional<int32_t> OptionalInt32_t;
 // Calculate Luminance Slice QP values from slice header and PPS.
 namespace {
 // internal function
-absl::optional<int32_t> GetSliceQpYInternal(
+std::unique_ptr<int32_t> GetSliceQpYInternal(
     uint32_t nal_unit_type,
-    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>
         payload,
     const struct H265BitstreamParserState* bitstream_parser_state) {
   // make sure the payload contains a slice header
   if (!IsSliceSegment(nal_unit_type)) {
-    return absl::nullopt;
+    return nullptr;
   }
 
   // check some values
@@ -48,24 +45,24 @@ absl::optional<int32_t> GetSliceQpYInternal(
   // check the PPS exists in the bitstream parser state
   auto pps = bitstream_parser_state->GetPps(pps_id);
   if (pps.get() == nullptr) {
-    return absl::nullopt;
+    return nullptr;
   }
   const auto init_qp_minus26 = pps->init_qp_minus26;
 
   // Equation 7-54, Section 7.4.7.1
   int32_t slice_qpy = 26 + init_qp_minus26 + slice_qp_delta;
 
-  return OptionalInt32_t(slice_qpy);
+  return std::make_unique<int32_t>(slice_qpy);
 }
 }  // namespace
 
 #ifdef RTP_DEFINE
-absl::optional<int32_t> H265Utils::GetSliceQpY(
+std::unique_ptr<int32_t> H265Utils::GetSliceQpY(
     const H265RtpParser::RtpState rtp,
     const H265BitstreamParserState* bitstream_parser_state) {
   // get the actual NAL header (not the RTP one)
-  absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
-  absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState> payload;
+  std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
+  std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState> payload;
   uint32_t nal_unit_type = 0;
   if (rtp.nal_unit_header->nal_unit_type <= 47) {
     header = rtp.rtp_single->nal_unit_header;
@@ -80,13 +77,13 @@ absl::optional<int32_t> H265Utils::GetSliceQpY(
   } else if (rtp.nal_unit_header->nal_unit_type == FU) {
     // check this is the first NAL of the frame
     if (rtp.rtp_fu->s_bit == 0) {
-      return absl::nullopt;
+      return nullptr;
     }
     nal_unit_type = rtp.rtp_fu->fu_type;
     payload = rtp.rtp_fu->nal_unit_payload;
   } else {
     // invalid value
-    return absl::nullopt;
+    return nullptr;
   }
   // get the slice QP_Y value
   return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
@@ -99,19 +96,17 @@ void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
   slice_qp_y_vector->clear();
 
   // parse the incoming bitstream
-  absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream_state;
+  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream_state;
   bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
       data, length, bitstream_parser_state);
   // get all possible QP values
-  for (absl::optional<struct H265NalUnitParser::NalUnitState> nal_unit :
-       bitstream_state->nal_units) {
+  for (auto& nal_unit : bitstream_state->nal_units) {
     uint32_t nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;
-    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
-        payload = nal_unit->nal_unit_payload;
+    auto& payload = nal_unit->nal_unit_payload;
     // get the slice QP_Y value
     auto slice_qp_y_value =
         GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
-    if (slice_qp_y_value != absl::nullopt) {
+    if (slice_qp_y_value != nullptr) {
       slice_qp_y_vector->push_back(*slice_qp_y_value);
     }
   }

@@ -6,9 +6,8 @@
 
 #include <stdio.h>
 
-#include <vector>
+#include <memory>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -27,17 +26,17 @@ class H265RtpSingleParser {
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
 
-    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>
+    std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState>
         nal_unit_header;
-    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>
         nal_unit_payload;
   };
 
   // Unpack RBSP and parse RTP Single NAL Unit state from the supplied buffer.
-  static absl::optional<RtpSingleState> ParseRtpSingle(
+  static std::unique_ptr<RtpSingleState> ParseRtpSingle(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<RtpSingleState> ParseRtpSingle(
+  static std::unique_ptr<RtpSingleState> ParseRtpSingle(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };

@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_profile_tier_level_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -35,7 +35,7 @@ class H265VpsParser {
     uint32_t vps_max_sub_layers_minus1 = 0;
     uint32_t vps_temporal_id_nesting_flag = 0;
     uint32_t vps_reserved_0xffff_16bits = 0;
-    absl::optional<struct H265ProfileTierLevelParser::ProfileTierLevelState>
+    std::unique_ptr<struct H265ProfileTierLevelParser::ProfileTierLevelState>
         profile_tier_level;
     uint32_t vps_sub_layer_ordering_info_present_flag = 0;
     std::vector<uint32_t> vps_max_dec_pic_buffering_minus1;

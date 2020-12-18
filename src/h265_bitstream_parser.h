@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -31,12 +31,12 @@ class H265BitstreamParser {
     bool add_offset;
     bool add_length;
     // NAL units
-    std::vector<absl::optional<struct H265NalUnitParser::NalUnitState>>
+    std::vector<std::unique_ptr<struct H265NalUnitParser::NalUnitState>>
         nal_units;
   };
 
   // Unpack RBSP and parse bitstream state from the supplied buffer.
-  static absl::optional<BitstreamState> ParseBitstream(
+  static std::unique_ptr<BitstreamState> ParseBitstream(
       const uint8_t* data, size_t length,
       H265BitstreamParserState* bitstream_parser_state) noexcept;
 

@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -27,23 +27,23 @@ class H265RtpApParser {
 #endif  // FDUMP_DEFINE
 
     // common header
-    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
+    std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
 
     // payload
     std::vector<size_t> nal_unit_sizes;
     std::vector<
-        absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>>
+        std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState>>
         nal_unit_headers;
     std::vector<
-        absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>>
+        std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>>
         nal_unit_payloads;
   };
 
   // Unpack RBSP and parse RTP AP state from the supplied buffer.
-  static absl::optional<RtpApState> ParseRtpAp(
+  static std::unique_ptr<RtpApState> ParseRtpAp(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<RtpApState> ParseRtpAp(
+  static std::unique_ptr<RtpApState> ParseRtpAp(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };

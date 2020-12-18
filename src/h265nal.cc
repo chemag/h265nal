@@ -11,7 +11,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "absl/types/optional.h"
 #include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
@@ -210,13 +209,13 @@ int main(int argc, char **argv) {
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
   // create bitstream parser state
-  absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
   h265nal::H265BitstreamParserState bitstream_parser_state;
 
   // parse the file
   bitstream = h265nal::H265BitstreamParser::ParseBitstream(
       buffer.data(), buffer.size(), &bitstream_parser_state);
-  if (bitstream == absl::nullopt) {
+  if (bitstream == nullptr) {
     // did not work
     fprintf(stderr, "Could not init h265 bitstream parser\n");
     return -1;

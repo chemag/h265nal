@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
+#include <vector>
 
 namespace h265nal {
 

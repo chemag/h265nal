@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -19,7 +18,7 @@ class H265RtpApParserTest : public ::testing::Test {
   H265RtpApParserTest() {}
   ~H265RtpApParserTest() override {}
 
-  absl::optional<H265RtpApParser::RtpApState> rtp_ap_;
+  std::unique_ptr<H265RtpApParser::RtpApState> rtp_ap_;
 };
 
 TEST_F(H265RtpApParserTest, TestSampleAUD) {
@@ -46,7 +45,7 @@ TEST_F(H265RtpApParserTest, TestSampleAUD) {
   H265BitstreamParserState bitstream_parser_state;
   rtp_ap_ = H265RtpApParser::ParseRtpAp(buffer, arraysize(buffer),
                                         &bitstream_parser_state);
-  EXPECT_TRUE(rtp_ap_ != absl::nullopt);
+  EXPECT_TRUE(rtp_ap_ != nullptr);
 
   // check the common header
   auto header = rtp_ap_->header;

@@ -7,16 +7,12 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 
-namespace {
-typedef absl::optional<h265nal::H265RtpSingleParser::RtpSingleState>
-    OptionalRtpSingle;
-}  // namespace
 
 namespace h265nal {
 
@@ -25,7 +21,7 @@ namespace h265nal {
 // https://tools.ietf.org/html/rfc7798#section-4.4.1
 
 // Unpack RBSP and parse RTP Single NAL Unit state from the supplied buffer.
-absl::optional<H265RtpSingleParser::RtpSingleState>
+std::unique_ptr<H265RtpSingleParser::RtpSingleState>
 H265RtpSingleParser::ParseRtpSingle(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
@@ -34,23 +30,23 @@ H265RtpSingleParser::ParseRtpSingle(
   return ParseRtpSingle(&bit_buffer, bitstream_parser_state);
 }
 
-absl::optional<H265RtpSingleParser::RtpSingleState>
+std::unique_ptr<H265RtpSingleParser::RtpSingleState>
 H265RtpSingleParser::ParseRtpSingle(
     rtc::BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 RTP Single NAL Unit pseudo-NAL Unit.
-  RtpSingleState rtp_single;
+  auto rtp_single = std::make_unique<RtpSingleState>();
 
   // nal_unit_header()
-  rtp_single.nal_unit_header =
+  rtp_single->nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
 
   // nal_unit_payload()
-  rtp_single.nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
-      bit_buffer, rtp_single.nal_unit_header->nal_unit_type,
+  rtp_single->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
+      bit_buffer, rtp_single->nal_unit_header->nal_unit_type,
       bitstream_parser_state);
 
-  return OptionalRtpSingle(rtp_single);
+  return rtp_single;
 }
 
 #ifdef FDUMP_DEFINE

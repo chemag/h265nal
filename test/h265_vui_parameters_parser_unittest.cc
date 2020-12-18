@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -19,7 +18,7 @@ class H265VuiParametersParserTest : public ::testing::Test {
   H265VuiParametersParserTest() {}
   ~H265VuiParametersParserTest() override {}
 
-  absl::optional<H265VuiParametersParser::VuiParametersState> vui_parameters_;
+  std::unique_ptr<H265VuiParametersParser::VuiParametersState> vui_parameters_;
 };
 
 TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
@@ -29,7 +28,7 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
   };
   vui_parameters_ =
       H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer));
-  EXPECT_TRUE(vui_parameters_ != absl::nullopt);
+  EXPECT_TRUE(vui_parameters_ != nullptr);
 
   EXPECT_EQ(0, vui_parameters_->aspect_ratio_info_present_flag);
   EXPECT_EQ(0, vui_parameters_->overscan_info_present_flag);

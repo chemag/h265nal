@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_pps_parser.h"
@@ -23,7 +22,7 @@ class H265SliceSegmentLayerParserTest : public ::testing::Test {
   H265SliceSegmentLayerParserTest() {}
   ~H265SliceSegmentLayerParserTest() override {}
 
-  absl::optional<H265SliceSegmentLayerParser::SliceSegmentLayerState>
+  std::unique_ptr<H265SliceSegmentLayerParser::SliceSegmentLayerState>
       slice_segment_layer_;
 };
 
@@ -50,7 +49,7 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
   slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
       buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
       &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer_ != absl::nullopt);
+  EXPECT_TRUE(slice_segment_layer_ != nullptr);
 
   auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
 
@@ -99,7 +98,7 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice2) {
   slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
       buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
       &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer_ != absl::nullopt);
+  EXPECT_TRUE(slice_segment_layer_ != nullptr);
 
   auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
 

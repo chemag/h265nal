@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_utils.h"
@@ -21,7 +20,7 @@ class H265BitstreamParserTest : public ::testing::Test {
   H265BitstreamParserTest() {}
   ~H265BitstreamParserTest() override {}
 
-  absl::optional<H265BitstreamParser::BitstreamState> bitstream_;
+  std::unique_ptr<H265BitstreamParser::BitstreamState> bitstream_;
 };
 
 TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
@@ -61,7 +60,7 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
 
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer, arraysize(buffer),
                                                    &bitstream_parser_state);
-  EXPECT_TRUE(bitstream_ != absl::nullopt);
+  EXPECT_TRUE(bitstream_ != nullptr);
 
   // check there are 4 NAL units
   EXPECT_EQ(4, bitstream_->nal_units.size());
@@ -187,7 +186,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   // 0. parse buffer0
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer0, arraysize(buffer0),
                                                    &bitstream_parser_state);
-  EXPECT_TRUE(bitstream_ != absl::nullopt);
+  EXPECT_TRUE(bitstream_ != nullptr);
 
   // check there are 4 NAL units
   EXPECT_EQ(4, bitstream_->nal_units.size());
@@ -227,7 +226,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   // 1. parse buffer1
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer1, arraysize(buffer1),
                                                    &bitstream_parser_state);
-  EXPECT_TRUE(bitstream_ != absl::nullopt);
+  EXPECT_TRUE(bitstream_ != nullptr);
 
   // check there is 1 NAL units
   EXPECT_EQ(1, bitstream_->nal_units.size());
@@ -243,7 +242,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   // 2. parse buffer2
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer2, arraysize(buffer2),
                                                    &bitstream_parser_state);
-  EXPECT_TRUE(bitstream_ != absl::nullopt);
+  EXPECT_TRUE(bitstream_ != nullptr);
 
   // check there is 1 NAL units
   EXPECT_EQ(1, bitstream_->nal_units.size());

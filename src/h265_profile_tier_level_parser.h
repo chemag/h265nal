@@ -7,9 +7,9 @@
 #include <stdio.h>
 
 #include <array>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -55,9 +55,9 @@ class H265ProfileInfoParser {
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
-  static absl::optional<ProfileInfoState> ParseProfileInfo(
+  static std::unique_ptr<ProfileInfoState> ParseProfileInfo(
       const uint8_t* data, size_t length) noexcept;
-  static absl::optional<ProfileInfoState> ParseProfileInfo(
+  static std::unique_ptr<ProfileInfoState> ParseProfileInfo(
       rtc::BitBuffer* bit_buffer) noexcept;
 };
 
@@ -79,21 +79,21 @@ class H265ProfileTierLevelParser {
     unsigned int maxNumSubLayersMinus1;
 
     // contents
-    absl::optional<struct H265ProfileInfoParser::ProfileInfoState> general;
+    std::unique_ptr<struct H265ProfileInfoParser::ProfileInfoState> general;
     uint32_t general_level_idc = 0;
     std::vector<uint32_t> sub_layer_profile_present_flag;
     std::vector<uint32_t> sub_layer_level_present_flag;
     std::vector<uint32_t> reserved_zero_2bits;
-    std::vector<absl::optional<struct H265ProfileInfoParser::ProfileInfoState>>
+    std::vector<std::unique_ptr<struct H265ProfileInfoParser::ProfileInfoState>>
         sub_layer;
     std::vector<uint32_t> sub_layer_level_idc;
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.
-  static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
+  static std::unique_ptr<ProfileTierLevelState> ParseProfileTierLevel(
       const uint8_t* data, size_t length, const bool profilePresentFlag,
       const unsigned int maxNumSubLayersMinus1) noexcept;
-  static absl::optional<ProfileTierLevelState> ParseProfileTierLevel(
+  static std::unique_ptr<ProfileTierLevelState> ParseProfileTierLevel(
       rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
       const unsigned int maxNumSubLayersMinus1) noexcept;
 };

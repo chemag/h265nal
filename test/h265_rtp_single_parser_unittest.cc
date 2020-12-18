@@ -9,7 +9,6 @@
 
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_utils.h"
 #include "rtc_base/arraysize.h"
@@ -22,7 +21,7 @@ class H265RtpSingleParserTest : public ::testing::Test {
   H265RtpSingleParserTest() {}
   ~H265RtpSingleParserTest() override {}
 
-  absl::optional<H265RtpSingleParser::RtpSingleState> rtp_single_;
+  std::unique_ptr<H265RtpSingleParser::RtpSingleState> rtp_single_;
 };
 
 TEST_F(H265RtpSingleParserTest, TestSampleVps) {
@@ -33,7 +32,7 @@ TEST_F(H265RtpSingleParserTest, TestSampleVps) {
   H265BitstreamParserState bitstream_parser_state;
   rtp_single_ = H265RtpSingleParser::ParseRtpSingle(buffer, arraysize(buffer),
                                                     &bitstream_parser_state);
-  EXPECT_TRUE(rtp_single_ != absl::nullopt);
+  EXPECT_TRUE(rtp_single_ != nullptr);
 
   // check the header
   EXPECT_EQ(0, rtp_single_->nal_unit_header->forbidden_zero_bit);
@@ -84,7 +83,7 @@ TEST_F(H265RtpSingleParserTest, TestMultipleRtpPackets) {
   for (const auto &buffer : vbuffer) {
     rtp_single_ = H265RtpSingleParser::ParseRtpSingle(
         buffer.data(), buffer.size(), &bitstream_parser_state);
-    EXPECT_TRUE(rtp_single_ != absl::nullopt);
+    EXPECT_TRUE(rtp_single_ != nullptr);
 
     // check the header
     auto &header = rtp_single_->nal_unit_header;

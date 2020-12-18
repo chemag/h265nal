@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 #include <cstdint>
-#include <vector>
+#include <memory>
 
 #include "h265_common.h"
 #include "h265_pps_parser.h"

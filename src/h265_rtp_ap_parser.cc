@@ -7,17 +7,14 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
 
-namespace {
-typedef absl::optional<h265nal::H265RtpApParser::RtpApState> OptionalRtpAp;
-}  // namespace
 
 namespace h265nal {
 
@@ -26,7 +23,7 @@ namespace h265nal {
 // https://tools.ietf.org/html/rfc7798#section-4.4.2
 
 // Unpack RBSP and parse RTP AP state from the supplied buffer.
-absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
+std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
@@ -34,34 +31,34 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
   return ParseRtpAp(&bit_buffer, bitstream_parser_state);
 }
 
-absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
+std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     rtc::BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 RTP AP pseudo-NAL Unit.
-  RtpApState rtp_ap;
+  auto rtp_ap = std::make_unique<RtpApState>();
 
   // first read the common header
-  rtp_ap.header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  rtp_ap->header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
 
   while (bit_buffer->RemainingBitCount() > 0) {
     // NALU size
     uint32_t nalu_size;
     if (!bit_buffer->ReadBits(&nalu_size, 16)) {
-      return absl::nullopt;
+      return nullptr;
     }
-    rtp_ap.nal_unit_sizes.push_back(nalu_size);
+    rtp_ap->nal_unit_sizes.push_back(nalu_size);
 
     // NALU header
-    rtp_ap.nal_unit_headers.push_back(
+    rtp_ap->nal_unit_headers.push_back(
         H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer));
 
     // NALU payload
-    rtp_ap.nal_unit_payloads.push_back(
+    rtp_ap->nal_unit_payloads.push_back(
         H265NalUnitPayloadParser::ParseNalUnitPayload(
-            bit_buffer, rtp_ap.nal_unit_headers.back()->nal_unit_type,
+            bit_buffer, rtp_ap->nal_unit_headers.back()->nal_unit_type,
             bitstream_parser_state));
   }
-  return OptionalRtpAp(rtp_ap);
+  return rtp_ap;
 }
 
 #ifdef FDUMP_DEFINE

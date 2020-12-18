@@ -6,9 +6,8 @@
 
 #include <stdio.h>
 
-#include <vector>
+#include <memory>
 
-#include "absl/types/optional.h"
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -27,7 +26,7 @@ class H265RtpFuParser {
 #endif  // FDUMP_DEFINE
 
     // common header
-    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
+    std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
 
     // fu header
     uint32_t s_bit;
@@ -35,15 +34,15 @@ class H265RtpFuParser {
     uint32_t fu_type;
 
     // optional payload
-    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>
         nal_unit_payload;
   };
 
   // Unpack RBSP and parse RTP FU state from the supplied buffer.
-  static absl::optional<RtpFuState> ParseRtpFu(
+  static std::unique_ptr<RtpFuState> ParseRtpFu(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<RtpFuState> ParseRtpFu(
+  static std::unique_ptr<RtpFuState> ParseRtpFu(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };

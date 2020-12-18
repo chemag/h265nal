@@ -6,12 +6,12 @@ cmake_minimum_required(VERSION 3.0)
 # https://cmake.org/cmake/help/v3.0/command/project.html
 project(h265nal VERSION 0.12)
 
-# Abseil requires C++11
-set(CMAKE_CXX_STANDARD 11)
+# std::make_ptr requires C++14
+set(CMAKE_CXX_STANDARD 14)
 
 # set up clang-tidy
 set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-format-style='google'")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 enable_testing()
 

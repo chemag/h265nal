@@ -7,17 +7,14 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265BitstreamParser::BitstreamState>
-    OptionalBitstream;
-
 // The size of a full NALU start sequence {0 0 0 1}, used for the first NALU
 // of an access unit, and for SPS and PPS blocks.
 // const size_t kNaluLongStartSequenceSize = 4;
@@ -81,11 +78,11 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data,
 // each NAL unit buffer, and adds the corresponding parsed struct into
 // the `bitstream` list (a `BitstreamState` object).
 // Function returns the said `bitstream` list.
-absl::optional<H265BitstreamParser::BitstreamState>
+std::unique_ptr<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(
     const uint8_t* data, size_t length,
     H265BitstreamParserState* bitstream_parser_state) noexcept {
-  BitstreamState bitstream;
+  auto bitstream = std::make_unique<BitstreamState>();
 
   // (1) split the input string into a vector of NAL units
   std::vector<NaluIndex> nalu_indices = FindNaluIndices(data, length);
@@ -93,23 +90,23 @@ H265BitstreamParser::ParseBitstream(
   // process each of the NAL units
   for (const NaluIndex& nalu_index : nalu_indices) {
     // (2) parse the NAL units, and add them to the vector
-    bitstream.nal_units.push_back(H265NalUnitParser::ParseNalUnit(
+    bitstream->nal_units.push_back(H265NalUnitParser::ParseNalUnit(
         &data[nalu_index.payload_start_offset], nalu_index.payload_size,
         bitstream_parser_state));
-    if (bitstream.nal_units.back() != absl::nullopt) {
+    if (bitstream->nal_units.back() != nullptr) {
       // store the offset
-      bitstream.nal_units.back()->offset = nalu_index.payload_start_offset;
-      bitstream.nal_units.back()->length = nalu_index.payload_size;
+      bitstream->nal_units.back()->offset = nalu_index.payload_start_offset;
+      bitstream->nal_units.back()->length = nalu_index.payload_size;
     }
   }
 
-  return OptionalBitstream(bitstream);
+  return bitstream;
 }
 
 #ifdef FDUMP_DEFINE
 void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
-  for (absl::optional<struct H265NalUnitParser::NalUnitState> nal_unit :
+  for (std::unique_ptr<struct H265NalUnitParser::NalUnitState> nal_unit :
        nal_units) {
     nal_unit->fdump(outfp, indent_level, add_offset, add_length);
     fprintf(outfp, "\n");

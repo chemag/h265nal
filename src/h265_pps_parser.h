@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
 #include "h265_profile_tier_level_parser.h"

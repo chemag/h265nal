@@ -6,9 +6,8 @@
 
 #include <stdio.h>
 
-#include <vector>
+#include <memory>
 
-#include "absl/types/optional.h"
 #include "h265_aud_parser.h"
 #include "h265_pps_parser.h"
 #include "h265_slice_parser.h"
@@ -37,9 +36,9 @@ class H265NalUnitHeaderParser {
   };
 
   // Unpack RBSP and parse NAL unit header state from the supplied buffer.
-  static absl::optional<NalUnitHeaderState> ParseNalUnitHeader(
+  static std::unique_ptr<NalUnitHeaderState> ParseNalUnitHeader(
       const uint8_t* data, size_t length) noexcept;
-  static absl::optional<NalUnitHeaderState> ParseNalUnitHeader(
+  static std::unique_ptr<NalUnitHeaderState> ParseNalUnitHeader(
       rtc::BitBuffer* bit_buffer) noexcept;
 };
 
@@ -59,16 +58,16 @@ class H265NalUnitPayloadParser {
     std::shared_ptr<struct H265VpsParser::VpsState> vps;
     std::shared_ptr<struct H265SpsParser::SpsState> sps;
     std::shared_ptr<struct H265PpsParser::PpsState> pps;
-    absl::optional<struct H265AudParser::AudState> aud;
-    absl::optional<struct H265SliceSegmentLayerParser::SliceSegmentLayerState>
+    std::unique_ptr<struct H265AudParser::AudState> aud;
+    std::unique_ptr<struct H265SliceSegmentLayerParser::SliceSegmentLayerState>
         slice_segment_layer;
   };
 
   // Unpack RBSP and parse NAL unit payload state from the supplied buffer.
-  static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
+  static std::unique_ptr<NalUnitPayloadState> ParseNalUnitPayload(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<NalUnitPayloadState> ParseNalUnitPayload(
+  static std::unique_ptr<NalUnitPayloadState> ParseNalUnitPayload(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
@@ -90,17 +89,17 @@ class H265NalUnitParser {
     size_t offset;
     size_t length;
 
-    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>
+    std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState>
         nal_unit_header;
-    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>
         nal_unit_payload;
   };
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
-  static absl::optional<NalUnitState> ParseNalUnit(
+  static std::unique_ptr<NalUnitState> ParseNalUnit(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<NalUnitState> ParseNalUnit(
+  static std::unique_ptr<NalUnitState> ParseNalUnit(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };

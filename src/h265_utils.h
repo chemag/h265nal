@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #ifdef RTP_DEFINE
 #include "h265_rtp_parser.h"
@@ -21,7 +21,7 @@ class H265Utils {
  public:
   // Get the slice QP for the Y component (Equation 7-54)
 #ifdef RTP_DEFINE
-  static absl::optional<int32_t> GetSliceQpY(
+  static std::unique_ptr<int32_t> GetSliceQpY(
       const H265RtpParser::RtpState rtp,
       const H265BitstreamParserState* bitstream_parser_state);
 #endif  // RTP_DEFINE

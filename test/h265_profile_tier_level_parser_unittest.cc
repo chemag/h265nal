@@ -13,7 +13,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -24,7 +23,7 @@ class H265ProfileTierLevelParserTest : public ::testing::Test {
   H265ProfileTierLevelParserTest() {}
   ~H265ProfileTierLevelParserTest() override {}
 
-  absl::optional<H265ProfileTierLevelParser::ProfileTierLevelState> ptls_;
+  std::unique_ptr<H265ProfileTierLevelParser::ProfileTierLevelState> ptls_;
 };
 
 TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
@@ -35,7 +34,7 @@ TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
   };
   ptls_ = H265ProfileTierLevelParser::ParseProfileTierLevel(
       buffer, arraysize(buffer), true, 0);
-  EXPECT_TRUE(ptls_ != absl::nullopt);
+  EXPECT_TRUE(ptls_ != nullptr);
   EXPECT_EQ(0, ptls_->general->profile_space);
   EXPECT_EQ(0, ptls_->general->tier_flag);
   EXPECT_EQ(1, ptls_->general->profile_idc);

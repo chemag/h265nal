@@ -6,9 +6,8 @@
 
 #include <stdio.h>
 
-#include <vector>
+#include <memory>
 
-#include "absl/types/optional.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -90,9 +89,9 @@ class H265VuiParametersParser {
   };
 
   // Unpack RBSP and parse VIU Parameters state from the supplied buffer.
-  static absl::optional<VuiParametersState> ParseVuiParameters(
+  static std::unique_ptr<VuiParametersState> ParseVuiParameters(
       const uint8_t* data, size_t length) noexcept;
-  static absl::optional<VuiParametersState> ParseVuiParameters(
+  static std::unique_ptr<VuiParametersState> ParseVuiParameters(
       rtc::BitBuffer* bit_buffer) noexcept;
 };
 

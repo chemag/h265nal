@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
@@ -20,7 +19,7 @@ class H265NalUnitParserTest : public ::testing::Test {
   H265NalUnitParserTest() {}
   ~H265NalUnitParserTest() override {}
 
-  absl::optional<H265NalUnitParser::NalUnitState> nal_unit_;
+  std::unique_ptr<H265NalUnitParser::NalUnitState> nal_unit_;
 };
 
 TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
@@ -31,7 +30,7 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
   H265BitstreamParserState bitstream_parser_state;
   nal_unit_ = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
                                               &bitstream_parser_state);
-  EXPECT_TRUE(nal_unit_ != absl::nullopt);
+  EXPECT_TRUE(nal_unit_ != nullptr);
 
   // check the header
   EXPECT_EQ(0, nal_unit_->nal_unit_header->forbidden_zero_bit);

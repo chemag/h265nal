@@ -7,15 +7,11 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 
-namespace {
-typedef absl::optional<h265nal::H265VuiParametersParser::VuiParametersState>
-    OptionalVuiParameters;
-}  // namespace
 
 namespace h265nal {
 
@@ -24,7 +20,7 @@ namespace h265nal {
 // http://www.itu.int/rec/T-REC-H.265
 
 // Unpack RBSP and parse VUI Parameters state from the supplied buffer.
-absl::optional<H265VuiParametersParser::VuiParametersState>
+std::unique_ptr<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(const uint8_t* data,
                                             size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
@@ -32,219 +28,219 @@ H265VuiParametersParser::ParseVuiParameters(const uint8_t* data,
   return ParseVuiParameters(&bit_buffer);
 }
 
-absl::optional<H265VuiParametersParser::VuiParametersState>
+std::unique_ptr<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(
     rtc::BitBuffer* bit_buffer) noexcept {
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for
   // a complete description.
-  VuiParametersState vui;
+  auto vui = std::make_unique<VuiParametersState>();
 
   // vui_video_parameter_set_id  u(1)
-  if (!bit_buffer->ReadBits(&(vui.aspect_ratio_info_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->aspect_ratio_info_present_flag), 1)) {
+    return nullptr;
   }
 
-  if (vui.aspect_ratio_info_present_flag) {
+  if (vui->aspect_ratio_info_present_flag) {
     // aspect_ratio_idc  u(8)
-    if (!bit_buffer->ReadBits(&(vui.aspect_ratio_idc), 8)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->aspect_ratio_idc), 8)) {
+      return nullptr;
     }
-    if (vui.aspect_ratio_idc == AR_EXTENDED_SAR) {
+    if (vui->aspect_ratio_idc == AR_EXTENDED_SAR) {
       // sar_width  u(16)
-      if (!bit_buffer->ReadBits(&(vui.sar_width), 8)) {
-        return absl::nullopt;
+      if (!bit_buffer->ReadBits(&(vui->sar_width), 8)) {
+        return nullptr;
       }
       // sar_height  u(16)
-      if (!bit_buffer->ReadBits(&(vui.sar_height), 8)) {
-        return absl::nullopt;
+      if (!bit_buffer->ReadBits(&(vui->sar_height), 8)) {
+        return nullptr;
       }
     }
   }
 
   // overscan_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.overscan_info_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->overscan_info_present_flag), 1)) {
+    return nullptr;
   }
 
-  if (vui.overscan_info_present_flag) {
+  if (vui->overscan_info_present_flag) {
     // overscan_appropriate_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.overscan_appropriate_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->overscan_appropriate_flag), 1)) {
+      return nullptr;
     }
   }
 
   // video_signal_type_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.video_signal_type_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->video_signal_type_present_flag), 1)) {
+    return nullptr;
   }
 
-  if (vui.video_signal_type_present_flag) {
+  if (vui->video_signal_type_present_flag) {
     // video_format  u(3)
-    if (!bit_buffer->ReadBits(&(vui.video_format), 3)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->video_format), 3)) {
+      return nullptr;
     }
     // video_full_range_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.video_full_range_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->video_full_range_flag), 1)) {
+      return nullptr;
     }
     // colour_description_present_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.colour_description_present_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->colour_description_present_flag), 1)) {
+      return nullptr;
     }
-    if (vui.colour_description_present_flag) {
+    if (vui->colour_description_present_flag) {
       // colour_primaries  u(8)
-      if (!bit_buffer->ReadBits(&(vui.colour_primaries), 8)) {
-        return absl::nullopt;
+      if (!bit_buffer->ReadBits(&(vui->colour_primaries), 8)) {
+        return nullptr;
       }
       // transfer_characteristics  u(8)
-      if (!bit_buffer->ReadBits(&(vui.transfer_characteristics), 8)) {
-        return absl::nullopt;
+      if (!bit_buffer->ReadBits(&(vui->transfer_characteristics), 8)) {
+        return nullptr;
       }
       // matrix_coeffs  u(8)
-      if (!bit_buffer->ReadBits(&(vui.matrix_coeffs), 8)) {
-        return absl::nullopt;
+      if (!bit_buffer->ReadBits(&(vui->matrix_coeffs), 8)) {
+        return nullptr;
       }
     }
   }
 
   // chroma_loc_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.chroma_loc_info_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->chroma_loc_info_present_flag), 1)) {
+    return nullptr;
   }
-  if (vui.chroma_loc_info_present_flag) {
+  if (vui->chroma_loc_info_present_flag) {
     // chroma_sample_loc_type_top_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui.chroma_sample_loc_type_top_field))) {
-      return absl::nullopt;
+            &(vui->chroma_sample_loc_type_top_field))) {
+      return nullptr;
     }
     // chroma_sample_loc_type_bottom_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui.chroma_sample_loc_type_bottom_field))) {
-      return absl::nullopt;
+            &(vui->chroma_sample_loc_type_bottom_field))) {
+      return nullptr;
     }
   }
 
   // neutral_chroma_indication_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.neutral_chroma_indication_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->neutral_chroma_indication_flag), 1)) {
+    return nullptr;
   }
 
   // field_seq_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.field_seq_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->field_seq_flag), 1)) {
+    return nullptr;
   }
 
   // frame_field_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.frame_field_info_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->frame_field_info_present_flag), 1)) {
+    return nullptr;
   }
 
   // default_display_window_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.default_display_window_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->default_display_window_flag), 1)) {
+    return nullptr;
   }
-  if (vui.default_display_window_flag) {
+  if (vui->default_display_window_flag) {
     // def_disp_win_left_offset ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.def_disp_win_left_offset))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_left_offset))) {
+      return nullptr;
     }
     // def_disp_win_right_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.def_disp_win_right_offset))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_right_offset))) {
+      return nullptr;
     }
     // def_disp_win_top_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.def_disp_win_top_offset))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_top_offset))) {
+      return nullptr;
     }
     // def_disp_win_bottom_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.def_disp_win_bottom_offset))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_bottom_offset))) {
+      return nullptr;
     }
   }
 
   // vui_timing_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.vui_timing_info_present_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->vui_timing_info_present_flag), 1)) {
+    return nullptr;
   }
-  if (vui.vui_timing_info_present_flag) {
+  if (vui->vui_timing_info_present_flag) {
     // vui_num_units_in_tick  u(32)
-    if (!bit_buffer->ReadBits(&(vui.vui_num_units_in_tick), 32)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->vui_num_units_in_tick), 32)) {
+      return nullptr;
     }
     // vui_time_scale  u(32)
-    if (!bit_buffer->ReadBits(&(vui.vui_time_scale), 32)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->vui_time_scale), 32)) {
+      return nullptr;
     }
     // vui_poc_proportional_to_timing_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.vui_poc_proportional_to_timing_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->vui_poc_proportional_to_timing_flag), 1)) {
+      return nullptr;
     }
-    if (vui.vui_poc_proportional_to_timing_flag) {
+    if (vui->vui_poc_proportional_to_timing_flag) {
       // vui_num_ticks_poc_diff_one_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(vui.vui_num_ticks_poc_diff_one_minus1))) {
-        return absl::nullopt;
+              &(vui->vui_num_ticks_poc_diff_one_minus1))) {
+        return nullptr;
       }
     }
     // vui_hrd_parameters_present_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.vui_hrd_parameters_present_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->vui_hrd_parameters_present_flag), 1)) {
+      return nullptr;
     }
-    if (vui.vui_hrd_parameters_present_flag) {
+    if (vui->vui_hrd_parameters_present_flag) {
       // hrd_parameters( 1, sps_max_sub_layers_minus1 )
       // TODO(chemag): add support for hrd_parameters()
 #ifdef FPRINT_ERRORS
       fprintf(stderr, "error: unimplemented hrd_parameters in vui\n");
 #endif  // FPRINT_ERRORS
-      return absl::nullopt;
+      return nullptr;
     }
   }
 
   // bitstream_restriction_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui.bitstream_restriction_flag), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(vui->bitstream_restriction_flag), 1)) {
+    return nullptr;
   }
-  if (vui.bitstream_restriction_flag) {
+  if (vui->bitstream_restriction_flag) {
     // tiles_fixed_structure_flag u(1)
-    if (!bit_buffer->ReadBits(&(vui.tiles_fixed_structure_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->tiles_fixed_structure_flag), 1)) {
+      return nullptr;
     }
     // motion_vectors_over_pic_boundaries_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.motion_vectors_over_pic_boundaries_flag),
+    if (!bit_buffer->ReadBits(&(vui->motion_vectors_over_pic_boundaries_flag),
                               1)) {
-      return absl::nullopt;
+      return nullptr;
     }
     // restricted_ref_pic_lists_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui.restricted_ref_pic_lists_flag), 1)) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadBits(&(vui->restricted_ref_pic_lists_flag), 1)) {
+      return nullptr;
     }
     // min_spatial_segmentation_idc  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui.min_spatial_segmentation_idc))) {
-      return absl::nullopt;
+            &(vui->min_spatial_segmentation_idc))) {
+      return nullptr;
     }
     // max_bytes_per_pic_denom  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.max_bytes_per_pic_denom))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->max_bytes_per_pic_denom))) {
+      return nullptr;
     }
     // max_bits_per_min_cu_denom  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui.max_bits_per_min_cu_denom))) {
-      return absl::nullopt;
+    if (!bit_buffer->ReadExponentialGolomb(&(vui->max_bits_per_min_cu_denom))) {
+      return nullptr;
     }
     // log2_max_mv_length_horizontal  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui.log2_max_mv_length_horizontal))) {
-      return absl::nullopt;
+            &(vui->log2_max_mv_length_horizontal))) {
+      return nullptr;
     }
     // log2_max_mv_length_vertical  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui.log2_max_mv_length_vertical))) {
-      return absl::nullopt;
+            &(vui->log2_max_mv_length_vertical))) {
+      return nullptr;
     }
   }
 
-  return OptionalVuiParameters(vui);
+  return vui;
 }
 
 #ifdef FDUMP_DEFINE

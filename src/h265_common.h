@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "rtc_base/bit_buffer.h"

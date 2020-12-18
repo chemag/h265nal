@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -19,7 +18,7 @@ class H265RtpFuParserTest : public ::testing::Test {
   H265RtpFuParserTest() {}
   ~H265RtpFuParserTest() override {}
 
-  absl::optional<H265RtpFuParser::RtpFuState> rtp_fu_;
+  std::unique_ptr<H265RtpFuParser::RtpFuState> rtp_fu_;
 };
 
 TEST_F(H265RtpFuParserTest, TestSampleStart) {
@@ -33,7 +32,7 @@ TEST_F(H265RtpFuParserTest, TestSampleStart) {
   H265BitstreamParserState bitstream_parser_state;
   rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
                                         &bitstream_parser_state);
-  EXPECT_TRUE(rtp_fu_ != absl::nullopt);
+  EXPECT_TRUE(rtp_fu_ != nullptr);
 
   // check the common header
   auto header = rtp_fu_->header;
@@ -58,7 +57,7 @@ TEST_F(H265RtpFuParserTest, TestSampleMiddle) {
   H265BitstreamParserState bitstream_parser_state;
   rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
                                         &bitstream_parser_state);
-  EXPECT_TRUE(rtp_fu_ != absl::nullopt);
+  EXPECT_TRUE(rtp_fu_ != nullptr);
 
   // check the common header
   auto header = rtp_fu_->header;
@@ -83,7 +82,7 @@ TEST_F(H265RtpFuParserTest, TestSampleEnd) {
   H265BitstreamParserState bitstream_parser_state;
   rtp_fu_ = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
                                         &bitstream_parser_state);
-  EXPECT_TRUE(rtp_fu_ != absl::nullopt);
+  EXPECT_TRUE(rtp_fu_ != nullptr);
 
   // check the common header
   auto header = rtp_fu_->header;

@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "h265_vui_parameters_parser.h"
@@ -33,7 +33,7 @@ class H265SpsParser {
     uint32_t sps_video_parameter_set_id = 0;
     uint32_t sps_max_sub_layers_minus1 = 0;
     uint32_t sps_temporal_id_nesting_flag = 0;
-    absl::optional<struct H265ProfileTierLevelParser::ProfileTierLevelState>
+    std::unique_ptr<struct H265ProfileTierLevelParser::ProfileTierLevelState>
         profile_tier_level;
     uint32_t sps_seq_parameter_set_id = 0;
     uint32_t chroma_format_idc = 0;
@@ -70,7 +70,7 @@ class H265SpsParser {
     uint32_t log2_diff_max_min_pcm_luma_coding_block_size = 0;
     uint32_t pcm_loop_filter_disabled_flag = 0;
     uint32_t num_short_term_ref_pic_sets = 0;
-    std::vector<absl::optional<struct H265StRefPicSetParser::StRefPicSetState>>
+    std::vector<std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>>
         st_ref_pic_set;
     uint32_t long_term_ref_pics_present_flag = 0;
     uint32_t num_long_term_ref_pics_sps = 0;
@@ -79,7 +79,7 @@ class H265SpsParser {
     uint32_t sps_temporal_mvp_enabled_flag = 0;
     uint32_t strong_intra_smoothing_enabled_flag = 0;
     uint32_t vui_parameters_present_flag = 0;
-    absl::optional<struct H265VuiParametersParser::VuiParametersState>
+    std::unique_ptr<struct H265VuiParametersParser::VuiParametersState>
         vui_parameters;
     uint32_t sps_extension_present_flag = 0;
     uint32_t sps_range_extension_flag = 0;

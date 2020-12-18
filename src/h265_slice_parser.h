@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -72,7 +72,7 @@ class H265SliceSegmentHeaderParser {
     uint32_t colour_plane_id = 0;
     uint32_t slice_pic_order_cnt_lsb = 0;
     uint32_t short_term_ref_pic_set_sps_flag = 0;
-    absl::optional<struct H265StRefPicSetParser::StRefPicSetState>
+    std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>
         st_ref_pic_set;
     uint32_t short_term_ref_pic_set_idx = 0;
     uint32_t num_long_term_sps = 0;
@@ -116,10 +116,10 @@ class H265SliceSegmentHeaderParser {
   };
 
   // Unpack RBSP and parse slice state from the supplied buffer.
-  static absl::optional<SliceSegmentHeaderState> ParseSliceSegmentHeader(
+  static std::unique_ptr<SliceSegmentHeaderState> ParseSliceSegmentHeader(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<SliceSegmentHeaderState> ParseSliceSegmentHeader(
+  static std::unique_ptr<SliceSegmentHeaderState> ParseSliceSegmentHeader(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
@@ -140,17 +140,17 @@ class H265SliceSegmentLayerParser {
     uint32_t nal_unit_type = 0;
 
     // contents
-    absl::optional<struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
+    std::unique_ptr<struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
         slice_segment_header;
     // slice_segment_data()
     // rbsp_slice_segment_trailing_bits()
   };
 
   // Unpack RBSP and parse slice state from the supplied buffer.
-  static absl::optional<SliceSegmentLayerState> ParseSliceSegmentLayer(
+  static std::unique_ptr<SliceSegmentLayerState> ParseSliceSegmentLayer(
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
-  static absl::optional<SliceSegmentLayerState> ParseSliceSegmentLayer(
+  static std::unique_ptr<SliceSegmentLayerState> ParseSliceSegmentLayer(
       rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };

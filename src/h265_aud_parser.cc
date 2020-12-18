@@ -7,14 +7,11 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 
-namespace {
-typedef absl::optional<h265nal::H265AudParser::AudState> OptionalAud;
-}  // namespace
 
 namespace h265nal {
 
@@ -23,28 +20,28 @@ namespace h265nal {
 // http://www.itu.int/rec/T-REC-H.265
 
 // Unpack RBSP and parse AUD state from the supplied buffer.
-absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
+std::unique_ptr<H265AudParser::AudState> H265AudParser::ParseAud(
     const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseAud(&bit_buffer);
 }
 
-absl::optional<H265AudParser::AudState> H265AudParser::ParseAud(
+std::unique_ptr<H265AudParser::AudState> H265AudParser::ParseAud(
     rtc::BitBuffer* bit_buffer) noexcept {
   // H265 AUD NAL Unit (access_unit_delimiter_rbsp()) parser.
   // Section 7.3.2.5 ("Access unit delimiter RBSP syntax") of the H.265
   // standard for a complete description.
-  AudState aud;
+  auto aud = std::make_unique<AudState>();
 
   // pic_type  u(3)
-  if (!bit_buffer->ReadBits(&(aud.pic_type), 3)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(aud->pic_type), 3)) {
+    return nullptr;
   }
 
   rbsp_trailing_bits(bit_buffer);
 
-  return OptionalAud(aud);
+  return aud;
 }
 
 #ifdef FDUMP_DEFINE

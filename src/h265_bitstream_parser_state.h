@@ -7,6 +7,7 @@
 #include <stdio.h>
 
 #include <map>
+#include <memory>
 
 #include "h265_pps_parser.h"
 #include "h265_sps_parser.h"

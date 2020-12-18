@@ -8,6 +8,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <memory>
 #include <vector>
 
 #include "h265_common.h"

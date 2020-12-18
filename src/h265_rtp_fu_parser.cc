@@ -7,16 +7,13 @@
 #include <stdio.h>
 
 #include <cstdint>
+#include <memory>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 
-namespace {
-typedef absl::optional<h265nal::H265RtpFuParser::RtpFuState> OptionalRtpFu;
-}  // namespace
 
 namespace h265nal {
 
@@ -25,7 +22,7 @@ namespace h265nal {
 // https://tools.ietf.org/html/rfc7798#section-4.4.2
 
 // Unpack RBSP and parse RTP FU state from the supplied buffer.
-absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
+std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
@@ -33,36 +30,36 @@ absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   return ParseRtpFu(&bit_buffer, bitstream_parser_state);
 }
 
-absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
+std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
     rtc::BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 RTP FU pseudo-NAL Unit.
-  RtpFuState rtp_fu;
+  auto rtp_fu = std::make_unique<RtpFuState>();
 
   // first read the common header
-  rtp_fu.header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  rtp_fu->header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
 
   // read the fu header
-  if (!bit_buffer->ReadBits(&(rtp_fu.s_bit), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(rtp_fu->s_bit), 1)) {
+    return nullptr;
   }
-  if (!bit_buffer->ReadBits(&(rtp_fu.e_bit), 1)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(rtp_fu->e_bit), 1)) {
+    return nullptr;
   }
-  if (!bit_buffer->ReadBits(&(rtp_fu.fu_type), 6)) {
-    return absl::nullopt;
+  if (!bit_buffer->ReadBits(&(rtp_fu->fu_type), 6)) {
+    return nullptr;
   }
 
-  if (rtp_fu.s_bit == 0) {
+  if (rtp_fu->s_bit == 0) {
     // not the start of a fragmented NAL: stop here
-    return OptionalRtpFu(rtp_fu);
+    return rtp_fu;
   }
 
   // start of a fragmented NAL: keep reading
-  rtp_fu.nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
-      bit_buffer, rtp_fu.fu_type, bitstream_parser_state);
+  rtp_fu->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
+      bit_buffer, rtp_fu->fu_type, bitstream_parser_state);
 
-  return OptionalRtpFu(rtp_fu);
+  return rtp_fu;
 }
 
 #ifdef FDUMP_DEFINE
