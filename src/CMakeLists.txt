@@ -63,8 +63,3 @@ configure_file(config.h.in config.h)
 
 # this allows the 'config.h' file to be used throughout the program
 target_include_directories(h265nal PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
-
-add_executable(h265nal-bin h265nal.cc)
-target_link_libraries(h265nal-bin PUBLIC h265nal)
-# rename executable using target properties
-set_target_properties(h265nal-bin PROPERTIES OUTPUT_NAME h265nal)
