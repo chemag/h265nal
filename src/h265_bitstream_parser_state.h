@@ -19,8 +19,12 @@ namespace h265nal {
 // The parsed state of the bitstream.
 struct H265BitstreamParserState {
   H265BitstreamParserState() = default;
-  H265BitstreamParserState(const H265BitstreamParserState&) = default;
   ~H265BitstreamParserState() = default;
+  // disable copy ctor, move ctor, and copy&move assignments
+  H265BitstreamParserState(const H265BitstreamParserState&) = delete;
+  H265BitstreamParserState(H265BitstreamParserState&&) = delete;
+  H265BitstreamParserState& operator=(const H265BitstreamParserState&) = delete;
+  H265BitstreamParserState& operator=(H265BitstreamParserState&&) = delete;
 
   // VPS state
   std::map<uint32_t, std::shared_ptr<struct H265VpsParser::VpsState>> vps;

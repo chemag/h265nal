@@ -22,8 +22,13 @@ class H265BitstreamParser {
   // the accumulated VPS/PPS/SPS state).
   struct BitstreamState {
     BitstreamState() = default;
-    BitstreamState(const BitstreamState&) = default;
     ~BitstreamState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    BitstreamState(const BitstreamState&) = delete;
+    BitstreamState(BitstreamState&&) = delete;
+    BitstreamState& operator=(const BitstreamState&) = delete;
+    BitstreamState& operator=(BitstreamState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

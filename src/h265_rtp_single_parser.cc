@@ -13,7 +13,6 @@
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 
-
 namespace h265nal {
 
 // General note: this is based off rfc7798.

@@ -19,7 +19,6 @@
 
 namespace h265nal {
 
-
 // General note: this is based off the 2016/12 version of the H.265 standard.
 // You can find it on this page:
 // http://www.itu.int/rec/T-REC-H.265
@@ -29,7 +28,7 @@ namespace {
 // internal function
 std::unique_ptr<int32_t> GetSliceQpYInternal(
     uint32_t nal_unit_type,
-    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState> const&
         payload,
     const struct H265BitstreamParserState* bitstream_parser_state) {
   // make sure the payload contains a slice header
@@ -58,35 +57,35 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
 
 #ifdef RTP_DEFINE
 std::unique_ptr<int32_t> H265Utils::GetSliceQpY(
-    const H265RtpParser::RtpState rtp,
+    std::unique_ptr<struct H265RtpParser::RtpState> const& rtp,
     const H265BitstreamParserState* bitstream_parser_state) {
   // get the actual NAL header (not the RTP one)
-  std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
-  std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState> payload;
+  std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>*
+      payload;
   uint32_t nal_unit_type = 0;
-  if (rtp.nal_unit_header->nal_unit_type <= 47) {
-    header = rtp.rtp_single->nal_unit_header;
+  if (rtp->nal_unit_header->nal_unit_type <= 47) {
+    auto& header = rtp->rtp_single->nal_unit_header;
     nal_unit_type = header->nal_unit_type;
-    payload = rtp.rtp_single->nal_unit_payload;
-  } else if (rtp.nal_unit_header->nal_unit_type == AP) {
+    payload = &rtp->rtp_single->nal_unit_payload;
+  } else if (rtp->nal_unit_header->nal_unit_type == AP) {
     // use the latest NAL unit in the AP
-    size_t index = rtp.rtp_ap->nal_unit_headers.size() - 1;
-    header = rtp.rtp_ap->nal_unit_headers[index];
+    size_t index = rtp->rtp_ap->nal_unit_headers.size() - 1;
+    auto& header = rtp->rtp_ap->nal_unit_headers[index];
     nal_unit_type = header->nal_unit_type;
-    payload = rtp.rtp_ap->nal_unit_payloads[index];
-  } else if (rtp.nal_unit_header->nal_unit_type == FU) {
+    payload = &rtp->rtp_ap->nal_unit_payloads[index];
+  } else if (rtp->nal_unit_header->nal_unit_type == FU) {
     // check this is the first NAL of the frame
-    if (rtp.rtp_fu->s_bit == 0) {
+    if (rtp->rtp_fu->s_bit == 0) {
       return nullptr;
     }
-    nal_unit_type = rtp.rtp_fu->fu_type;
-    payload = rtp.rtp_fu->nal_unit_payload;
+    nal_unit_type = rtp->rtp_fu->fu_type;
+    payload = &rtp->rtp_fu->nal_unit_payload;
   } else {
     // invalid value
     return nullptr;
   }
   // get the slice QP_Y value
-  return GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
+  return GetSliceQpYInternal(nal_unit_type, *payload, bitstream_parser_state);
 }
 #endif  // RTP_DEFINE
 
@@ -96,8 +95,7 @@ void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
   slice_qp_y_vector->clear();
 
   // parse the incoming bitstream
-  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream_state;
-  bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
+  auto bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
       data, length, bitstream_parser_state);
   // get all possible QP values
   for (auto& nal_unit : bitstream_state->nal_units) {

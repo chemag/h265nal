@@ -14,7 +14,6 @@
 #include "h265_common.h"
 #include "h265_st_ref_pic_set_parser.h"
 
-
 namespace h265nal {
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
@@ -203,8 +202,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       size_t slice_pic_order_cnt_lsb_len =
           slice_segment_header->log2_max_pic_order_cnt_lsb_minus4 + 4;
       // slice_pic_order_cnt_lsb  u(v)
-      if (!bit_buffer->ReadBits(&(slice_segment_header->slice_pic_order_cnt_lsb),
-                                slice_pic_order_cnt_lsb_len)) {
+      if (!bit_buffer->ReadBits(
+              &(slice_segment_header->slice_pic_order_cnt_lsb),
+              slice_pic_order_cnt_lsb_len)) {
         return nullptr;
       }
 
@@ -346,8 +346,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       if (slice_segment_header->ChromaArrayType != 0) {
         // slice_sao_chroma_flag  u(1)
-        if (!bit_buffer->ReadBits(&(slice_segment_header->slice_sao_chroma_flag),
-                                  1)) {
+        if (!bit_buffer->ReadBits(
+                &(slice_segment_header->slice_sao_chroma_flag), 1)) {
           return nullptr;
         }
       }
@@ -399,7 +399,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           bitstream_parser_state->pps[pps_id]->cabac_init_present_flag;
       if (slice_segment_header->cabac_init_present_flag) {
         // cabac_init_flag  u(1)
-        if (!bit_buffer->ReadBits(&(slice_segment_header->cabac_init_flag), 1)) {
+        if (!bit_buffer->ReadBits(&(slice_segment_header->cabac_init_flag),
+                                  1)) {
           return nullptr;
         }
       }

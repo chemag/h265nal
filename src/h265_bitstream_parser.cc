@@ -106,8 +106,7 @@ H265BitstreamParser::ParseBitstream(
 #ifdef FDUMP_DEFINE
 void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
-  for (std::unique_ptr<struct H265NalUnitParser::NalUnitState> nal_unit :
-       nal_units) {
+  for (auto& nal_unit : nal_units) {
     nal_unit->fdump(outfp, indent_level, add_offset, add_length);
     fprintf(outfp, "\n");
   }

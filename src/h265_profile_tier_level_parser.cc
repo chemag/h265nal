@@ -14,7 +14,6 @@
 
 #include "h265_common.h"
 
-
 namespace h265nal {
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
@@ -124,7 +123,8 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
   // for (j = 0; j < 32; j++)
   for (uint32_t j = 0; j < 32; j++) {
     // profile_compatibility_flag[j]  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->profile_compatibility_flag[j], 1)) {
+    if (!bit_buffer->ReadBits(&profile_info->profile_compatibility_flag[j],
+                              1)) {
       return nullptr;
     }
   }
@@ -173,11 +173,13 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
       return nullptr;
     }
     // max_422chroma_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_422chroma_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(&profile_info->max_422chroma_constraint_flag,
+                              1)) {
       return nullptr;
     }
     // max_420chroma_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_420chroma_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(&profile_info->max_420chroma_constraint_flag,
+                              1)) {
       return nullptr;
     }
     // max_monochrome_constraint_flag  u(1)
@@ -372,7 +374,7 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
     fprintf(outfp, "sub_layer {");
     indent_level = indent_level_incr(indent_level);
 
-    for (auto v : sub_layer) {
+    for (auto& v : sub_layer) {
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "{");
       v->fdump(outfp, indent_level);

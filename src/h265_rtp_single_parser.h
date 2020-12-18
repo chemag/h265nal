@@ -20,8 +20,13 @@ class H265RtpSingleParser {
   // The parsed state of the RTP Single NAL Unit.
   struct RtpSingleState {
     RtpSingleState() = default;
-    RtpSingleState(const RtpSingleState&) = default;
     ~RtpSingleState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    RtpSingleState(const RtpSingleState&) = delete;
+    RtpSingleState(RtpSingleState&&) = delete;
+    RtpSingleState& operator=(const RtpSingleState&) = delete;
+    RtpSingleState& operator=(RtpSingleState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

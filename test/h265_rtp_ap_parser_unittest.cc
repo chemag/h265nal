@@ -48,7 +48,7 @@ TEST_F(H265RtpApParserTest, TestSampleAUD) {
   EXPECT_TRUE(rtp_ap_ != nullptr);
 
   // check the common header
-  auto header = rtp_ap_->header;
+  auto& header = rtp_ap_->header;
   EXPECT_EQ(0, header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::AP, header->nal_unit_type);
   EXPECT_EQ(0, header->nuh_layer_id);

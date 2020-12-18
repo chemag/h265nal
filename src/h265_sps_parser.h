@@ -24,8 +24,13 @@ class H265SpsParser {
   // Add more as they are actually needed.
   struct SpsState {
     SpsState() = default;
-    SpsState(const SpsState&) = default;
     ~SpsState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    SpsState(const SpsState&) = delete;
+    SpsState(SpsState&&) = delete;
+    SpsState& operator=(const SpsState&) = delete;
+    SpsState& operator=(SpsState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

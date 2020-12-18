@@ -19,8 +19,13 @@ class H265AudParser {
   // The parsed state of the AUD.
   struct AudState {
     AudState() = default;
-    AudState(const AudState&) = default;
     ~AudState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    AudState(const AudState&) = delete;
+    AudState(AudState&&) = delete;
+    AudState& operator=(const AudState&) = delete;
+    AudState& operator=(AudState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
@@ -31,7 +36,8 @@ class H265AudParser {
   // Unpack RBSP and parse AUD state from the supplied buffer.
   static std::unique_ptr<AudState> ParseAud(const uint8_t* data,
                                             size_t length) noexcept;
-  static std::unique_ptr<AudState> ParseAud(rtc::BitBuffer* bit_buffer) noexcept;
+  static std::unique_ptr<AudState> ParseAud(
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

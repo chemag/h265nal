@@ -23,8 +23,13 @@ class H265NalUnitHeaderParser {
   // The parsed state of the NAL Unit Header.
   struct NalUnitHeaderState {
     NalUnitHeaderState() = default;
-    NalUnitHeaderState(const NalUnitHeaderState&) = default;
     ~NalUnitHeaderState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    NalUnitHeaderState(const NalUnitHeaderState&) = delete;
+    NalUnitHeaderState(NalUnitHeaderState&&) = delete;
+    NalUnitHeaderState& operator=(const NalUnitHeaderState&) = delete;
+    NalUnitHeaderState& operator=(NalUnitHeaderState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
@@ -49,8 +54,13 @@ class H265NalUnitPayloadParser {
   // stored. Add more as they are actually needed.
   struct NalUnitPayloadState {
     NalUnitPayloadState() = default;
-    NalUnitPayloadState(const NalUnitPayloadState&) = default;
     ~NalUnitPayloadState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    NalUnitPayloadState(const NalUnitPayloadState&) = delete;
+    NalUnitPayloadState(NalUnitPayloadState&&) = delete;
+    NalUnitPayloadState& operator=(const NalUnitPayloadState&) = delete;
+    NalUnitPayloadState& operator=(NalUnitPayloadState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level, uint32_t nal_unit_type) const;
 #endif  // FDUMP_DEFINE
@@ -79,8 +89,13 @@ class H265NalUnitParser {
   // Add more as they are actually needed.
   struct NalUnitState {
     NalUnitState() = default;
-    NalUnitState(const NalUnitState&) = default;
     ~NalUnitState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    NalUnitState(const NalUnitState&) = delete;
+    NalUnitState(NalUnitState&&) = delete;
+    NalUnitState& operator=(const NalUnitState&) = delete;
+    NalUnitState& operator=(NalUnitState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level, bool add_offset,
                bool add_length) const;

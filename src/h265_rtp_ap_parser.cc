@@ -15,7 +15,6 @@
 #include "h265_nal_unit_parser.h"
 #include "rtc_base/bit_buffer.h"
 
-
 namespace h265nal {
 
 // General note: this is based off rfc7798/

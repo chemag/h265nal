@@ -12,7 +12,6 @@
 
 #include "h265_common.h"
 
-
 namespace h265nal {
 
 // General note: this is based off the 2016/12 version of the H.265 standard.

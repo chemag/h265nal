@@ -25,8 +25,13 @@ class H265SliceSegmentHeaderParser {
   // Add more as they are actually needed.
   struct SliceSegmentHeaderState {
     SliceSegmentHeaderState() = default;
-    SliceSegmentHeaderState(const SliceSegmentHeaderState&) = default;
     ~SliceSegmentHeaderState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    SliceSegmentHeaderState(const SliceSegmentHeaderState&) = delete;
+    SliceSegmentHeaderState(SliceSegmentHeaderState&&) = delete;
+    SliceSegmentHeaderState& operator=(const SliceSegmentHeaderState&) = delete;
+    SliceSegmentHeaderState& operator=(SliceSegmentHeaderState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
@@ -132,15 +137,23 @@ class H265SliceSegmentLayerParser {
   // Add more as they are actually needed.
   struct SliceSegmentLayerState {
     SliceSegmentLayerState() = default;
-    SliceSegmentLayerState(const SliceSegmentLayerState&) = default;
     ~SliceSegmentLayerState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    SliceSegmentLayerState(const SliceSegmentLayerState&) = delete;
+    SliceSegmentLayerState(SliceSegmentLayerState&&) = delete;
+    SliceSegmentLayerState& operator=(const SliceSegmentLayerState&) = delete;
+    SliceSegmentLayerState& operator=(SliceSegmentLayerState&&) = delete;
+
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     // input parameters
     uint32_t nal_unit_type = 0;
 
     // contents
-    std::unique_ptr<struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
+    std::unique_ptr<
+        struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
         slice_segment_header;
     // slice_segment_data()
     // rbsp_slice_segment_trailing_bits()

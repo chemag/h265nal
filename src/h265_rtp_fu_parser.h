@@ -19,8 +19,13 @@ class H265RtpFuParser {
   // The parsed state of the RTP FU.
   struct RtpFuState {
     RtpFuState() = default;
-    RtpFuState(const RtpFuState&) = default;
     ~RtpFuState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    RtpFuState(const RtpFuState&) = delete;
+    RtpFuState(RtpFuState&&) = delete;
+    RtpFuState& operator=(const RtpFuState&) = delete;
+    RtpFuState& operator=(RtpFuState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

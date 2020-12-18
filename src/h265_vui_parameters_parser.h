@@ -41,11 +41,17 @@ class H265VuiParametersParser {
   // Add more as they are actually needed.
   struct VuiParametersState {
     VuiParametersState() = default;
-    VuiParametersState(const VuiParametersState&) = default;
     ~VuiParametersState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    VuiParametersState(const VuiParametersState&) = delete;
+    VuiParametersState(VuiParametersState&&) = delete;
+    VuiParametersState& operator=(const VuiParametersState&) = delete;
+    VuiParametersState& operator=(VuiParametersState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
+
     uint32_t aspect_ratio_info_present_flag = 0;
     uint32_t aspect_ratio_idc = 0;
     uint32_t sar_width = 0;

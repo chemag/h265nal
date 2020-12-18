@@ -21,8 +21,13 @@ class H265RtpParser {
   // The parsed state of the RTP NAL Unit.
   struct RtpState {
     RtpState() = default;
-    RtpState(const RtpState&) = default;
     ~RtpState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    RtpState(const RtpState&) = delete;
+    RtpState(RtpState&&) = delete;
+    RtpState& operator=(const RtpState&) = delete;
+    RtpState& operator=(RtpState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

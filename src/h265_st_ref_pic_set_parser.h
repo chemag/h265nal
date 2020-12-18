@@ -21,8 +21,13 @@ class H265StRefPicSetParser {
   // The parsed state of the StRefPicSet.
   struct StRefPicSetState {
     StRefPicSetState() = default;
-    StRefPicSetState(const StRefPicSetState&) = default;
     ~StRefPicSetState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    StRefPicSetState(const StRefPicSetState&) = delete;
+    StRefPicSetState(StRefPicSetState&&) = delete;
+    StRefPicSetState& operator=(const StRefPicSetState&) = delete;
+    StRefPicSetState& operator=(StRefPicSetState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE

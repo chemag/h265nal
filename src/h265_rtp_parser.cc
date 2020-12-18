@@ -13,7 +13,6 @@
 #include "h265_common.h"
 #include "h265_nal_unit_parser.h"
 
-
 namespace h265nal {
 
 // General note: this is based off rfc7798.
@@ -36,7 +35,8 @@ std::unique_ptr<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
   auto rtp = std::make_unique<RtpState>();
 
   // peek a pseudo-nal_unit_header
-  rtp->nal_unit_header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  rtp->nal_unit_header =
+      H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
   bit_buffer->Seek(0, 0);
 
   if (rtp->nal_unit_header->nal_unit_type <= 47) {

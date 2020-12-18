@@ -12,7 +12,6 @@
 
 #include "h265_common.h"
 
-
 namespace h265nal {
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
@@ -154,7 +153,8 @@ H265VuiParametersParser::ParseVuiParameters(
       return nullptr;
     }
     // def_disp_win_bottom_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_bottom_offset))) {
+    if (!bit_buffer->ReadExponentialGolomb(
+            &(vui->def_disp_win_bottom_offset))) {
       return nullptr;
     }
   }

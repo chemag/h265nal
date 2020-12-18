@@ -23,8 +23,13 @@ class H265ProfileInfoParser {
   // Only some select values are stored. Add more as they are actually needed.
   struct ProfileInfoState {
     ProfileInfoState() = default;
-    ProfileInfoState(const ProfileInfoState&) = default;
     ~ProfileInfoState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    ProfileInfoState(const ProfileInfoState&) = delete;
+    ProfileInfoState(ProfileInfoState&&) = delete;
+    ProfileInfoState& operator=(const ProfileInfoState&) = delete;
+    ProfileInfoState& operator=(ProfileInfoState&&) = delete;
+
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
@@ -70,9 +75,16 @@ class H265ProfileTierLevelParser {
   // Add more as they are actually needed.
   struct ProfileTierLevelState {
     ProfileTierLevelState() = default;
-    ProfileTierLevelState(const ProfileTierLevelState&) = default;
     ~ProfileTierLevelState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    ProfileTierLevelState(const ProfileTierLevelState&) = delete;
+    ProfileTierLevelState(ProfileTierLevelState&&) = delete;
+    ProfileTierLevelState& operator=(const ProfileTierLevelState&) = delete;
+    ProfileTierLevelState& operator=(ProfileTierLevelState&&) = delete;
+
+#ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
 
     // input parameters
     bool profilePresentFlag;

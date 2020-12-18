@@ -17,7 +17,6 @@
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 
-
 namespace h265nal {
 
 // General note: this is based off the 2016/12 version of the H.265 standard.
@@ -25,7 +24,8 @@ namespace h265nal {
 // http://www.itu.int/rec/T-REC-H.265
 
 // Unpack RBSP and parse NAL Unit state from the supplied buffer.
-std::unique_ptr<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
+std::unique_ptr<H265NalUnitParser::NalUnitState>
+H265NalUnitParser::ParseNalUnit(
     const uint8_t* data, size_t length,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
@@ -34,7 +34,8 @@ std::unique_ptr<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit
   return ParseNalUnit(&bit_buffer, bitstream_parser_state);
 }
 
-std::unique_ptr<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
+std::unique_ptr<H265NalUnitParser::NalUnitState>
+H265NalUnitParser::ParseNalUnit(
     rtc::BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 NAL Unit (nal_unit()) parser.

@@ -22,7 +22,7 @@ class H265Utils {
   // Get the slice QP for the Y component (Equation 7-54)
 #ifdef RTP_DEFINE
   static std::unique_ptr<int32_t> GetSliceQpY(
-      const H265RtpParser::RtpState rtp,
+      std::unique_ptr<struct H265RtpParser::RtpState> const& rtp,
       const H265BitstreamParserState* bitstream_parser_state);
 #endif  // RTP_DEFINE
   static void GetSliceQpY(const uint8_t* data, size_t length,

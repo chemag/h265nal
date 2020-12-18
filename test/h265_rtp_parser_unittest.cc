@@ -150,7 +150,9 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
       rtp_fu->nal_unit_payload->slice_segment_layer->slice_segment_header;
   EXPECT_EQ(13, slice_segment_header->slice_qp_delta);
 
-  EXPECT_EQ(47, H265Utils::GetSliceQpY(*rtp_, &bitstream_parser_state));
+  auto slice_qpy = H265Utils::GetSliceQpY(rtp_, &bitstream_parser_state);
+  EXPECT_TRUE(slice_qpy != nullptr);
+  EXPECT_EQ(47, *slice_qpy);
 }
 
 }  // namespace h265nal
