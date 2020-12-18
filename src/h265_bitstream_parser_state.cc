@@ -9,19 +9,18 @@
 #include <cstdint>
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "h265_pps_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 
 namespace {
-typedef absl::optional<struct h265nal::H265VpsParser::VpsState>
-    OptionalVpsState;
-typedef absl::optional<struct h265nal::H265SpsParser::SpsState>
-    OptionalSpsState;
-typedef absl::optional<struct h265nal::H265PpsParser::PpsState>
-    OptionalPpsState;
+typedef std::shared_ptr<struct h265nal::H265VpsParser::VpsState>
+    SharedPtrVpsState;
+typedef std::shared_ptr<struct h265nal::H265SpsParser::SpsState>
+    SharedPtrSpsState;
+typedef std::shared_ptr<struct h265nal::H265PpsParser::PpsState>
+    SharedPtrPpsState;
 }  // namespace
 
 namespace h265nal {
@@ -30,34 +29,34 @@ namespace h265nal {
 // You can find it on this page:
 // http://www.itu.int/rec/T-REC-H.265
 
-absl::optional<struct H265VpsParser::VpsState> H265BitstreamParserState::GetVps(
-    uint32_t vps_id) const {
+std::shared_ptr<struct H265VpsParser::VpsState>
+H265BitstreamParserState::GetVps(uint32_t vps_id) const {
   // check the VPS exists in the bitstream parser state
   auto it = vps.find(vps_id);
   if (it == vps.end()) {
-    return absl::nullopt;
+    return SharedPtrVpsState(nullptr);
   }
-  return OptionalVpsState(it->second);
+  return SharedPtrVpsState(it->second);
 }
 
-absl::optional<struct H265SpsParser::SpsState> H265BitstreamParserState::GetSps(
-    uint32_t sps_id) const {
+std::shared_ptr<struct H265SpsParser::SpsState>
+H265BitstreamParserState::GetSps(uint32_t sps_id) const {
   // check the SPS exists in the bitstream parser state
   auto it = sps.find(sps_id);
   if (it == sps.end()) {
-    return absl::nullopt;
+    return SharedPtrSpsState(nullptr);
   }
-  return OptionalSpsState(it->second);
+  return SharedPtrSpsState(it->second);
 }
 
-absl::optional<struct H265PpsParser::PpsState> H265BitstreamParserState::GetPps(
-    uint32_t pps_id) const {
+std::shared_ptr<struct H265PpsParser::PpsState>
+H265BitstreamParserState::GetPps(uint32_t pps_id) const {
   // check the PPS exists in the bitstream parser state
   auto it = pps.find(pps_id);
   if (it == pps.end()) {
-    return absl::nullopt;
+    return SharedPtrPpsState(nullptr);
   }
-  return OptionalPpsState(it->second);
+  return SharedPtrPpsState(it->second);
 }
 
 }  // namespace h265nal

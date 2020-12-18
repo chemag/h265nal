@@ -56,11 +56,11 @@ class H265NalUnitPayloadParser {
     void fdump(FILE* outfp, int indent_level, uint32_t nal_unit_type) const;
 #endif  // FDUMP_DEFINE
 
-    struct H265VpsParser::VpsState vps;
-    struct H265SpsParser::SpsState sps;
-    struct H265PpsParser::PpsState pps;
-    struct H265AudParser::AudState aud;
-    struct H265SliceSegmentLayerParser::SliceSegmentLayerState
+    std::shared_ptr<struct H265VpsParser::VpsState> vps;
+    std::shared_ptr<struct H265SpsParser::SpsState> sps;
+    std::shared_ptr<struct H265PpsParser::PpsState> pps;
+    absl::optional<struct H265AudParser::AudState> aud;
+    absl::optional<struct H265SliceSegmentLayerParser::SliceSegmentLayerState>
         slice_segment_layer;
   };
 
@@ -90,8 +90,10 @@ class H265NalUnitParser {
     size_t offset;
     size_t length;
 
-    struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
-    struct H265NalUnitPayloadParser::NalUnitPayloadState nal_unit_payload;
+    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>
+        nal_unit_header;
+    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+        nal_unit_payload;
   };
 
   // Unpack RBSP and parse NAL unit state from the supplied buffer.

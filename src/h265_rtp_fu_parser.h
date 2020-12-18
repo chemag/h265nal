@@ -27,7 +27,7 @@ class H265RtpFuParser {
 #endif  // FDUMP_DEFINE
 
     // common header
-    struct H265NalUnitHeaderParser::NalUnitHeaderState header;
+    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
 
     // fu header
     uint32_t s_bit;
@@ -35,7 +35,8 @@ class H265RtpFuParser {
     uint32_t fu_type;
 
     // optional payload
-    struct H265NalUnitPayloadParser::NalUnitPayloadState nal_unit_payload;
+    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+        nal_unit_payload;
   };
 
   // Unpack RBSP and parse RTP FU state from the supplied buffer.

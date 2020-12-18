@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -19,7 +18,7 @@ class H265PpsParserTest : public ::testing::Test {
   H265PpsParserTest() {}
   ~H265PpsParserTest() override {}
 
-  absl::optional<H265PpsParser::PpsState> pps_;
+  std::shared_ptr<H265PpsParser::PpsState> pps_;
 };
 
 TEST_F(H265PpsParserTest, TestSamplePPS) {
@@ -29,7 +28,7 @@ TEST_F(H265PpsParserTest, TestSamplePPS) {
   };
 
   pps_ = H265PpsParser::ParsePps(buffer, arraysize(buffer));
-  EXPECT_TRUE(pps_ != absl::nullopt);
+  EXPECT_TRUE(pps_ != nullptr);
 
   EXPECT_EQ(0, pps_->pps_pic_parameter_set_id);
   EXPECT_EQ(0, pps_->pps_pic_parameter_set_id);

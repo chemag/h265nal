@@ -39,19 +39,21 @@ TEST_F(H265RtpParserTest, TestSampleSingle) {
 
   // check the header
   auto &header = rtp_->nal_unit_header;
-  EXPECT_EQ(0, header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::SPS_NUT, header.nal_unit_type);
-  EXPECT_EQ(0, header.nuh_layer_id);
-  EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+  EXPECT_EQ(0, header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::SPS_NUT, header->nal_unit_type);
+  EXPECT_EQ(0, header->nuh_layer_id);
+  EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check some values
   auto &rtp_single = rtp_->rtp_single;
-  auto &sps = rtp_single.nal_unit_payload.sps;
-  EXPECT_EQ(1280, sps.pic_width_in_luma_samples);
-  EXPECT_EQ(736, sps.pic_height_in_luma_samples);
-  auto sps_id = sps.sps_seq_parameter_set_id;
-  EXPECT_EQ(1280, bitstream_parser_state.sps[sps_id].pic_width_in_luma_samples);
-  EXPECT_EQ(736, bitstream_parser_state.sps[sps_id].pic_height_in_luma_samples);
+  auto &sps = rtp_single->nal_unit_payload->sps;
+  EXPECT_EQ(1280, sps->pic_width_in_luma_samples);
+  EXPECT_EQ(736, sps->pic_height_in_luma_samples);
+  auto sps_id = sps->sps_seq_parameter_set_id;
+  EXPECT_EQ(1280,
+            bitstream_parser_state.sps[sps_id]->pic_width_in_luma_samples);
+  EXPECT_EQ(736,
+            bitstream_parser_state.sps[sps_id]->pic_height_in_luma_samples);
 }
 
 TEST_F(H265RtpParserTest, TestSampleApAndFu) {
@@ -88,34 +90,36 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
 
   // check the common header
   auto &ap_header = rtp_->nal_unit_header;
-  // also: auto &ap_header = rtp_->rtp_ap.header;
-  EXPECT_EQ(0, ap_header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::AP, ap_header.nal_unit_type);
-  EXPECT_EQ(0, ap_header.nuh_layer_id);
-  EXPECT_EQ(1, ap_header.nuh_temporal_id_plus1);
+  // also: auto &ap_header = rtp_->rtp_ap->header;
+  EXPECT_EQ(0, ap_header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::AP, ap_header->nal_unit_type);
+  EXPECT_EQ(0, ap_header->nuh_layer_id);
+  EXPECT_EQ(1, ap_header->nuh_temporal_id_plus1);
 
   // check there are 3 valid NAL units
   auto &rtp_ap = rtp_->rtp_ap;
-  EXPECT_EQ(3, rtp_ap.nal_unit_sizes.size());
-  EXPECT_EQ(3, rtp_ap.nal_unit_headers.size());
-  EXPECT_EQ(3, rtp_ap.nal_unit_payloads.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_sizes.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_headers.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_payloads.size());
 
   // check the types
-  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_ap.nal_unit_headers[0].nal_unit_type);
-  EXPECT_EQ(NalUnitType::SPS_NUT, rtp_ap.nal_unit_headers[1].nal_unit_type);
-  EXPECT_EQ(NalUnitType::PPS_NUT, rtp_ap.nal_unit_headers[2].nal_unit_type);
+  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_ap->nal_unit_headers[0]->nal_unit_type);
+  EXPECT_EQ(NalUnitType::SPS_NUT, rtp_ap->nal_unit_headers[1]->nal_unit_type);
+  EXPECT_EQ(NalUnitType::PPS_NUT, rtp_ap->nal_unit_headers[2]->nal_unit_type);
 
   // check some values
-  auto &sps = rtp_ap.nal_unit_payloads[1].sps;
-  EXPECT_EQ(1280, sps.pic_width_in_luma_samples);
-  EXPECT_EQ(736, sps.pic_height_in_luma_samples);
-  auto sps_id = sps.sps_seq_parameter_set_id;
-  EXPECT_EQ(1280, bitstream_parser_state.sps[sps_id].pic_width_in_luma_samples);
-  EXPECT_EQ(736, bitstream_parser_state.sps[sps_id].pic_height_in_luma_samples);
-  auto &pps = rtp_ap.nal_unit_payloads[2].pps;
-  EXPECT_EQ(8, pps.init_qp_minus26);
-  auto pps_id = pps.pps_pic_parameter_set_id;
-  EXPECT_EQ(8, bitstream_parser_state.pps[pps_id].init_qp_minus26);
+  auto &sps = rtp_ap->nal_unit_payloads[1]->sps;
+  EXPECT_EQ(1280, sps->pic_width_in_luma_samples);
+  EXPECT_EQ(736, sps->pic_height_in_luma_samples);
+  auto sps_id = sps->sps_seq_parameter_set_id;
+  EXPECT_EQ(1280,
+            bitstream_parser_state.sps[sps_id]->pic_width_in_luma_samples);
+  EXPECT_EQ(736,
+            bitstream_parser_state.sps[sps_id]->pic_height_in_luma_samples);
+  auto &pps = rtp_ap->nal_unit_payloads[2]->pps;
+  EXPECT_EQ(8, pps->init_qp_minus26);
+  auto pps_id = pps->pps_pic_parameter_set_id;
+  EXPECT_EQ(8, bitstream_parser_state.pps[pps_id]->init_qp_minus26);
 
   // FU (Aggregation Packet) containing the start of an IDR_W_RADL.
   const uint8_t buffer2[] = {
@@ -130,22 +134,22 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
 
   // check the main header
   auto &fu_header = rtp_->nal_unit_header;
-  // also: auto &fu_header = rtp_->rtp_fu.header;
-  EXPECT_EQ(0, fu_header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::FU, fu_header.nal_unit_type);
-  EXPECT_EQ(0, fu_header.nuh_layer_id);
-  EXPECT_EQ(1, fu_header.nuh_temporal_id_plus1);
+  // also: auto &fu_header = rtp_->rtp_fu->header;
+  EXPECT_EQ(0, fu_header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::FU, fu_header->nal_unit_type);
+  EXPECT_EQ(0, fu_header->nuh_layer_id);
+  EXPECT_EQ(1, fu_header->nuh_temporal_id_plus1);
 
   // check the fu header
   auto &rtp_fu = rtp_->rtp_fu;
-  EXPECT_EQ(1, rtp_fu.s_bit);
-  EXPECT_EQ(0, rtp_fu.e_bit);
-  EXPECT_EQ(NalUnitType::IDR_W_RADL, rtp_fu.fu_type);
+  EXPECT_EQ(1, rtp_fu->s_bit);
+  EXPECT_EQ(0, rtp_fu->e_bit);
+  EXPECT_EQ(NalUnitType::IDR_W_RADL, rtp_fu->fu_type);
 
   // check some values
   auto &slice_segment_header =
-      rtp_fu.nal_unit_payload.slice_segment_layer.slice_segment_header;
-  EXPECT_EQ(13, slice_segment_header.slice_qp_delta);
+      rtp_fu->nal_unit_payload->slice_segment_layer->slice_segment_header;
+  EXPECT_EQ(13, slice_segment_header->slice_qp_delta);
 
   EXPECT_EQ(47, H265Utils::GetSliceQpY(*rtp_, &bitstream_parser_state));
 }

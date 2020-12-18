@@ -14,15 +14,7 @@
 #include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
-    OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
-    OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265RtpParser::RtpState> OptionalRtp;
-typedef absl::optional<h265nal::H265RtpSingleParser::RtpSingleState>
-    OptionalRtpSingle;
-typedef absl::optional<h265nal::H265RtpApParser::RtpApState> OptionalRtpAp;
-typedef absl::optional<h265nal::H265RtpFuParser::RtpFuState> OptionalRtpFu;
 }  // namespace
 
 namespace h265nal {
@@ -47,36 +39,23 @@ absl::optional<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
   RtpState rtp;
 
   // peek a pseudo-nal_unit_header
-  OptionalNalUnitHeader nal_unit_header =
-      H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header != absl::nullopt) {
-    rtp.nal_unit_header = *nal_unit_header;
-  }
+  rtp.nal_unit_header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
   bit_buffer->Seek(0, 0);
 
-  if (rtp.nal_unit_header.nal_unit_type <= 47) {
+  if (rtp.nal_unit_header->nal_unit_type <= 47) {
     // rtp_single()
-    OptionalRtpSingle rtp_single =
+    rtp.rtp_single =
         H265RtpSingleParser::ParseRtpSingle(bit_buffer, bitstream_parser_state);
-    if (rtp_single != absl::nullopt) {
-      rtp.rtp_single = *rtp_single;
-    }
 
-  } else if (rtp.nal_unit_header.nal_unit_type == AP) {
+  } else if (rtp.nal_unit_header->nal_unit_type == AP) {
     // rtp_ap()
-    OptionalRtpAp rtp_ap =
+    rtp.rtp_ap =
         H265RtpApParser::ParseRtpAp(bit_buffer, bitstream_parser_state);
-    if (rtp_ap != absl::nullopt) {
-      rtp.rtp_ap = *rtp_ap;
-    }
 
-  } else if (rtp.nal_unit_header.nal_unit_type == FU) {
+  } else if (rtp.nal_unit_header->nal_unit_type == FU) {
     // rtp_fu()
-    OptionalRtpFu rtp_fu =
+    rtp.rtp_fu =
         H265RtpFuParser::ParseRtpFu(bit_buffer, bitstream_parser_state);
-    if (rtp_fu != absl::nullopt) {
-      rtp.rtp_fu = *rtp_fu;
-    }
   }
 
   return OptionalRtp(rtp);
@@ -88,17 +67,17 @@ void H265RtpParser::RtpState::fdump(FILE* outfp, int indent_level) const {
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  nal_unit_header.fdump(outfp, indent_level);
+  nal_unit_header->fdump(outfp, indent_level);
 
-  if (nal_unit_header.nal_unit_type <= 47) {
+  if (nal_unit_header->nal_unit_type <= 47) {
     // rtp_single()
-    rtp_single.fdump(outfp, indent_level);
-  } else if (nal_unit_header.nal_unit_type == AP) {
+    rtp_single->fdump(outfp, indent_level);
+  } else if (nal_unit_header->nal_unit_type == AP) {
     // rtp_ap()
-    rtp_ap.fdump(outfp, indent_level);
-  } else if (nal_unit_header.nal_unit_type == FU) {
+    rtp_ap->fdump(outfp, indent_level);
+  } else if (nal_unit_header->nal_unit_type == FU) {
     // rtp_fu()
-    rtp_fu.fdump(outfp, indent_level);
+    rtp_fu->fdump(outfp, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

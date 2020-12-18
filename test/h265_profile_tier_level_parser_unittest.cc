@@ -36,33 +36,33 @@ TEST_F(H265ProfileTierLevelParserTest, TestSampleValue) {
   ptls_ = H265ProfileTierLevelParser::ParseProfileTierLevel(
       buffer, arraysize(buffer), true, 0);
   EXPECT_TRUE(ptls_ != absl::nullopt);
-  EXPECT_EQ(0, ptls_->general.profile_space);
-  EXPECT_EQ(0, ptls_->general.tier_flag);
-  EXPECT_EQ(1, ptls_->general.profile_idc);
-  EXPECT_THAT(ptls_->general.profile_compatibility_flag,
+  EXPECT_EQ(0, ptls_->general->profile_space);
+  EXPECT_EQ(0, ptls_->general->tier_flag);
+  EXPECT_EQ(1, ptls_->general->profile_idc);
+  EXPECT_THAT(ptls_->general->profile_compatibility_flag,
               ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0}));
-  EXPECT_EQ(1, ptls_->general.progressive_source_flag);
-  EXPECT_EQ(0, ptls_->general.interlaced_source_flag);
-  EXPECT_EQ(1, ptls_->general.non_packed_constraint_flag);
-  EXPECT_EQ(1, ptls_->general.frame_only_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_12bit_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_10bit_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_8bit_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_422chroma_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_420chroma_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_monochrome_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.intra_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.one_picture_only_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.lower_bit_rate_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.max_14bit_constraint_flag);
-  EXPECT_EQ(0, ptls_->general.reserved_zero_33bits);
-  EXPECT_EQ(0, ptls_->general.reserved_zero_34bits);
-  EXPECT_EQ(0, ptls_->general.reserved_zero_43bits);
-  EXPECT_EQ(0, ptls_->general.inbld_flag);
-  EXPECT_EQ(0, ptls_->general.reserved_zero_bit);
+  EXPECT_EQ(1, ptls_->general->progressive_source_flag);
+  EXPECT_EQ(0, ptls_->general->interlaced_source_flag);
+  EXPECT_EQ(1, ptls_->general->non_packed_constraint_flag);
+  EXPECT_EQ(1, ptls_->general->frame_only_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_12bit_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_10bit_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_8bit_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_422chroma_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_420chroma_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_monochrome_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->intra_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->one_picture_only_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->lower_bit_rate_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->max_14bit_constraint_flag);
+  EXPECT_EQ(0, ptls_->general->reserved_zero_33bits);
+  EXPECT_EQ(0, ptls_->general->reserved_zero_34bits);
+  EXPECT_EQ(0, ptls_->general->reserved_zero_43bits);
+  EXPECT_EQ(0, ptls_->general->inbld_flag);
+  EXPECT_EQ(0, ptls_->general->reserved_zero_bit);
   EXPECT_EQ(93, ptls_->general_level_idc);
 
   EXPECT_EQ(0, ptls_->sub_layer_profile_present_flag.size());

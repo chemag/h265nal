@@ -38,13 +38,13 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
 
   // get some mock state
   H265BitstreamParserState bitstream_parser_state;
-  H265VpsParser::VpsState vps;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
   bitstream_parser_state.vps[0] = vps;
-  H265SpsParser::SpsState sps;
-  sps.sample_adaptive_offset_enabled_flag = 1;
-  sps.chroma_format_idc = 1;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->sample_adaptive_offset_enabled_flag = 1;
+  sps->chroma_format_idc = 1;
   bitstream_parser_state.sps[0] = sps;
-  H265PpsParser::PpsState pps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;
 
   slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
@@ -54,22 +54,22 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
 
   auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
 
-  EXPECT_EQ(1, slice_segment_header.first_slice_segment_in_pic_flag);
-  EXPECT_EQ(0, slice_segment_header.no_output_of_prior_pics_flag);
-  EXPECT_EQ(0, slice_segment_header.slice_pic_parameter_set_id);
-  EXPECT_EQ(2, slice_segment_header.slice_type);
-  EXPECT_EQ(1, slice_segment_header.slice_sao_luma_flag);
-  EXPECT_EQ(1, slice_segment_header.slice_sao_chroma_flag);
-  EXPECT_EQ(9, slice_segment_header.slice_qp_delta);
+  EXPECT_EQ(1, slice_segment_header->first_slice_segment_in_pic_flag);
+  EXPECT_EQ(0, slice_segment_header->no_output_of_prior_pics_flag);
+  EXPECT_EQ(0, slice_segment_header->slice_pic_parameter_set_id);
+  EXPECT_EQ(2, slice_segment_header->slice_type);
+  EXPECT_EQ(1, slice_segment_header->slice_sao_luma_flag);
+  EXPECT_EQ(1, slice_segment_header->slice_sao_chroma_flag);
+  EXPECT_EQ(9, slice_segment_header->slice_qp_delta);
 
 #if 0
-  EXPECT_EQ(1, slice_segment_header.alignment_bit_equal_to_one);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
+  EXPECT_EQ(1, slice_segment_header->alignment_bit_equal_to_one);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
 #endif
 }
 
@@ -83,17 +83,17 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice2) {
 
   // get some mock state
   H265BitstreamParserState bitstream_parser_state;
-  H265VpsParser::VpsState vps;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
   bitstream_parser_state.vps[0] = vps;
-  H265SpsParser::SpsState sps;
-  sps.sample_adaptive_offset_enabled_flag = 1;
-  sps.chroma_format_idc = 1;
-  sps.log2_min_luma_coding_block_size_minus3 = 0;
-  sps.log2_diff_max_min_luma_coding_block_size = 2;
-  sps.pic_width_in_luma_samples = 1280;
-  sps.pic_height_in_luma_samples = 736;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->sample_adaptive_offset_enabled_flag = 1;
+  sps->chroma_format_idc = 1;
+  sps->log2_min_luma_coding_block_size_minus3 = 0;
+  sps->log2_diff_max_min_luma_coding_block_size = 2;
+  sps->pic_width_in_luma_samples = 1280;
+  sps->pic_height_in_luma_samples = 736;
   bitstream_parser_state.sps[0] = sps;
-  H265PpsParser::PpsState pps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;
 
   slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
@@ -103,23 +103,23 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice2) {
 
   auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
 
-  EXPECT_EQ(0, slice_segment_header.first_slice_segment_in_pic_flag);
-  EXPECT_EQ(0, slice_segment_header.no_output_of_prior_pics_flag);
-  EXPECT_EQ(0, slice_segment_header.slice_pic_parameter_set_id);
-  EXPECT_EQ(192, slice_segment_header.slice_segment_address);
-  EXPECT_EQ(3, slice_segment_header.slice_type);
-  EXPECT_EQ(1, slice_segment_header.slice_sao_luma_flag);
-  EXPECT_EQ(0, slice_segment_header.slice_sao_chroma_flag);
-  EXPECT_EQ(15, slice_segment_header.slice_qp_delta);
+  EXPECT_EQ(0, slice_segment_header->first_slice_segment_in_pic_flag);
+  EXPECT_EQ(0, slice_segment_header->no_output_of_prior_pics_flag);
+  EXPECT_EQ(0, slice_segment_header->slice_pic_parameter_set_id);
+  EXPECT_EQ(192, slice_segment_header->slice_segment_address);
+  EXPECT_EQ(3, slice_segment_header->slice_type);
+  EXPECT_EQ(1, slice_segment_header->slice_sao_luma_flag);
+  EXPECT_EQ(0, slice_segment_header->slice_sao_chroma_flag);
+  EXPECT_EQ(15, slice_segment_header->slice_qp_delta);
 
 #if 0
-  EXPECT_EQ(1, slice_segment_header.alignment_bit_equal_to_one);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
-  EXPECT_EQ(0, slice_segment_header.alignment_bit_equal_to_zero);
+  EXPECT_EQ(1, slice_segment_header->alignment_bit_equal_to_one);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
+  EXPECT_EQ(0, slice_segment_header->alignment_bit_equal_to_zero);
 #endif
 }
 

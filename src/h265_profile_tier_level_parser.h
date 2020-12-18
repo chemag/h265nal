@@ -79,12 +79,13 @@ class H265ProfileTierLevelParser {
     unsigned int maxNumSubLayersMinus1;
 
     // contents
-    struct H265ProfileInfoParser::ProfileInfoState general;
+    absl::optional<struct H265ProfileInfoParser::ProfileInfoState> general;
     uint32_t general_level_idc = 0;
     std::vector<uint32_t> sub_layer_profile_present_flag;
     std::vector<uint32_t> sub_layer_level_present_flag;
     std::vector<uint32_t> reserved_zero_2bits;
-    std::vector<struct H265ProfileInfoParser::ProfileInfoState> sub_layer;
+    std::vector<absl::optional<struct H265ProfileInfoParser::ProfileInfoState>>
+        sub_layer;
     std::vector<uint32_t> sub_layer_level_idc;
   };
 

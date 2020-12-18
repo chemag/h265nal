@@ -16,10 +16,6 @@
 #include "rtc_base/bit_buffer.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
-    OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
-    OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265RtpApParser::RtpApState> OptionalRtpAp;
 }  // namespace
 
@@ -45,11 +41,7 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
   RtpApState rtp_ap;
 
   // first read the common header
-  OptionalNalUnitHeader nal_unit_header_common =
-      H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header_common != absl::nullopt) {
-    rtp_ap.header = *nal_unit_header_common;
-  }
+  rtp_ap.header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
 
   while (bit_buffer->RemainingBitCount() > 0) {
     // NALU size
@@ -60,19 +52,14 @@ absl::optional<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     rtp_ap.nal_unit_sizes.push_back(nalu_size);
 
     // NALU header
-    OptionalNalUnitHeader nal_unit_header =
-        H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-    if (nal_unit_header != absl::nullopt) {
-      rtp_ap.nal_unit_headers.push_back(*nal_unit_header);
-    }
+    rtp_ap.nal_unit_headers.push_back(
+        H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer));
 
     // NALU payload
-    OptionalNalUnitPayload nal_unit_payload =
+    rtp_ap.nal_unit_payloads.push_back(
         H265NalUnitPayloadParser::ParseNalUnitPayload(
-            bit_buffer, nal_unit_header->nal_unit_type, bitstream_parser_state);
-    if (nal_unit_payload != absl::nullopt) {
-      rtp_ap.nal_unit_payloads.push_back(*nal_unit_payload);
-    }
+            bit_buffer, rtp_ap.nal_unit_headers.back()->nal_unit_type,
+            bitstream_parser_state));
   }
   return OptionalRtpAp(rtp_ap);
 }
@@ -83,18 +70,18 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  header.fdump(outfp, indent_level);
+  header->fdump(outfp, indent_level);
 
   for (unsigned int i = 0; i < nal_unit_sizes.size(); ++i) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "nal_unit_size: %zu", nal_unit_sizes[i]);
 
     fdump_indent_level(outfp, indent_level);
-    nal_unit_headers[i].fdump(outfp, indent_level);
+    nal_unit_headers[i]->fdump(outfp, indent_level);
 
     fdump_indent_level(outfp, indent_level);
-    nal_unit_payloads[i].fdump(outfp, nal_unit_headers[i].nal_unit_type,
-                               indent_level);
+    nal_unit_payloads[i]->fdump(outfp, nal_unit_headers[i]->nal_unit_type,
+                                indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

@@ -7,7 +7,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "absl/types/optional.h"
 #include "h265_common.h"
 #include "rtc_base/arraysize.h"
 #include "rtc_base/bit_buffer.h"
@@ -19,7 +18,7 @@ class H265VpsParserTest : public ::testing::Test {
   H265VpsParserTest() {}
   ~H265VpsParserTest() override {}
 
-  absl::optional<H265VpsParser::VpsState> vps_;
+  std::shared_ptr<H265VpsParser::VpsState> vps_;
 };
 
 TEST_F(H265VpsParserTest, TestSampleVPS) {
@@ -29,7 +28,7 @@ TEST_F(H265VpsParserTest, TestSampleVPS) {
       0x03, 0x00, 0x5d, 0xac, 0x59, 0x00
   };
   vps_ = H265VpsParser::ParseVps(buffer, arraysize(buffer));
-  EXPECT_TRUE(vps_ != absl::nullopt);
+  EXPECT_TRUE(vps_ != nullptr);
 
   EXPECT_EQ(0, vps_->vps_video_parameter_set_id);
   EXPECT_EQ(1, vps_->vps_base_layer_internal_flag);
@@ -39,39 +38,43 @@ TEST_F(H265VpsParserTest, TestSampleVPS) {
   EXPECT_EQ(1, vps_->vps_temporal_id_nesting_flag);
   EXPECT_EQ(0xffff, vps_->vps_reserved_0xffff_16bits);
   // profile_tier_level start
-  EXPECT_EQ(0, vps_->profile_tier_level.general.profile_space);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.tier_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.profile_idc);
-  EXPECT_THAT(vps_->profile_tier_level.general.profile_compatibility_flag,
+  EXPECT_EQ(0, vps_->profile_tier_level->general->profile_space);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->tier_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->profile_idc);
+  EXPECT_THAT(vps_->profile_tier_level->general->profile_compatibility_flag,
               ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0}));
-  EXPECT_EQ(1, vps_->profile_tier_level.general.progressive_source_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.interlaced_source_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.non_packed_constraint_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.frame_only_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_12bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_10bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_8bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_422chroma_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_420chroma_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_monochrome_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.intra_constraint_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->progressive_source_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->interlaced_source_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->non_packed_constraint_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->frame_only_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_12bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_10bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_8bit_constraint_flag);
   EXPECT_EQ(0,
-            vps_->profile_tier_level.general.one_picture_only_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.lower_bit_rate_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_14bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_33bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_34bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_43bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.inbld_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_bit);
-  EXPECT_EQ(93, vps_->profile_tier_level.general_level_idc);
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_profile_present_flag.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_level_present_flag.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.reserved_zero_2bits.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer.size());
+            vps_->profile_tier_level->general->max_422chroma_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->max_420chroma_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->max_monochrome_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->intra_constraint_flag);
+  EXPECT_EQ(
+      0, vps_->profile_tier_level->general->one_picture_only_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->lower_bit_rate_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_14bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_33bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_34bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_43bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->inbld_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_bit);
+  EXPECT_EQ(93, vps_->profile_tier_level->general_level_idc);
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer_profile_present_flag.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer_level_present_flag.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->reserved_zero_2bits.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer.size());
   // profile_tier_level end
   EXPECT_EQ(1, vps_->vps_sub_layer_ordering_info_present_flag);
   EXPECT_THAT(vps_->vps_max_dec_pic_buffering_minus1,
@@ -101,7 +104,7 @@ TEST_F(H265VpsParserTest, TestSampleVPS2) {
       0x03, 0x00, 0x5d, 0xac, 0x56, 0x07, 0xe4, 0x00
   };
   vps_ = H265VpsParser::ParseVps(buffer, arraysize(buffer));
-  EXPECT_TRUE(vps_ != absl::nullopt);
+  EXPECT_TRUE(vps_ != nullptr);
 
   EXPECT_EQ(0, vps_->vps_video_parameter_set_id);
   EXPECT_EQ(1, vps_->vps_base_layer_internal_flag);
@@ -111,39 +114,43 @@ TEST_F(H265VpsParserTest, TestSampleVPS2) {
   EXPECT_EQ(1, vps_->vps_temporal_id_nesting_flag);
   EXPECT_EQ(0xffff, vps_->vps_reserved_0xffff_16bits);
   // profile_tier_level start
-  EXPECT_EQ(0, vps_->profile_tier_level.general.profile_space);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.tier_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.profile_idc);
-  EXPECT_THAT(vps_->profile_tier_level.general.profile_compatibility_flag,
+  EXPECT_EQ(0, vps_->profile_tier_level->general->profile_space);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->tier_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->profile_idc);
+  EXPECT_THAT(vps_->profile_tier_level->general->profile_compatibility_flag,
               ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0,
                                            0, 0, 0, 0, 0, 0, 0, 0}));
-  EXPECT_EQ(1, vps_->profile_tier_level.general.progressive_source_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.interlaced_source_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.non_packed_constraint_flag);
-  EXPECT_EQ(1, vps_->profile_tier_level.general.frame_only_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_12bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_10bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_8bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_422chroma_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_420chroma_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_monochrome_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.intra_constraint_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->progressive_source_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->interlaced_source_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->non_packed_constraint_flag);
+  EXPECT_EQ(1, vps_->profile_tier_level->general->frame_only_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_12bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_10bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_8bit_constraint_flag);
   EXPECT_EQ(0,
-            vps_->profile_tier_level.general.one_picture_only_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.lower_bit_rate_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.max_14bit_constraint_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_33bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_34bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_43bits);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.inbld_flag);
-  EXPECT_EQ(0, vps_->profile_tier_level.general.reserved_zero_bit);
-  EXPECT_EQ(93, vps_->profile_tier_level.general_level_idc);
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_profile_present_flag.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer_level_present_flag.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.reserved_zero_2bits.size());
-  EXPECT_EQ(0, vps_->profile_tier_level.sub_layer.size());
+            vps_->profile_tier_level->general->max_422chroma_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->max_420chroma_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->max_monochrome_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->intra_constraint_flag);
+  EXPECT_EQ(
+      0, vps_->profile_tier_level->general->one_picture_only_constraint_flag);
+  EXPECT_EQ(0,
+            vps_->profile_tier_level->general->lower_bit_rate_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->max_14bit_constraint_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_33bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_34bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_43bits);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->inbld_flag);
+  EXPECT_EQ(0, vps_->profile_tier_level->general->reserved_zero_bit);
+  EXPECT_EQ(93, vps_->profile_tier_level->general_level_idc);
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer_profile_present_flag.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer_level_present_flag.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->reserved_zero_2bits.size());
+  EXPECT_EQ(0, vps_->profile_tier_level->sub_layer.size());
   // profile_tier_level end
   EXPECT_EQ(1, vps_->vps_sub_layer_ordering_info_present_flag);
   EXPECT_THAT(vps_->vps_max_dec_pic_buffering_minus1,

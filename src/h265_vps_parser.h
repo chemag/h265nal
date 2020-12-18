@@ -35,7 +35,8 @@ class H265VpsParser {
     uint32_t vps_max_sub_layers_minus1 = 0;
     uint32_t vps_temporal_id_nesting_flag = 0;
     uint32_t vps_reserved_0xffff_16bits = 0;
-    struct H265ProfileTierLevelParser::ProfileTierLevelState profile_tier_level;
+    absl::optional<struct H265ProfileTierLevelParser::ProfileTierLevelState>
+        profile_tier_level;
     uint32_t vps_sub_layer_ordering_info_present_flag = 0;
     std::vector<uint32_t> vps_max_dec_pic_buffering_minus1;
     std::vector<uint32_t> vps_max_num_reorder_pics;
@@ -56,9 +57,10 @@ class H265VpsParser {
   };
 
   // Unpack RBSP and parse VPS state from the supplied buffer.
-  static absl::optional<VpsState> ParseVps(const uint8_t* data,
-                                           size_t length) noexcept;
-  static absl::optional<VpsState> ParseVps(rtc::BitBuffer* bit_buffer) noexcept;
+  static std::shared_ptr<VpsState> ParseVps(const uint8_t* data,
+                                            size_t length) noexcept;
+  static std::shared_ptr<VpsState> ParseVps(
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

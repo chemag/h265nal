@@ -15,10 +15,6 @@
 #include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
-    OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
-    OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265RtpFuParser::RtpFuState> OptionalRtpFu;
 }  // namespace
 
@@ -44,11 +40,7 @@ absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   RtpFuState rtp_fu;
 
   // first read the common header
-  OptionalNalUnitHeader nal_unit_header =
-      H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header != absl::nullopt) {
-    rtp_fu.header = *nal_unit_header;
-  }
+  rtp_fu.header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
 
   // read the fu header
   if (!bit_buffer->ReadBits(&(rtp_fu.s_bit), 1)) {
@@ -67,12 +59,8 @@ absl::optional<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   }
 
   // start of a fragmented NAL: keep reading
-  OptionalNalUnitPayload nal_unit_payload =
-      H265NalUnitPayloadParser::ParseNalUnitPayload(bit_buffer, rtp_fu.fu_type,
-                                                    bitstream_parser_state);
-  if (nal_unit_payload != absl::nullopt) {
-    rtp_fu.nal_unit_payload = *nal_unit_payload;
-  }
+  rtp_fu.nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
+      bit_buffer, rtp_fu.fu_type, bitstream_parser_state);
 
   return OptionalRtpFu(rtp_fu);
 }
@@ -83,7 +71,7 @@ void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  header.fdump(outfp, indent_level);
+  header->fdump(outfp, indent_level);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "s_bit: %i", s_bit);
@@ -97,7 +85,7 @@ void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
   if (s_bit == 1) {
     // start of a fragmented NAL: dump payload
     fdump_indent_level(outfp, indent_level);
-    nal_unit_payload.fdump(outfp, fu_type, indent_level);
+    nal_unit_payload->fdump(outfp, fu_type, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

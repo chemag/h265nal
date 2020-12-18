@@ -37,10 +37,10 @@ TEST_F(H265RtpFuParserTest, TestSampleStart) {
 
   // check the common header
   auto header = rtp_fu_->header;
-  EXPECT_EQ(0, header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::FU, header.nal_unit_type);
-  EXPECT_EQ(0, header.nuh_layer_id);
-  EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+  EXPECT_EQ(0, header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::FU, header->nal_unit_type);
+  EXPECT_EQ(0, header->nuh_layer_id);
+  EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check the fu header
   EXPECT_EQ(1, rtp_fu_->s_bit);
@@ -62,10 +62,10 @@ TEST_F(H265RtpFuParserTest, TestSampleMiddle) {
 
   // check the common header
   auto header = rtp_fu_->header;
-  EXPECT_EQ(0, header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::FU, header.nal_unit_type);
-  EXPECT_EQ(0, header.nuh_layer_id);
-  EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+  EXPECT_EQ(0, header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::FU, header->nal_unit_type);
+  EXPECT_EQ(0, header->nuh_layer_id);
+  EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check the fu header
   EXPECT_EQ(0, rtp_fu_->s_bit);
@@ -87,10 +87,10 @@ TEST_F(H265RtpFuParserTest, TestSampleEnd) {
 
   // check the common header
   auto header = rtp_fu_->header;
-  EXPECT_EQ(0, header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::FU, header.nal_unit_type);
-  EXPECT_EQ(0, header.nuh_layer_id);
-  EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+  EXPECT_EQ(0, header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::FU, header->nal_unit_type);
+  EXPECT_EQ(0, header->nuh_layer_id);
+  EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check the fu header
   EXPECT_EQ(0, rtp_fu_->s_bit);

@@ -72,7 +72,8 @@ class H265SliceSegmentHeaderParser {
     uint32_t colour_plane_id = 0;
     uint32_t slice_pic_order_cnt_lsb = 0;
     uint32_t short_term_ref_pic_set_sps_flag = 0;
-    struct H265StRefPicSetParser::StRefPicSetState st_ref_pic_set;
+    absl::optional<struct H265StRefPicSetParser::StRefPicSetState>
+        st_ref_pic_set;
     uint32_t short_term_ref_pic_set_idx = 0;
     uint32_t num_long_term_sps = 0;
     uint32_t num_long_term_pics = 0;
@@ -139,7 +140,7 @@ class H265SliceSegmentLayerParser {
     uint32_t nal_unit_type = 0;
 
     // contents
-    struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState
+    absl::optional<struct H265SliceSegmentHeaderParser::SliceSegmentHeaderState>
         slice_segment_header;
     // slice_segment_data()
     // rbsp_slice_segment_trailing_bits()

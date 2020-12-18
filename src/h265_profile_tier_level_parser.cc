@@ -56,11 +56,8 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   profile_tier_level.maxNumSubLayersMinus1 = maxNumSubLayersMinus1;
 
   if (profilePresentFlag) {
-    OptionalProfileInfo profile_info =
+    profile_tier_level.general =
         H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
-    if (profile_info != absl::nullopt) {
-      profile_tier_level.general = *profile_info;
-    }
   }
 
   // general_level_idc  u(8)
@@ -93,11 +90,8 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   }
 
   for (uint32_t i = 0; i < maxNumSubLayersMinus1; i++) {
-    OptionalProfileInfo profile_info =
-        H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
-    if (profile_info != absl::nullopt) {
-      profile_tier_level.sub_layer.push_back(*profile_info);
-    }
+    profile_tier_level.sub_layer.push_back(
+        H265ProfileInfoParser::ParseProfileInfo(bit_buffer));
 
     // sub_layer_level_idc  u(8)
     if (!bit_buffer->ReadBits(&bits_tmp, 8)) {
@@ -347,7 +341,7 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
     indent_level = indent_level_incr(indent_level);
 
     fdump_indent_level(outfp, indent_level);
-    general.fdump(outfp, indent_level);
+    general->fdump(outfp, indent_level);
 
     indent_level = indent_level_decr(indent_level);
     fdump_indent_level(outfp, indent_level);
@@ -385,10 +379,11 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
     fprintf(outfp, "sub_layer {");
     indent_level = indent_level_incr(indent_level);
 
-    for (const struct H265ProfileInfoParser::ProfileInfoState& v : sub_layer) {
+    for (absl::optional<struct H265ProfileInfoParser::ProfileInfoState> v :
+         sub_layer) {
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "{");
-      v.fdump(outfp, indent_level);
+      v->fdump(outfp, indent_level);
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "}");
     }

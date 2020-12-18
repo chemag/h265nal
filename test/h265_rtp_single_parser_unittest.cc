@@ -36,10 +36,10 @@ TEST_F(H265RtpSingleParserTest, TestSampleVps) {
   EXPECT_TRUE(rtp_single_ != absl::nullopt);
 
   // check the header
-  EXPECT_EQ(0, rtp_single_->nal_unit_header.forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_single_->nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, rtp_single_->nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, rtp_single_->nal_unit_header.nuh_temporal_id_plus1);
+  EXPECT_EQ(0, rtp_single_->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_single_->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, rtp_single_->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, rtp_single_->nal_unit_header->nuh_temporal_id_plus1);
 }
 
 TEST_F(H265RtpSingleParserTest, TestMultipleRtpPackets) {
@@ -92,50 +92,50 @@ TEST_F(H265RtpSingleParserTest, TestMultipleRtpPackets) {
 
     if (i == 0) {  // VPS
       // check the header
-      EXPECT_EQ(0, header.forbidden_zero_bit);
-      EXPECT_EQ(NalUnitType::VPS_NUT, header.nal_unit_type);
-      EXPECT_EQ(0, header.nuh_layer_id);
-      EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+      EXPECT_EQ(0, header->forbidden_zero_bit);
+      EXPECT_EQ(NalUnitType::VPS_NUT, header->nal_unit_type);
+      EXPECT_EQ(0, header->nuh_layer_id);
+      EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
     } else if (i == 1) {  // SPS
       // check the header
-      EXPECT_EQ(0, header.forbidden_zero_bit);
-      EXPECT_EQ(NalUnitType::SPS_NUT, header.nal_unit_type);
-      EXPECT_EQ(0, header.nuh_layer_id);
-      EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+      EXPECT_EQ(0, header->forbidden_zero_bit);
+      EXPECT_EQ(NalUnitType::SPS_NUT, header->nal_unit_type);
+      EXPECT_EQ(0, header->nuh_layer_id);
+      EXPECT_EQ(1, header->nuh_temporal_id_plus1);
       // check some values
-      auto &sps = payload.sps;
-      EXPECT_EQ(1280, sps.pic_width_in_luma_samples);
-      EXPECT_EQ(736, sps.pic_height_in_luma_samples);
-      auto sps_id = sps.sps_seq_parameter_set_id;
+      auto &sps = payload->sps;
+      EXPECT_EQ(1280, sps->pic_width_in_luma_samples);
+      EXPECT_EQ(736, sps->pic_height_in_luma_samples);
+      auto sps_id = sps->sps_seq_parameter_set_id;
       EXPECT_EQ(1280,
-                bitstream_parser_state.sps[sps_id].pic_width_in_luma_samples);
+                bitstream_parser_state.sps[sps_id]->pic_width_in_luma_samples);
       EXPECT_EQ(736,
-                bitstream_parser_state.sps[sps_id].pic_height_in_luma_samples);
+                bitstream_parser_state.sps[sps_id]->pic_height_in_luma_samples);
 
     } else if (i == 2) {  // PPS
       // check the header
-      EXPECT_EQ(0, header.forbidden_zero_bit);
-      EXPECT_EQ(NalUnitType::PPS_NUT, header.nal_unit_type);
-      EXPECT_EQ(0, header.nuh_layer_id);
-      EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+      EXPECT_EQ(0, header->forbidden_zero_bit);
+      EXPECT_EQ(NalUnitType::PPS_NUT, header->nal_unit_type);
+      EXPECT_EQ(0, header->nuh_layer_id);
+      EXPECT_EQ(1, header->nuh_temporal_id_plus1);
       // check some values
-      auto &pps = payload.pps;
-      EXPECT_EQ(0, pps.init_qp_minus26);
-      auto pps_id = pps.pps_pic_parameter_set_id;
-      EXPECT_EQ(0, bitstream_parser_state.pps[pps_id].init_qp_minus26);
+      auto &pps = payload->pps;
+      EXPECT_EQ(0, pps->init_qp_minus26);
+      auto pps_id = pps->pps_pic_parameter_set_id;
+      EXPECT_EQ(0, bitstream_parser_state.pps[pps_id]->init_qp_minus26);
 
     } else if (i == 3) {  // slice
       // check the header
-      EXPECT_EQ(0, header.forbidden_zero_bit);
-      EXPECT_EQ(NalUnitType::IDR_W_RADL, header.nal_unit_type);
-      EXPECT_EQ(0, header.nuh_layer_id);
-      EXPECT_EQ(1, header.nuh_temporal_id_plus1);
+      EXPECT_EQ(0, header->forbidden_zero_bit);
+      EXPECT_EQ(NalUnitType::IDR_W_RADL, header->nal_unit_type);
+      EXPECT_EQ(0, header->nuh_layer_id);
+      EXPECT_EQ(1, header->nuh_temporal_id_plus1);
       // check some values
-      auto &slice_header = payload.slice_segment_layer.slice_segment_header;
-      EXPECT_EQ(9, slice_header.slice_qp_delta);
-      auto pps_id = slice_header.slice_pic_parameter_set_id;
-      EXPECT_EQ(0, bitstream_parser_state.pps[pps_id].init_qp_minus26);
+      auto &slice_header = payload->slice_segment_layer->slice_segment_header;
+      EXPECT_EQ(9, slice_header->slice_qp_delta);
+      auto pps_id = slice_header->slice_pic_parameter_set_id;
+      EXPECT_EQ(0, bitstream_parser_state.pps[pps_id]->init_qp_minus26);
     }
 
     i += 1;

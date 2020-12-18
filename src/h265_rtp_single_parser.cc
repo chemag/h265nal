@@ -14,10 +14,6 @@
 #include "h265_nal_unit_parser.h"
 
 namespace {
-typedef absl::optional<h265nal::H265NalUnitHeaderParser::NalUnitHeaderState>
-    OptionalNalUnitHeader;
-typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
-    OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265RtpSingleParser::RtpSingleState>
     OptionalRtpSingle;
 }  // namespace
@@ -46,20 +42,13 @@ H265RtpSingleParser::ParseRtpSingle(
   RtpSingleState rtp_single;
 
   // nal_unit_header()
-  OptionalNalUnitHeader nal_unit_header =
+  rtp_single.nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header != absl::nullopt) {
-    rtp_single.nal_unit_header = *nal_unit_header;
-  }
 
   // nal_unit_payload()
-  OptionalNalUnitPayload nal_unit_payload =
-      H265NalUnitPayloadParser::ParseNalUnitPayload(
-          bit_buffer, rtp_single.nal_unit_header.nal_unit_type,
-          bitstream_parser_state);
-  if (nal_unit_payload != absl::nullopt) {
-    rtp_single.nal_unit_payload = *nal_unit_payload;
-  }
+  rtp_single.nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
+      bit_buffer, rtp_single.nal_unit_header->nal_unit_type,
+      bitstream_parser_state);
 
   return OptionalRtpSingle(rtp_single);
 }
@@ -72,11 +61,11 @@ void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
 
   // header
   fdump_indent_level(outfp, indent_level);
-  nal_unit_header.fdump(outfp, indent_level);
+  nal_unit_header->fdump(outfp, indent_level);
 
   // payload
   fdump_indent_level(outfp, indent_level);
-  nal_unit_payload.fdump(outfp, indent_level, nal_unit_header.nal_unit_type);
+  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

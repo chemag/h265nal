@@ -8,7 +8,6 @@
 
 #include <vector>
 
-#include "absl/types/optional.h"
 #include "h265_profile_tier_level_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -81,9 +80,10 @@ class H265PpsParser {
   };
 
   // Unpack RBSP and parse PPS state from the supplied buffer.
-  static absl::optional<PpsState> ParsePps(const uint8_t* data,
-                                           size_t length) noexcept;
-  static absl::optional<PpsState> ParsePps(rtc::BitBuffer* bit_buffer) noexcept;
+  static std::shared_ptr<PpsState> ParsePps(const uint8_t* data,
+                                            size_t length) noexcept;
+  static std::shared_ptr<PpsState> ParsePps(
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

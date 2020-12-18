@@ -27,13 +27,15 @@ class H265RtpApParser {
 #endif  // FDUMP_DEFINE
 
     // common header
-    struct H265NalUnitHeaderParser::NalUnitHeaderState header;
+    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
 
     // payload
     std::vector<size_t> nal_unit_sizes;
-    std::vector<struct H265NalUnitHeaderParser::NalUnitHeaderState>
+    std::vector<
+        absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>>
         nal_unit_headers;
-    std::vector<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+    std::vector<
+        absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>>
         nal_unit_payloads;
   };
 

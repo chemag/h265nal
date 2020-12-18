@@ -33,7 +33,8 @@ class H265SpsParser {
     uint32_t sps_video_parameter_set_id = 0;
     uint32_t sps_max_sub_layers_minus1 = 0;
     uint32_t sps_temporal_id_nesting_flag = 0;
-    struct H265ProfileTierLevelParser::ProfileTierLevelState profile_tier_level;
+    absl::optional<struct H265ProfileTierLevelParser::ProfileTierLevelState>
+        profile_tier_level;
     uint32_t sps_seq_parameter_set_id = 0;
     uint32_t chroma_format_idc = 0;
     uint32_t separate_colour_plane_flag = 0;
@@ -69,7 +70,8 @@ class H265SpsParser {
     uint32_t log2_diff_max_min_pcm_luma_coding_block_size = 0;
     uint32_t pcm_loop_filter_disabled_flag = 0;
     uint32_t num_short_term_ref_pic_sets = 0;
-    std::vector<struct H265StRefPicSetParser::StRefPicSetState> st_ref_pic_set;
+    std::vector<absl::optional<struct H265StRefPicSetParser::StRefPicSetState>>
+        st_ref_pic_set;
     uint32_t long_term_ref_pics_present_flag = 0;
     uint32_t num_long_term_ref_pics_sps = 0;
     std::vector<uint32_t> lt_ref_pic_poc_lsb_sps;
@@ -77,7 +79,8 @@ class H265SpsParser {
     uint32_t sps_temporal_mvp_enabled_flag = 0;
     uint32_t strong_intra_smoothing_enabled_flag = 0;
     uint32_t vui_parameters_present_flag = 0;
-    struct H265VuiParametersParser::VuiParametersState vui_parameters;
+    absl::optional<struct H265VuiParametersParser::VuiParametersState>
+        vui_parameters;
     uint32_t sps_extension_present_flag = 0;
     uint32_t sps_range_extension_flag = 0;
     uint32_t sps_multilayer_extension_flag = 0;
@@ -95,9 +98,10 @@ class H265SpsParser {
   };
 
   // Unpack RBSP and parse SPS state from the supplied buffer.
-  static absl::optional<SpsState> ParseSps(const uint8_t* data,
-                                           size_t length) noexcept;
-  static absl::optional<SpsState> ParseSps(rtc::BitBuffer* bit_buffer) noexcept;
+  static std::shared_ptr<SpsState> ParseSps(const uint8_t* data,
+                                            size_t length) noexcept;
+  static std::shared_ptr<SpsState> ParseSps(
+      rtc::BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

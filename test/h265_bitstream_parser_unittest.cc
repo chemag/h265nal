@@ -67,32 +67,36 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(4, bitstream_->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,
-            bitstream_->nal_units[0].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[0].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[0]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 2nd NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[1].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[1]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::SPS_NUT,
-            bitstream_->nal_units[1].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[1].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[1].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[1]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[1]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[1]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 3rd NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[2].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[2]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::PPS_NUT,
-            bitstream_->nal_units[2].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[2].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[2].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[2]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[2]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[2]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 4th NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[3].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[3]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL,
-            bitstream_->nal_units[3].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[3].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[3].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[3]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[3]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[3]->nal_unit_header->nuh_temporal_id_plus1);
 }
 
 // VPS, SPS, PPS for a 1280x720 camera capture.
@@ -189,32 +193,36 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   EXPECT_EQ(4, bitstream_->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,
-            bitstream_->nal_units[0].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[0].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[0]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 2nd NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[1].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[1]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::SPS_NUT,
-            bitstream_->nal_units[1].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[1].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[1].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[1]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[1]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[1]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 3rd NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[2].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[2]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::PPS_NUT,
-            bitstream_->nal_units[2].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[2].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[2].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[2]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[2]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[2]->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the 4th NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[3].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[3]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL,
-            bitstream_->nal_units[3].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[3].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[3].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[3]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[3]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[3]->nal_unit_header->nuh_temporal_id_plus1);
 
   // 1. parse buffer1
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer1, arraysize(buffer1),
@@ -225,11 +233,12 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   EXPECT_EQ(1, bitstream_->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
-            bitstream_->nal_units[0].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[0].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[0]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
 
   // 2. parse buffer2
   bitstream_ = H265BitstreamParser::ParseBitstream(buffer2, arraysize(buffer2),
@@ -240,11 +249,12 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   EXPECT_EQ(1, bitstream_->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.forbidden_zero_bit);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
-            bitstream_->nal_units[0].nal_unit_header.nal_unit_type);
-  EXPECT_EQ(0, bitstream_->nal_units[0].nal_unit_header.nuh_layer_id);
-  EXPECT_EQ(1, bitstream_->nal_units[0].nal_unit_header.nuh_temporal_id_plus1);
+            bitstream_->nal_units[0]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream_->nal_units[0]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1,
+            bitstream_->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
 }
 
 TEST_F(H265BitstreamParserTest, TestMultipleBuffersGetSliceQpY) {

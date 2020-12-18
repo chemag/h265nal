@@ -28,10 +28,11 @@ class H265RtpParser {
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
 
-    struct H265NalUnitHeaderParser::NalUnitHeaderState nal_unit_header;
-    struct H265RtpSingleParser::RtpSingleState rtp_single;
-    struct H265RtpApParser::RtpApState rtp_ap;
-    struct H265RtpFuParser::RtpFuState rtp_fu;
+    absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState>
+        nal_unit_header;
+    absl::optional<struct H265RtpSingleParser::RtpSingleState> rtp_single;
+    absl::optional<struct H265RtpApParser::RtpApState> rtp_ap;
+    absl::optional<struct H265RtpFuParser::RtpFuState> rtp_fu;
   };
 
   // Unpack RBSP and parse RTP NAL Unit state from the supplied buffer.

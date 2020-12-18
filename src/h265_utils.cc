@@ -32,21 +32,22 @@ namespace {
 // internal function
 absl::optional<int32_t> GetSliceQpYInternal(
     uint32_t nal_unit_type,
-    const struct H265NalUnitPayloadParser::NalUnitPayloadState* payload,
-    const H265BitstreamParserState* bitstream_parser_state) {
+    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+        payload,
+    const struct H265BitstreamParserState* bitstream_parser_state) {
   // make sure the payload contains a slice header
   if (!IsSliceSegment(nal_unit_type)) {
     return absl::nullopt;
   }
 
   // check some values
-  auto& slice_header = payload->slice_segment_layer.slice_segment_header;
-  auto pps_id = slice_header.slice_pic_parameter_set_id;
-  auto slice_qp_delta = slice_header.slice_qp_delta;
+  auto& slice_header = payload->slice_segment_layer->slice_segment_header;
+  auto pps_id = slice_header->slice_pic_parameter_set_id;
+  auto slice_qp_delta = slice_header->slice_qp_delta;
 
   // check the PPS exists in the bitstream parser state
   auto pps = bitstream_parser_state->GetPps(pps_id);
-  if (pps == absl::nullopt) {
+  if (pps.get() == nullptr) {
     return absl::nullopt;
   }
   const auto init_qp_minus26 = pps->init_qp_minus26;
@@ -63,26 +64,26 @@ absl::optional<int32_t> H265Utils::GetSliceQpY(
     const H265RtpParser::RtpState rtp,
     const H265BitstreamParserState* bitstream_parser_state) {
   // get the actual NAL header (not the RTP one)
-  const struct H265NalUnitHeaderParser::NalUnitHeaderState* header;
-  const struct H265NalUnitPayloadParser::NalUnitPayloadState* payload;
+  absl::optional<struct H265NalUnitHeaderParser::NalUnitHeaderState> header;
+  absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState> payload;
   uint32_t nal_unit_type = 0;
-  if (rtp.nal_unit_header.nal_unit_type <= 47) {
-    header = &(rtp.rtp_single.nal_unit_header);
+  if (rtp.nal_unit_header->nal_unit_type <= 47) {
+    header = rtp.rtp_single->nal_unit_header;
     nal_unit_type = header->nal_unit_type;
-    payload = &(rtp.rtp_single.nal_unit_payload);
-  } else if (rtp.nal_unit_header.nal_unit_type == AP) {
+    payload = rtp.rtp_single->nal_unit_payload;
+  } else if (rtp.nal_unit_header->nal_unit_type == AP) {
     // use the latest NAL unit in the AP
-    size_t index = rtp.rtp_ap.nal_unit_headers.size() - 1;
-    header = &(rtp.rtp_ap.nal_unit_headers[index]);
+    size_t index = rtp.rtp_ap->nal_unit_headers.size() - 1;
+    header = rtp.rtp_ap->nal_unit_headers[index];
     nal_unit_type = header->nal_unit_type;
-    payload = &(rtp.rtp_ap.nal_unit_payloads[index]);
-  } else if (rtp.nal_unit_header.nal_unit_type == FU) {
+    payload = rtp.rtp_ap->nal_unit_payloads[index];
+  } else if (rtp.nal_unit_header->nal_unit_type == FU) {
     // check this is the first NAL of the frame
-    if (rtp.rtp_fu.s_bit == 0) {
+    if (rtp.rtp_fu->s_bit == 0) {
       return absl::nullopt;
     }
-    nal_unit_type = rtp.rtp_fu.fu_type;
-    payload = &(rtp.rtp_fu.nal_unit_payload);
+    nal_unit_type = rtp.rtp_fu->fu_type;
+    payload = rtp.rtp_fu->nal_unit_payload;
   } else {
     // invalid value
     return absl::nullopt;
@@ -102,14 +103,14 @@ void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
   bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
       data, length, bitstream_parser_state);
   // get all possible QP values
-  for (const struct H265NalUnitParser::NalUnitState& nal_unit :
+  for (absl::optional<struct H265NalUnitParser::NalUnitState> nal_unit :
        bitstream_state->nal_units) {
-    uint32_t nal_unit_type = nal_unit.nal_unit_header.nal_unit_type;
-    const struct H265NalUnitPayloadParser::NalUnitPayloadState& payload =
-        nal_unit.nal_unit_payload;
+    uint32_t nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;
+    absl::optional<struct H265NalUnitPayloadParser::NalUnitPayloadState>
+        payload = nal_unit->nal_unit_payload;
     // get the slice QP_Y value
     auto slice_qp_y_value =
-        GetSliceQpYInternal(nal_unit_type, &payload, bitstream_parser_state);
+        GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
     if (slice_qp_y_value != absl::nullopt) {
       slice_qp_y_vector->push_back(*slice_qp_y_value);
     }

@@ -24,13 +24,6 @@ typedef absl::optional<h265nal::H265NalUnitPayloadParser::NalUnitPayloadState>
     OptionalNalUnitPayload;
 typedef absl::optional<h265nal::H265NalUnitParser::NalUnitState>
     OptionalNalUnit;
-typedef absl::optional<h265nal::H265VpsParser::VpsState> OptionalVps;
-typedef absl::optional<h265nal::H265SpsParser::SpsState> OptionalSps;
-typedef absl::optional<h265nal::H265PpsParser::PpsState> OptionalPps;
-typedef absl::optional<h265nal::H265AudParser::AudState> OptionalAud;
-typedef absl::optional<
-    h265nal::H265SliceSegmentLayerParser::SliceSegmentLayerState>
-    OptionalSliceSegmentLayer;
 }  // namespace
 
 namespace h265nal {
@@ -58,20 +51,13 @@ absl::optional<H265NalUnitParser::NalUnitState> H265NalUnitParser::ParseNalUnit(
   NalUnitState nal_unit;
 
   // nal_unit_header()
-  OptionalNalUnitHeader nal_unit_header =
+  nal_unit.nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
-  if (nal_unit_header != absl::nullopt) {
-    nal_unit.nal_unit_header = *nal_unit_header;
-  }
 
   // nal_unit_payload()
-  OptionalNalUnitPayload nal_unit_payload =
-      H265NalUnitPayloadParser::ParseNalUnitPayload(
-          bit_buffer, nal_unit.nal_unit_header.nal_unit_type,
-          bitstream_parser_state);
-  if (nal_unit_payload != absl::nullopt) {
-    nal_unit.nal_unit_payload = *nal_unit_payload;
-  }
+  nal_unit.nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
+      bit_buffer, nal_unit.nal_unit_header->nal_unit_type,
+      bitstream_parser_state);
 
   return OptionalNalUnit(nal_unit);
 }
@@ -151,12 +137,9 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     case RASL_N:
     case RASL_R: {
       // slice_segment_layer_rbsp()
-      OptionalSliceSegmentLayer slice_segment_layer =
+      nal_unit_payload.slice_segment_layer =
           H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
               bit_buffer, nal_unit_type, bitstream_parser_state);
-      if (slice_segment_layer != absl::nullopt) {
-        nal_unit_payload.slice_segment_layer = *slice_segment_layer;
-      }
       break;
     }
     case RSV_VCL_N10:
@@ -174,12 +157,9 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     case IDR_N_LP:
     case CRA_NUT: {
       // slice_segment_layer_rbsp()
-      OptionalSliceSegmentLayer slice_segment_layer =
+      nal_unit_payload.slice_segment_layer =
           H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
               bit_buffer, nal_unit_type, bitstream_parser_state);
-      if (slice_segment_layer != absl::nullopt) {
-        nal_unit_payload.slice_segment_layer = *slice_segment_layer;
-      }
       break;
     }
     case RSV_IRAP_VCL22:
@@ -198,41 +178,34 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       break;
     case VPS_NUT: {
       // video_parameter_set_rbsp()
-      OptionalVps vps = H265VpsParser::ParseVps(bit_buffer);
-      if (vps != absl::nullopt) {
-        nal_unit_payload.vps = *vps;
-        uint32_t vps_id = nal_unit_payload.vps.vps_video_parameter_set_id;
+      nal_unit_payload.vps = H265VpsParser::ParseVps(bit_buffer);
+      if (nal_unit_payload.vps.get() != nullptr) {
+        uint32_t vps_id = nal_unit_payload.vps->vps_video_parameter_set_id;
         bitstream_parser_state->vps[vps_id] = nal_unit_payload.vps;
       }
-
       break;
     }
     case SPS_NUT: {
       // seq_parameter_set_rbsp()
-      OptionalSps sps = H265SpsParser::ParseSps(bit_buffer);
-      if (sps != absl::nullopt) {
-        nal_unit_payload.sps = *sps;
-        uint32_t sps_id = nal_unit_payload.sps.sps_seq_parameter_set_id;
+      nal_unit_payload.sps = H265SpsParser::ParseSps(bit_buffer);
+      if (nal_unit_payload.sps.get() != nullptr) {
+        uint32_t sps_id = nal_unit_payload.sps->sps_seq_parameter_set_id;
         bitstream_parser_state->sps[sps_id] = nal_unit_payload.sps;
       }
       break;
     }
     case PPS_NUT: {
       // pic_parameter_set_rbsp()
-      OptionalPps pps = H265PpsParser::ParsePps(bit_buffer);
-      if (pps != absl::nullopt) {
-        nal_unit_payload.pps = *pps;
-        uint32_t pps_id = nal_unit_payload.pps.pps_pic_parameter_set_id;
+      nal_unit_payload.pps = H265PpsParser::ParsePps(bit_buffer);
+      if (nal_unit_payload.pps.get() != nullptr) {
+        uint32_t pps_id = nal_unit_payload.pps->pps_pic_parameter_set_id;
         bitstream_parser_state->pps[pps_id] = nal_unit_payload.pps;
       }
       break;
     }
     case AUD_NUT: {
       // access_unit_delimiter_rbsp()
-      OptionalAud aud = H265AudParser::ParseAud(bit_buffer);
-      if (aud != absl::nullopt) {
-        nal_unit_payload.aud = *aud;
-      }
+      nal_unit_payload.aud = H265AudParser::ParseAud(bit_buffer);
       break;
     }
     case EOS_NUT:
@@ -288,11 +261,11 @@ void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
 
   // header
   fdump_indent_level(outfp, indent_level);
-  nal_unit_header.fdump(outfp, indent_level);
+  nal_unit_header->fdump(outfp, indent_level);
 
   // payload
   fdump_indent_level(outfp, indent_level);
-  nal_unit_payload.fdump(outfp, indent_level, nal_unit_header.nal_unit_type);
+  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
@@ -337,7 +310,7 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case RADL_R:
     case RASL_N:
     case RASL_R:
-      slice_segment_layer.fdump(outfp, indent_level);
+      slice_segment_layer->fdump(outfp, indent_level);
       break;
     case RSV_VCL_N10:
     case RSV_VCL_R11:
@@ -353,7 +326,7 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case IDR_W_RADL:
     case IDR_N_LP:
     case CRA_NUT:
-      slice_segment_layer.fdump(outfp, indent_level);
+      slice_segment_layer->fdump(outfp, indent_level);
       break;
     case RSV_IRAP_VCL22:
     case RSV_IRAP_VCL23:
@@ -370,16 +343,16 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       // reserved, non-IRAP pictures
       break;
     case VPS_NUT:
-      vps.fdump(outfp, indent_level);
+      vps->fdump(outfp, indent_level);
       break;
     case SPS_NUT:
-      sps.fdump(outfp, indent_level);
+      sps->fdump(outfp, indent_level);
       break;
     case PPS_NUT:
-      pps.fdump(outfp, indent_level);
+      pps->fdump(outfp, indent_level);
       break;
     case AUD_NUT:
-      aud.fdump(outfp, indent_level);
+      aud->fdump(outfp, indent_level);
       break;
     case EOS_NUT:
       // end_of_seq_rbsp()
