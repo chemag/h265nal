@@ -60,8 +60,10 @@ void H265SliceSegmentLayerParser::SliceSegmentLayerState::fdump(
   fprintf(outfp, "slice_segment_layer {");
   indent_level = indent_level_incr(indent_level);
 
-  fdump_indent_level(outfp, indent_level);
-  slice_segment_header->fdump(outfp, indent_level);
+  if (slice_segment_header.get() != nullptr) {
+    fdump_indent_level(outfp, indent_level);
+    slice_segment_header->fdump(outfp, indent_level);
+  }
 
   // slice_segment_data()
   // rbsp_slice_segment_trailing_bits()
