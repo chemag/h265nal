@@ -12,6 +12,10 @@ find_library(GMOCK_LIBRARY gmock)
 include_directories(PUBLIC ../src)
 include_directories(PUBLIC ../webrtc)
 
+# MacOS requirements
+include_directories(PUBLIC /usr/local/include)
+link_directories(/usr/local/lib)
+
 add_executable(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_unittest.cc)
 add_test(h265_profile_tier_level_parser_unittest h265_profile_tier_level_parser_unittest)
 #target_include_directories(h265_profile_tier_level_parser_unittest PUBLIC /usr/local/include ${CMAKE_CURRENT_SOURCE_DIR} webrtc)

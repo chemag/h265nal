@@ -3,14 +3,14 @@
 By [Chema Gonzalez](https://github.com/chemag), 2020-09-11
 
 
-# Rationale
+# 1. Rationale
 This document describes h265nal, a simpler H265 NAL unit parser.
 
 Final goal it to create a binary that accepts a file in h265 Annex B format
 (.265) and dumps the contents of the parsed NALs.
 
 
-# Install Instructions
+# 2. Install Instructions
 
 Get the git repo, and then build using cmake.
 
@@ -72,13 +72,23 @@ Running main() from /builddir/build/BUILD/googletest-release-1.8.1/googletest/sr
 [  PASSED  ] 1 test.
 ```
 
+Check the included vector file:
 
-# CLI Binary Operation
+```
+$ ./tools/h265nal ../media/foo.265
+h265nal: original version
+nal_unit { nal_unit_header { forbidden_zero_bit: 0 nal_unit_type: 39 nuh_layer_id: 0 nuh_temporal_id_plus1: 1 } nal_unit_payload {  } }
+...
+nal_unit { nal_unit_header { forbidden_zero_bit: 0 nal_unit_type: 0 nuh_layer_id: 0 nuh_temporal_id_plus1: 1 } nal_unit_payload { slice_segment_layer { slice_segment_header { first_slice_segment_in_pic_flag: 1 no_output_of_prior_pics_flag: 0 slice_pic_parameter_set_id: 0 dependent_slice_segment_flag: 0 slice_segment_address: 0 slice_reserved_flag { } slice_type: 0 pic_output_flag: 0 colour_plane_id: 0 slice_pic_order_cnt_lsb: 77 short_term_ref_pic_set_sps_flag: 0 st_ref_pic_set { num_negative_pics: 5 num_positive_pics: 1 delta_poc_s0_minus1 { 2 4 2 2 3 } used_by_curr_pic_s0_flag { 1 1 1 1 1 } delta_poc_s1_minus1 { 0 } used_by_curr_pic_s1_flag { 1 } } slice_temporal_mvp_enabled_flag: 1 slice_sao_luma_flag: 1 slice_sao_chroma_flag: 1 num_ref_idx_active_override_flag: 1 num_ref_idx_l0_active_minus1: 4 num_ref_idx_l1_active_minus1: 0 mvd_l1_zero_flag: 0 collocated_from_l0_flag: 0 five_minus_max_num_merge_cand: 1 slice_qp_delta: 15 slice_loop_filter_across_slices_enabled_flag: 0 num_entry_point_offsets: 12 offset_len_minus1: 5 entry_point_offset_minus1 { 10 2 27 9 2 17 14 24 18 21 16 6 } } } } }
+```
+
+
+# 3. CLI Binary Operation
 
 Parse all the NAL units of an Annex B (`.265` extension) file.
 
 ```
-$ ./src/h265nal file.265 --noas-one-line --add-length --add-offset
+$ ./tools/h265nal file.265 --noas-one-line --add-length --add-offset
 nal_unit {
   offset: 0x00000004
   length: 23
@@ -97,11 +107,11 @@ nal_unit {
 ```
 
 
-# Programmatic Integration Operation
+# 4. Programmatic Integration Operation
 
 There are 2 ways to integrate the parser in your C++ parser:
 
-## 1. Annex B H265 File Parsing
+## 4.1. Annex B H265 File Parsing
 If you just have a binary blob with Annex B format (e.g. you read
 a .265 file from a file, and want to convert the read blob into a set of
 parsed NAL units), use the `H265BitstreamParser::ParseBitstream()` method.
@@ -139,7 +149,7 @@ other NAL units (VPS, SPS, PPS), it will be stored into the
 `BitstreamParserState` object that is passed around.
 
 
-## 2. RTP Packet Parsing
+## 4.2. RTP Packet Parsing
 If you want to just pass consecutive RTP packets (rfc7798 format), and get
 information on their contents, use the `H265RtpParser::ParseRtp` method.
 
@@ -185,13 +195,13 @@ switch (rtp->nal_unit_header.nal_unit_type) {
 ```
 
 
-# Requirements
+# 5. Requirements
 Requires gtests, gmock.
 
 The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
 
 
-# TODO
+# 6. TODO
 
 List of tasks:
 * add lacking parsers (e.g. SEI)
@@ -200,11 +210,36 @@ List of tasks:
   integration.
 
 
-# Limitations
+# 7. Limitations
 
 * no support for PACI (rfc7798 Section 4.4.4)
 
 
-# License
+# 8. License
+
 h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
+
+
+# Appendix 1: MacOS Preparation Notes
+
+1. install gtests (see [here](https://stackoverflow.com/questions/15852631/how-to-install-gtest-on-mac-os-x-with-homebrew))
+
+```
+$ git clone https://github.com/google/googletest
+$ cd googletest
+$ mkdir build
+$ cd build
+$ cmake ..
+$ make
+$ sudo make install
+```
+
+2. install llvm (see [here](https://stackoverflow.com/questions/53111082/how-to-install-clang-tidy-on-macos))
+
+```
+$ brew install llvm
+$ ln -s "$(brew --prefix llvm)/bin/clang-format" "/usr/local/bin/clang-format"
+$ ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
+$ ln -s "$(brew --prefix llvm)/bin/clang-apply-replacements" "/usr/local/bin/clang-apply-replacements"
+```
 
