@@ -45,6 +45,11 @@ class H265BitstreamParser {
       const uint8_t* data, size_t length,
       H265BitstreamParserState* bitstream_parser_state) noexcept;
 
+  // Unpack RBSP and parse bitstream (internal state)
+  static std::unique_ptr<BitstreamState> ParseBitstream(
+      const uint8_t* data, size_t length, bool add_offset,
+      bool add_length) noexcept;
+
   struct NaluIndex {
     // Start index of NALU, including start sequence.
     size_t start_offset;

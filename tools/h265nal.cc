@@ -208,22 +208,11 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> buffer(size);
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
-  // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
-  h265nal::H265BitstreamParserState bitstream_parser_state;
-
-  // create bitstream parser state
-  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
-
-  // parse the file
-  bitstream = h265nal::H265BitstreamParser::ParseBitstream(
-      buffer.data(), buffer.size(), &bitstream_parser_state);
-  if (bitstream == nullptr) {
-    // did not work
-    fprintf(stderr, "Could not init h265 bitstream parser\n");
-    return -1;
-  }
-  bitstream->add_offset = options->add_offset;
-  bitstream->add_length = options->add_length;
+  // parse bitstream
+  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
+      h265nal::H265BitstreamParser::ParseBitstream(buffer.data(), buffer.size(),
+                                                   options->add_offset,
+                                                   options->add_length);
 
 #ifdef FDUMP_DEFINE
   // get outfile file descriptor

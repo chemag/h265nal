@@ -103,6 +103,29 @@ H265BitstreamParser::ParseBitstream(
   return bitstream;
 }
 
+std::unique_ptr<H265BitstreamParser::BitstreamState>
+H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
+                                    bool add_offset, bool add_length) noexcept {
+  // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
+  H265BitstreamParserState bitstream_parser_state;
+
+  // create bitstream parser state
+  auto bitstream = std::make_unique<BitstreamState>();
+
+  // parse the file
+  bitstream = ParseBitstream(data, length, &bitstream_parser_state);
+  if (bitstream == nullptr) {
+    // did not work
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "Could not init h265 bitstream parser\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
+  bitstream->add_offset = add_offset;
+  bitstream->add_length = add_length;
+  return bitstream;
+}
+
 #ifdef FDUMP_DEFINE
 void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
