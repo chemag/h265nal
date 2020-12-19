@@ -208,9 +208,11 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> buffer(size);
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
+  // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
+  h265nal::H265BitstreamParserState bitstream_parser_state;
+
   // create bitstream parser state
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
-  h265nal::H265BitstreamParserState bitstream_parser_state;
 
   // parse the file
   bitstream = h265nal::H265BitstreamParser::ParseBitstream(

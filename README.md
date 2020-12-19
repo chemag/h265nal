@@ -103,20 +103,24 @@ There are 2 ways to integrate the parser in your C++ parser:
 
 ## 1. Annex B H265 File Parsing
 If you just have a binary blob with Annex B format (e.g. you read
-a .265 file from a file, and want to convert the read blob into parsed
-NAL units), use the `H265BitstreamParser::ParseBitstream()` method.
+a .265 file from a file, and want to convert the read blob into a set of
+parsed NAL units), use the `H265BitstreamParser::ParseBitstream()` method.
+
+The following code has been copied from `tools/h265nal.cc`.
 
 ```
 // read your .265 file into the vector `buffer`
 std::vector<uint8_t> buffer(size);
 
-// create bitstream parser
-absl::optional<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+// keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
 h265nal::H265BitstreamParserState bitstream_parser_state;
+
+// create bitstream parser
+std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
 
 // parse the file
 bitstream = h265nal::H265BitstreamParser::ParseBitstream(
-    buffer.data(), buffer.size(), &bitstream_parser_state);
+      buffer.data(), buffer.size(), &bitstream_parser_state);
 ```
 
 The `H265BitstreamParser::ParseBitstream()` function receives a generic
@@ -124,10 +128,11 @@ binary string (`data` and `length`) that you read from the file, plus
 a `H265BitstreamParserState` object that keeps all the VPS/SPS/PPS it
 ever sees. It then:
 
-* (a) splits it into a vector of NAL units,
-* (b) parses each of the NAL units,
-* (c) adds the parsed NAL unit to a vector of parser NAL units, and
-* (d) updates the input `H265BitstreamParserState` object if it sees any VPS/PPS/SPS.
+* (1) splits the input string into a vector of NAL units, and
+* (2) parses the NAL units, and add them to the vector
+
+It will also updates the input `H265BitstreamParserState` object if it
+sees any VPS/PPS/SPS.
 
 Note that, if the parsed NAL unit has state that needs to be used to parse
 other NAL units (VPS, SPS, PPS), it will be stored into the
@@ -138,12 +143,14 @@ other NAL units (VPS, SPS, PPS), it will be stored into the
 If you want to just pass consecutive RTP packets (rfc7798 format), and get
 information on their contents, use the `H265RtpParser::ParseRtp` method.
 
+The following code has been copied from `test/h265_rtp_parser_unittest.cc`.
+
 ```
-// create bitstream parser state
+// keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
 H265BitstreamParserState bitstream_parser_state;
 
 // parse packet(s)
-absl::optional<H265RtpParser::RtpState> rtp = H265RtpParser::ParseRtp(
+std::unique_ptr<H265RtpParser::RtpState> rtp = H265RtpParser::ParseRtp(
     buffer, arraysize(buffer),
     &bitstream_parser_state);
 
@@ -179,7 +186,7 @@ switch (rtp->nal_unit_header.nal_unit_type) {
 
 
 # Requirements
-Requires gtests, gmock, abseil.
+Requires gtests, gmock.
 
 The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
 
