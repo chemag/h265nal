@@ -4,6 +4,8 @@
 
 #include "h265_slice_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cmath>
@@ -218,6 +220,17 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       slice_segment_header->num_short_term_ref_pic_sets =
           bitstream_parser_state->sps[sps_id]->num_short_term_ref_pic_sets;
+      // Rec. ITU-T H.265 v5 (02/2018) Page 81
+      if (slice_segment_header->num_short_term_ref_pic_sets > 64) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "error: slice_segment_header->num_short_term_ref_pic_sets == "
+                "%" PRIu32 " > 64\n",
+                slice_segment_header->num_short_term_ref_pic_sets);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
+
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
         // st_ref_pic_set(num_short_term_ref_pic_sets)
         slice_segment_header->st_ref_pic_set =

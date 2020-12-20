@@ -4,6 +4,8 @@
 
 #include "h265_sps_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cmath>
@@ -254,6 +256,15 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   // num_short_term_ref_pic_sets
   if (!bit_buffer->ReadExponentialGolomb(&(sps->num_short_term_ref_pic_sets))) {
+    return nullptr;
+  }
+  // Rec. ITU-T H.265 v5 (02/2018) Page 81
+  if (sps->num_short_term_ref_pic_sets > 64) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "error: sps->num_short_term_ref_pic_sets == %" PRIu32 " > 64\n",
+            sps->num_short_term_ref_pic_sets);
+#endif  // FPRINT_ERRORS
     return nullptr;
   }
 

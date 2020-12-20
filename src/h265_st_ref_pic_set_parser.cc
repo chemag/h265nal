@@ -4,6 +4,8 @@
 
 #include "h265_st_ref_pic_set_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -34,6 +36,15 @@ H265StRefPicSetParser::ParseStRefPicSet(
     uint32_t num_short_term_ref_pic_sets) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
+
+  // Rec. ITU-T H.265 v5 (02/2018) Page 81
+  if (num_short_term_ref_pic_sets > 64) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: num_short_term_ref_pic_sets == %" PRIu32 " > 64\n",
+            num_short_term_ref_pic_sets);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // H265 st_ref_pic_set() NAL Unit.
   // Section 7.3.7 ("Short-term reference picture set syntax parameter set
