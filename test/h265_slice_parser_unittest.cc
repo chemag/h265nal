@@ -21,12 +21,10 @@ class H265SliceSegmentLayerParserTest : public ::testing::Test {
  public:
   H265SliceSegmentLayerParserTest() {}
   ~H265SliceSegmentLayerParserTest() override {}
-
-  std::unique_ptr<H265SliceSegmentLayerParser::SliceSegmentLayerState>
-      slice_segment_layer_;
 };
 
 TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
+  // fuzzer::conv: data
   const uint8_t buffer[] = {
       0xaf, 0x09, 0x40, 0xf3, 0xb8, 0xd5, 0x39, 0xba,
       0x1f, 0xe4, 0xa6, 0x08, 0x5c, 0x6e, 0xb1, 0x8f,
@@ -35,6 +33,7 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
       0x61, 0x93, 0x72, 0xd6, 0xfc, 0x35, 0xe3, 0xc5
   };
 
+  // fuzzer::conv: begin
   // get some mock state
   H265BitstreamParserState bitstream_parser_state;
   auto vps = std::make_shared<H265VpsParser::VpsState>();
@@ -46,12 +45,15 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice) {
   auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;
 
-  slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
-      buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
-      &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer_ != nullptr);
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
+          &bitstream_parser_state);
+  // fuzzer::conv: end
 
-  auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
+  EXPECT_TRUE(slice_segment_layer != nullptr);
+
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
 
   EXPECT_EQ(1, slice_segment_header->first_slice_segment_in_pic_flag);
   EXPECT_EQ(0, slice_segment_header->no_output_of_prior_pics_flag);
@@ -95,12 +97,13 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice2) {
   auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;
 
-  slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
-      buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
-      &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer_ != nullptr);
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
+          &bitstream_parser_state);
+  EXPECT_TRUE(slice_segment_layer != nullptr);
 
-  auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
 
   EXPECT_EQ(0, slice_segment_header->first_slice_segment_in_pic_flag);
   EXPECT_EQ(0, slice_segment_header->no_output_of_prior_pics_flag);
@@ -161,13 +164,14 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSliceBroken) {
   auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;
 
-  slice_segment_layer_ = H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
-      buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
-      &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer_ != nullptr);
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
+          &bitstream_parser_state);
+  EXPECT_TRUE(slice_segment_layer != nullptr);
 
   // invalid slice_segment_header
-  auto& slice_segment_header = slice_segment_layer_->slice_segment_header;
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
   EXPECT_TRUE(slice_segment_header == nullptr);
 }
 

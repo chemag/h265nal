@@ -17,12 +17,11 @@ class H265RtpApParserTest : public ::testing::Test {
  public:
   H265RtpApParserTest() {}
   ~H265RtpApParserTest() override {}
-
-  std::unique_ptr<H265RtpApParser::RtpApState> rtp_ap_;
 };
 
 TEST_F(H265RtpApParserTest, TestSampleAUD) {
   // AP (Aggregation Packet) containing VPS, PPS, SPS
+  // fuzzer::conv: data
   const uint8_t buffer[] = {
       // AP header
       0x60, 0x01,
@@ -42,27 +41,30 @@ TEST_F(H265RtpApParserTest, TestSampleAUD) {
       0x00, 0x0a,
       // NALU 3 (PPS)
       0x44, 0x01, 0xc0, 0xe2, 0x4f, 0x09, 0x41, 0xec, 0x10, 0x80};
+  // fuzzer::conv: begin
   H265BitstreamParserState bitstream_parser_state;
-  rtp_ap_ = H265RtpApParser::ParseRtpAp(buffer, arraysize(buffer),
-                                        &bitstream_parser_state);
-  EXPECT_TRUE(rtp_ap_ != nullptr);
+  auto rtp_ap = H265RtpApParser::ParseRtpAp(buffer, arraysize(buffer),
+                                            &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(rtp_ap != nullptr);
 
   // check the common header
-  auto& header = rtp_ap_->header;
+  auto& header = rtp_ap->header;
   EXPECT_EQ(0, header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::AP, header->nal_unit_type);
   EXPECT_EQ(0, header->nuh_layer_id);
   EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check there are 3 valid NAL units
-  EXPECT_EQ(3, rtp_ap_->nal_unit_sizes.size());
-  EXPECT_EQ(3, rtp_ap_->nal_unit_headers.size());
-  EXPECT_EQ(3, rtp_ap_->nal_unit_payloads.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_sizes.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_headers.size());
+  EXPECT_EQ(3, rtp_ap->nal_unit_payloads.size());
 
   // check the types
-  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_ap_->nal_unit_headers[0]->nal_unit_type);
-  EXPECT_EQ(NalUnitType::SPS_NUT, rtp_ap_->nal_unit_headers[1]->nal_unit_type);
-  EXPECT_EQ(NalUnitType::PPS_NUT, rtp_ap_->nal_unit_headers[2]->nal_unit_type);
+  EXPECT_EQ(NalUnitType::VPS_NUT, rtp_ap->nal_unit_headers[0]->nal_unit_type);
+  EXPECT_EQ(NalUnitType::SPS_NUT, rtp_ap->nal_unit_headers[1]->nal_unit_type);
+  EXPECT_EQ(NalUnitType::PPS_NUT, rtp_ap->nal_unit_headers[2]->nal_unit_type);
 
   // check the parser state
 }

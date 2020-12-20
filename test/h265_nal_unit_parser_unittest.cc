@@ -18,28 +18,30 @@ class H265NalUnitParserTest : public ::testing::Test {
  public:
   H265NalUnitParserTest() {}
   ~H265NalUnitParserTest() override {}
-
-  std::unique_ptr<H265NalUnitParser::NalUnitState> nal_unit_;
 };
 
 TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
   // VPS for a 1280x720 camera capture.
+  // fuzzer::conv: data
   const uint8_t buffer[] = {0x40, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60,
                             0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
                             0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
+  // fuzzer::conv: begin
   H265BitstreamParserState bitstream_parser_state;
-  nal_unit_ = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
-                                              &bitstream_parser_state);
-  EXPECT_TRUE(nal_unit_ != nullptr);
+  auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
+                                                  &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(nal_unit != nullptr);
 
   // check the header
-  EXPECT_EQ(0, nal_unit_->nal_unit_header->forbidden_zero_bit);
-  EXPECT_EQ(NalUnitType::VPS_NUT, nal_unit_->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, nal_unit_->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, nal_unit_->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(0, nal_unit->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(NalUnitType::VPS_NUT, nal_unit->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, nal_unit->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, nal_unit->nal_unit_header->nuh_temporal_id_plus1);
 
   // check the payload
-  auto vps = nal_unit_->nal_unit_payload->vps;
+  auto vps = nal_unit->nal_unit_payload->vps;
   EXPECT_EQ(0, vps->vps_video_parameter_set_id);
   EXPECT_EQ(1, vps->vps_base_layer_internal_flag);
   EXPECT_EQ(1, vps->vps_base_layer_available_flag);

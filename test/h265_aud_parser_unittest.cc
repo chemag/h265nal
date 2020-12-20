@@ -17,16 +17,18 @@ class H265AudParserTest : public ::testing::Test {
  public:
   H265AudParserTest() {}
   ~H265AudParserTest() override {}
-
-  std::unique_ptr<H265AudParser::AudState> aud_;
 };
 
 TEST_F(H265AudParserTest, TestSampleAUD) {
+  // fuzzer::conv: data
   const uint8_t buffer[] = {0xff};
-  aud_ = H265AudParser::ParseAud(buffer, arraysize(buffer));
-  EXPECT_TRUE(aud_ != nullptr);
+  // fuzzer::conv: begin
+  auto aud = H265AudParser::ParseAud(buffer, arraysize(buffer));
+  // fuzzer::conv: end
 
-  EXPECT_EQ(7, aud_->pic_type);
+  EXPECT_TRUE(aud != nullptr);
+
+  EXPECT_EQ(7, aud->pic_type);
 }
 
 }  // namespace h265nal

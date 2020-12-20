@@ -18,12 +18,11 @@ class H265RtpParserTest : public ::testing::Test {
  public:
   H265RtpParserTest() {}
   ~H265RtpParserTest() override {}
-
-  std::unique_ptr<H265RtpParser::RtpState> rtp_;
 };
 
 TEST_F(H265RtpParserTest, TestSampleSingle) {
   // Single NAL Unit Packet (SPS for a 1280x736 camera capture).
+  // fuzzer::conv: data
   const uint8_t buffer[] = {
       0x42, 0x01, 0x01, 0x01, 0x60, 0x00, 0x00, 0x03,
       0x00, 0xb0, 0x00, 0x00, 0x03, 0x00, 0x00, 0x03,
@@ -31,20 +30,23 @@ TEST_F(H265RtpParserTest, TestSampleSingle) {
       0x13, 0x96, 0xbb, 0x93, 0x24, 0xbb, 0x95, 0x82,
       0x83, 0x03, 0x01, 0x76, 0x85, 0x09, 0x40
   };
+  // fuzzer::conv: begin
   H265BitstreamParserState bitstream_parser_state;
-  rtp_ = H265RtpParser::ParseRtp(buffer, arraysize(buffer),
-                                 &bitstream_parser_state);
-  EXPECT_TRUE(rtp_ != nullptr);
+  auto rtp = H265RtpParser::ParseRtp(buffer, arraysize(buffer),
+                                     &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(rtp != nullptr);
 
   // check the header
-  auto &header = rtp_->nal_unit_header;
+  auto &header = rtp->nal_unit_header;
   EXPECT_EQ(0, header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::SPS_NUT, header->nal_unit_type);
   EXPECT_EQ(0, header->nuh_layer_id);
   EXPECT_EQ(1, header->nuh_temporal_id_plus1);
 
   // check some values
-  auto &rtp_single = rtp_->rtp_single;
+  auto &rtp_single = rtp->rtp_single;
   auto &sps = rtp_single->nal_unit_payload->sps;
   EXPECT_EQ(1280, sps->pic_width_in_luma_samples);
   EXPECT_EQ(736, sps->pic_height_in_luma_samples);
@@ -56,10 +58,8 @@ TEST_F(H265RtpParserTest, TestSampleSingle) {
 }
 
 TEST_F(H265RtpParserTest, TestSampleApAndFu) {
-  // create bitstream parser state
-  H265BitstreamParserState bitstream_parser_state;
-
   // AP (Aggregation Packet) containing VPS, PPS, SPS
+  // fuzzer::conv: data
   const uint8_t buffer1[] = {
       // AP header
       0x60, 0x01,
@@ -83,20 +83,22 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
       0x44, 0x01, 0xc0, 0xe2, 0x4f, 0x09, 0x41, 0xec,
       0x10, 0x80
   };
-  rtp_ = H265RtpParser::ParseRtp(buffer1, arraysize(buffer1),
-                                 &bitstream_parser_state);
-  EXPECT_TRUE(rtp_ != nullptr);
+  H265BitstreamParserState bitstream_parser_state;
+  auto rtp = H265RtpParser::ParseRtp(buffer1, arraysize(buffer1),
+                                     &bitstream_parser_state);
+
+  EXPECT_TRUE(rtp != nullptr);
 
   // check the common header
-  auto &ap_header = rtp_->nal_unit_header;
-  // also: auto &ap_header = rtp_->rtp_ap->header;
+  auto &ap_header = rtp->nal_unit_header;
+  // also: auto &ap_header = rtp->rtp_ap->header;
   EXPECT_EQ(0, ap_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::AP, ap_header->nal_unit_type);
   EXPECT_EQ(0, ap_header->nuh_layer_id);
   EXPECT_EQ(1, ap_header->nuh_temporal_id_plus1);
 
   // check there are 3 valid NAL units
-  auto &rtp_ap = rtp_->rtp_ap;
+  auto &rtp_ap = rtp->rtp_ap;
   EXPECT_EQ(3, rtp_ap->nal_unit_sizes.size());
   EXPECT_EQ(3, rtp_ap->nal_unit_headers.size());
   EXPECT_EQ(3, rtp_ap->nal_unit_payloads.size());
@@ -127,20 +129,20 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
       0xf7, 0x6e, 0x52, 0x0f, 0xd3, 0xb5, 0x44, 0x61,
       0x58, 0x24, 0x68, 0xe0
   };
-  rtp_ = H265RtpParser::ParseRtp(buffer2, arraysize(buffer2),
-                                 &bitstream_parser_state);
-  EXPECT_TRUE(rtp_ != nullptr);
+  rtp = H265RtpParser::ParseRtp(buffer2, arraysize(buffer2),
+                                &bitstream_parser_state);
+  EXPECT_TRUE(rtp != nullptr);
 
   // check the main header
-  auto &fu_header = rtp_->nal_unit_header;
-  // also: auto &fu_header = rtp_->rtp_fu->header;
+  auto &fu_header = rtp->nal_unit_header;
+  // also: auto &fu_header = rtp->rtp_fu->header;
   EXPECT_EQ(0, fu_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::FU, fu_header->nal_unit_type);
   EXPECT_EQ(0, fu_header->nuh_layer_id);
   EXPECT_EQ(1, fu_header->nuh_temporal_id_plus1);
 
   // check the fu header
-  auto &rtp_fu = rtp_->rtp_fu;
+  auto &rtp_fu = rtp->rtp_fu;
   EXPECT_EQ(1, rtp_fu->s_bit);
   EXPECT_EQ(0, rtp_fu->e_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL, rtp_fu->fu_type);
@@ -150,7 +152,7 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
       rtp_fu->nal_unit_payload->slice_segment_layer->slice_segment_header;
   EXPECT_EQ(13, slice_segment_header->slice_qp_delta);
 
-  auto slice_qpy = H265Utils::GetSliceQpY(rtp_, &bitstream_parser_state);
+  auto slice_qpy = H265Utils::GetSliceQpY(rtp, &bitstream_parser_state);
   EXPECT_TRUE(slice_qpy != nullptr);
   EXPECT_EQ(47, *slice_qpy);
 }
