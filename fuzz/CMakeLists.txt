@@ -36,18 +36,24 @@ target_link_libraries(h265_pps_parser_fuzzer PUBLIC h265nal)
 add_executable(h265_aud_parser_fuzzer h265_aud_parser_fuzzer.cc)
 target_link_libraries(h265_aud_parser_fuzzer PUBLIC h265nal)
 
-add_compile_definitions(RTP_DEFINE)
-add_executable(h265_rtp_single_parser_fuzzer h265_rtp_single_parser_fuzzer.cc)
-target_link_libraries(h265_rtp_single_parser_fuzzer PUBLIC h265nal)
+if(H265NAL_SMALL_FOOTPRINT)
+  message(STATUS "fuzz: small footprint selected")
 
-add_executable(h265_rtp_parser_fuzzer h265_rtp_parser_fuzzer.cc)
-target_link_libraries(h265_rtp_parser_fuzzer PUBLIC h265nal)
+else()
+  message(STATUS "fuzz: normal footprint selected")
+  add_compile_definitions(RTP_DEFINE)
+  add_executable(h265_rtp_single_parser_fuzzer h265_rtp_single_parser_fuzzer.cc)
+  target_link_libraries(h265_rtp_single_parser_fuzzer PUBLIC h265nal)
 
-add_executable(h265_rtp_ap_parser_fuzzer h265_rtp_ap_parser_fuzzer.cc)
-target_link_libraries(h265_rtp_ap_parser_fuzzer PUBLIC h265nal)
+  add_executable(h265_rtp_parser_fuzzer h265_rtp_parser_fuzzer.cc)
+  target_link_libraries(h265_rtp_parser_fuzzer PUBLIC h265nal)
 
-add_executable(h265_rtp_fu_parser_fuzzer h265_rtp_fu_parser_fuzzer.cc)
-target_link_libraries(h265_rtp_fu_parser_fuzzer PUBLIC h265nal)
+  add_executable(h265_rtp_ap_parser_fuzzer h265_rtp_ap_parser_fuzzer.cc)
+  target_link_libraries(h265_rtp_ap_parser_fuzzer PUBLIC h265nal)
+
+  add_executable(h265_rtp_fu_parser_fuzzer h265_rtp_fu_parser_fuzzer.cc)
+  target_link_libraries(h265_rtp_fu_parser_fuzzer PUBLIC h265nal)
+endif()
 
 add_executable(h265_slice_parser_fuzzer h265_slice_parser_fuzzer.cc)
 target_link_libraries(h265_slice_parser_fuzzer PUBLIC h265nal)
