@@ -6,7 +6,7 @@
 # we will use those link directories when building `main`
 #target_link_libraries(main LINK_PUBLIC webrtc)
 
-option(H265NAL_SMALL_FOOTPRINT, "xmall footprint build")
+option(H265NAL_SMALL_FOOTPRINT, "small footprint build")
 
 if(H265NAL_SMALL_FOOTPRINT)
   message(STATUS "src: small footprint selected")
