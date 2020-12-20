@@ -37,6 +37,12 @@ std::unique_ptr<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
   // peek a pseudo-nal_unit_header
   rtp->nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  if (rtp->nal_unit_header == nullptr) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: cannot ParseNalUnitHeader in rtp packet\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
   bit_buffer->Seek(0, 0);
 
   if (rtp->nal_unit_header->nal_unit_type <= 47) {

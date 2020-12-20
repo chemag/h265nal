@@ -46,6 +46,12 @@ H265NalUnitParser::ParseNalUnit(
   // nal_unit_header()
   nal_unit->nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  if (nal_unit->nal_unit_header == nullptr) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: cannot ParseNalUnitHeader in nal unit\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // nal_unit_payload()
   nal_unit->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(

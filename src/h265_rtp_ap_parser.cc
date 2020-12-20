@@ -38,6 +38,12 @@ std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
 
   // first read the common header
   rtp_ap->header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  if (rtp_ap->header == nullptr) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: cannot ParseNalUnitHeader in rtp ap\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   while (bit_buffer->RemainingBitCount() > 0) {
     // NALU size
@@ -50,6 +56,12 @@ std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
     // NALU header
     rtp_ap->nal_unit_headers.push_back(
         H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer));
+    if (rtp_ap->nal_unit_headers.back() == nullptr) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "error: cannot ParseNalUnitHeader in rtp ap\n");
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     // NALU payload
     rtp_ap->nal_unit_payloads.push_back(

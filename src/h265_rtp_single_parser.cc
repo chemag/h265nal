@@ -39,6 +39,12 @@ H265RtpSingleParser::ParseRtpSingle(
   // nal_unit_header()
   rtp_single->nal_unit_header =
       H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  if (rtp_single->nal_unit_header == nullptr) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: cannot ParseNalUnitHeader in rtp single\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // nal_unit_payload()
   rtp_single->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
