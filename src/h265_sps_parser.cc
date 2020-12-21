@@ -667,36 +667,73 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
 }
 #endif  // FDUMP_DEFINE
 
-uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() {
-  // PicSizeInCtbsY support (page 77)
-  // Equation (7-10)
-  uint32_t MinCbLog2SizeY = log2_min_luma_coding_block_size_minus3 + 3;
-  // Equation (7-11)
-  uint32_t CtbLog2SizeY =
-      MinCbLog2SizeY + log2_diff_max_min_luma_coding_block_size;
-  // Equation (7-12)
-  // uint32_t MinCbSizeY = 1 << MinCbLog2SizeY;
-  // Equation (7-13)
-  uint32_t CtbSizeY = 1 << CtbLog2SizeY;
-  // Equation (7-14)
-  // uint32_t PicWidthInMinCbsY = pic_width_in_luma_samples / MinCbSizeY;
-  // Equation (7-15)
-  uint32_t PicWidthInCtbsY =
-      static_cast<uint32_t>(std::ceil(pic_width_in_luma_samples / CtbSizeY));
-  // Equation (7-16)
-  // uint32_t PicHeightInMinCbsY = pic_height_in_luma_samples / MinCbSizeY;
-  // Equation (7-17)
-  uint32_t PicHeightInCtbsY =
-      static_cast<uint32_t>(std::ceil(pic_height_in_luma_samples / CtbSizeY));
-  // Equation (7-18)
-  // uint32_t PicSizeInMinCbsY = PicWidthInMinCbsY * PicHeightInMinCbsY;
-  // Equation (7-19)
-  uint32_t PicSizeInCtbsY = PicWidthInCtbsY * PicHeightInCtbsY;
-  // PicSizeInSamplesY = pic_width_in_luma_samples *
-  //     pic_height_in_luma_samples (7-20)
-  // PicWidthInSamplesC = pic_width_in_luma_samples / SubWidthC (7-21)
-  // PicHeightInSamplesC = pic_height_in_luma_samples / SubHeightC (7-22)
-  return PicSizeInCtbsY;
+uint32_t H265SpsParser::SpsState::getMinCbLog2SizeY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-10)
+  return log2_min_luma_coding_block_size_minus3 + 3;
 }
+
+uint32_t H265SpsParser::SpsState::getCtbLog2SizeY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-11)
+  return getMinCbLog2SizeY() + log2_diff_max_min_luma_coding_block_size;
+}
+
+uint32_t H265SpsParser::SpsState::getMinCbSizeY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-12)
+  return 1 << getMinCbLog2SizeY();
+}
+
+uint32_t H265SpsParser::SpsState::getCtbSizeY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-13)
+  return 1 << getCtbLog2SizeY();
+}
+
+uint32_t H265SpsParser::SpsState::getPicWidthInMinCbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-14)
+  return pic_width_in_luma_samples / getMinCbSizeY();
+}
+
+uint32_t H265SpsParser::SpsState::getPicWidthInCtbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-15)
+  return static_cast<uint32_t>(
+      std::ceil(pic_width_in_luma_samples / getCtbSizeY()));
+}
+
+uint32_t H265SpsParser::SpsState::getPicHeightInMinCbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-16)
+  return pic_height_in_luma_samples / getMinCbSizeY();
+}
+
+uint32_t H265SpsParser::SpsState::getPicHeightInCtbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-17)
+  return static_cast<uint32_t>(
+      std::ceil(pic_height_in_luma_samples / getCtbSizeY()));
+}
+
+uint32_t H265SpsParser::SpsState::getPicSizeInMinCbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-18)
+  return getPicWidthInMinCbsY() * getPicHeightInMinCbsY();
+}
+
+uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-19)
+  return getPicWidthInCtbsY() * getPicHeightInCtbsY();
+}
+
+uint32_t H265SpsParser::SpsState::getPicSizeInSamplesY() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-20)
+  return pic_width_in_luma_samples * pic_height_in_luma_samples;
+}
+
+#if 0
+uint32_t H265SpsParser::SpsState::getPicWidthInSamplesC() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-21)
+  return pic_width_in_luma_samples / getSubWidthC();
+}
+
+uint32_t H265SpsParser::SpsState::getPicHeightInSamplesC() noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-22)
+  return pic_height_in_luma_samples / getSubHeightC();
+}
+#endif
 
 }  // namespace h265nal

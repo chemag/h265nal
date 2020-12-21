@@ -99,7 +99,21 @@ class H265SpsParser {
     uint32_t sps_extension_data_flag = 0;
 
     // derived values
-    uint32_t getPicSizeInCtbsY();
+    uint32_t getMinCbLog2SizeY() noexcept;
+    uint32_t getCtbLog2SizeY() noexcept;
+    uint32_t getMinCbSizeY() noexcept;
+    uint32_t getCtbSizeY() noexcept;
+    uint32_t getPicWidthInMinCbsY() noexcept;
+    uint32_t getPicWidthInCtbsY() noexcept;
+    uint32_t getPicHeightInMinCbsY() noexcept;
+    uint32_t getPicHeightInCtbsY() noexcept;
+    uint32_t getPicSizeInMinCbsY() noexcept;
+    uint32_t getPicSizeInCtbsY() noexcept;
+    uint32_t getPicSizeInSamplesY() noexcept;
+#if 0
+    uint32_t getPicWidthInSamplesC() noexcept;
+    uint32_t getPicHeightInSamplesC() noexcept;
+#endif
   };
 
   // Unpack RBSP and parse SPS state from the supplied buffer.
