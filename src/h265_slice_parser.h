@@ -10,6 +10,8 @@
 #include <vector>
 
 #include "h265_bitstream_parser_state.h"
+#include "h265_pps_parser.h"
+#include "h265_sps_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -118,6 +120,12 @@ class H265SliceSegmentHeaderParser {
     std::vector<uint32_t> entry_point_offset_minus1;
     uint32_t slice_segment_header_extension_length = 0;
     std::vector<uint32_t> slice_segment_header_extension_data_byte;
+
+    // Limits Check
+    bool isValidNumEntryPointOffsets(
+        uint32_t num_entry_point_offsets,
+        std::shared_ptr<struct H265SpsParser::SpsState> sps,
+        std::shared_ptr<struct H265PpsParser::PpsState> pps) noexcept;
   };
 
   // Unpack RBSP and parse slice state from the supplied buffer.

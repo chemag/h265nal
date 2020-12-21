@@ -594,6 +594,18 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
             &(slice_segment_header->num_entry_point_offsets))) {
       return nullptr;
     }
+    if (!slice_segment_header->isValidNumEntryPointOffsets(
+            slice_segment_header->num_entry_point_offsets,
+            bitstream_parser_state->sps[sps_id],
+            bitstream_parser_state->pps[pps_id])) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "error: invalid slice_segment_header->num_entry_point_offsets: "
+              "%" PRIu32 "\n",
+              slice_segment_header->num_entry_point_offsets);
+      return nullptr;
+#endif  // FPRINT_ERRORS
+    }
 
     if (slice_segment_header->num_entry_point_offsets > 0) {
       // offset_len_minus1  ue(v)
@@ -638,6 +650,48 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   // byte_alignment()
 
   return slice_segment_header;
+}
+
+bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
+    isValidNumEntryPointOffsets(
+        uint32_t num_entry_point_offsets,
+        std::shared_ptr<struct H265SpsParser::SpsState> sps,
+        std::shared_ptr<struct H265PpsParser::PpsState> pps) noexcept {
+  // Rec. ITU-T H.265 v5 (02/2018) Page 100
+  // The value of num_entry_point_offsets is constrained as follows:
+  // - If tiles_enabled_flag is equal to 0 and entropy_coding_sync_enabled_flag
+  //   is equal to 1, the value of num_entry_point_offsets shall be in the
+  //   range of 0 to PicHeightInCtbsY - 1, inclusive.
+  if (tiles_enabled_flag == 0 && entropy_coding_sync_enabled_flag == 1) {
+    return (num_entry_point_offsets <= (sps->getPicHeightInCtbsY() - 1));
+  }
+
+  // - Otherwise, if tiles_enabled_flag is equal to 1 and
+  //   entropy_coding_sync_enabled_flag is equal to 0, the value of
+  //   num_entry_point_offsets shall be in the range of 0 to
+  //   ( num_tile_columns_minus1 + 1 ) * ( num_tile_rows_minus1 + 1 ) - 1,
+  //   inclusive.
+  if (tiles_enabled_flag == 1 && entropy_coding_sync_enabled_flag == 0) {
+    uint32_t max_num_entry_point_offsets =
+        ((pps->num_tile_columns_minus1 + 1) * (pps->num_tile_rows_minus1 + 1) -
+         1);
+    return (num_entry_point_offsets <= max_num_entry_point_offsets);
+  }
+
+  // - Otherwise, when tiles_enabled_flag is equal to 1 and
+  //   entropy_coding_sync_enabled_flag is equal to 1, the value of
+  //   num_entry_point_offsets shall be in the range of 0 to
+  // ( num_tile_columns_minus1 + 1 ) * PicHeightInCtbsY - 1, inclusive.
+  if (tiles_enabled_flag == 1 && entropy_coding_sync_enabled_flag == 1) {
+    uint32_t max_num_entry_point_offsets =
+        ((pps->num_tile_columns_minus1 + 1) * (sps->getPicHeightInCtbsY() - 1));
+    return (num_entry_point_offsets <= max_num_entry_point_offsets);
+  }
+
+  // TODO(chemag): not clear what to do in other cases. As the same paragraph
+  // contains "When not present, the value of num_entry_point_offsets is
+  // inferred to be equal to 0.", we will check for zero here.
+  return (num_entry_point_offsets == 0);
 }
 
 #ifdef FDUMP_DEFINE
