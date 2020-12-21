@@ -695,7 +695,7 @@ uint32_t H265SpsParser::SpsState::getPicWidthInMinCbsY() noexcept {
 uint32_t H265SpsParser::SpsState::getPicWidthInCtbsY() noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-15)
   return static_cast<uint32_t>(
-      std::ceil(pic_width_in_luma_samples / getCtbSizeY()));
+      std::ceil(1.0 * pic_width_in_luma_samples / getCtbSizeY()));
 }
 
 uint32_t H265SpsParser::SpsState::getPicHeightInMinCbsY() noexcept {
@@ -706,7 +706,7 @@ uint32_t H265SpsParser::SpsState::getPicHeightInMinCbsY() noexcept {
 uint32_t H265SpsParser::SpsState::getPicHeightInCtbsY() noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-17)
   return static_cast<uint32_t>(
-      std::ceil(pic_height_in_luma_samples / getCtbSizeY()));
+      std::ceil(1.0 * pic_height_in_luma_samples / getCtbSizeY()));
 }
 
 uint32_t H265SpsParser::SpsState::getPicSizeInMinCbsY() noexcept {
