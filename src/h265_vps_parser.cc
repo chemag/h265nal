@@ -106,9 +106,7 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   if (!bit_buffer->ReadBits(&(vps->vps_max_layer_id), 6)) {
     return nullptr;
   }
-  // Page 74: "vps_max_layer_id shall be less than 63 in bitstreams conforming
-  // to this version of this Specification."
-  if (vps->vps_max_layer_id >= 63) {
+  if (vps->vps_max_layer_id > h265limits::VPS_MAX_LAYER_ID_MAX) {
 #ifdef FPRINT_ERRORS
     fprintf(stderr, "error: vps->vps_max_layer_id value too large: %i\n",
             vps->vps_max_layer_id);
@@ -120,9 +118,8 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   if (!bit_buffer->ReadExponentialGolomb(&(vps->vps_num_layer_sets_minus1))) {
     return nullptr;
   }
-  // Page 74: "The value of vps_num_layer_sets_minus1 shall be in the range of
-  // 0 to 1023, inclusive."
-  if (vps->vps_num_layer_sets_minus1 > 1023) {
+  if (vps->vps_num_layer_sets_minus1 >
+      h265limits::VPS_NUM_LAYER_SETS_MINUS1_MAX) {
 #ifdef FPRINT_ERRORS
     fprintf(stderr,
             "error: vps->vps_num_layer_sets_minus1 value too large: %i\n",

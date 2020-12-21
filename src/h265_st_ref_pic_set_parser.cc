@@ -37,10 +37,12 @@ H265StRefPicSetParser::ParseStRefPicSet(
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
-  // Rec. ITU-T H.265 v5 (02/2018) Page 81
-  if (num_short_term_ref_pic_sets > 64) {
+  if (num_short_term_ref_pic_sets >
+      h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX) {
 #ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: num_short_term_ref_pic_sets == %" PRIu32 " > 64\n",
+    fprintf(stderr,
+            "error: num_short_term_ref_pic_sets == %" PRIu32
+            " > h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX\n",
             num_short_term_ref_pic_sets);
 #endif  // FPRINT_ERRORS
     return nullptr;

@@ -258,11 +258,12 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(&(sps->num_short_term_ref_pic_sets))) {
     return nullptr;
   }
-  // Rec. ITU-T H.265 v5 (02/2018) Page 81
-  if (sps->num_short_term_ref_pic_sets > 64) {
+  if (sps->num_short_term_ref_pic_sets >
+      h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX) {
 #ifdef FPRINT_ERRORS
     fprintf(stderr,
-            "error: sps->num_short_term_ref_pic_sets == %" PRIu32 " > 64\n",
+            "error: sps->num_short_term_ref_pic_sets == %" PRIu32
+            " > h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX\n",
             sps->num_short_term_ref_pic_sets);
 #endif  // FPRINT_ERRORS
     return nullptr;

@@ -68,6 +68,23 @@ enum NalUnitType : uint8_t {
   FU = 49,
 };
 
+namespace h265limits {
+// Rec. ITU-T H.265 v5 (02/2018) Page 81
+// "The value of num_short_term_ref_pic_sets shall be in the range of
+// 0 to 64, inclusive."
+const uint32_t NUM_SHORT_TERM_REF_PIC_SETS_MAX = 64;
+
+// Rec. ITU-T H.265 v5 (02/2018) Page 74
+// "vps_max_layer_id shall be less than 63 in bitstreams conforming
+// to this version of this Specification."
+const uint32_t VPS_MAX_LAYER_ID_MAX = 62;
+
+// Rec. ITU-T H.265 v5 (02/2018) Page 74
+// "The value of vps_num_layer_sets_minus1 shall be in the range of
+// 0 to 1023, inclusive."
+const uint32_t VPS_NUM_LAYER_SETS_MINUS1_MAX = 1023;
+}  // namespace h265limits
+
 // Slice detector
 bool IsSliceSegment(uint32_t nal_unit_type);
 
