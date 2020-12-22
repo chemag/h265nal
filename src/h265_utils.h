@@ -23,11 +23,11 @@ class H265Utils {
 #ifdef RTP_DEFINE
   static std::unique_ptr<int32_t> GetSliceQpY(
       std::unique_ptr<struct H265RtpParser::RtpState> const& rtp,
-      const H265BitstreamParserState* bitstream_parser_state);
+      const H265BitstreamParserState* bitstream_parser_state) noexcept;
 #endif  // RTP_DEFINE
-  static void GetSliceQpY(const uint8_t* data, size_t length,
-                          H265BitstreamParserState* bitstream_parser_state,
-                          std::vector<int32_t>* slice_qp_y_vector);
+  static std::vector<int32_t> GetSliceQpY(
+      const uint8_t* data, size_t length,
+      H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
 }  // namespace h265nal

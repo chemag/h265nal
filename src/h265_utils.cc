@@ -30,7 +30,7 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
     uint32_t nal_unit_type,
     std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState> const&
         payload,
-    const struct H265BitstreamParserState* bitstream_parser_state) {
+    const struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // make sure the payload contains a slice header
   if (!IsSliceSegment(nal_unit_type)) {
     return nullptr;
@@ -58,7 +58,7 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
 #ifdef RTP_DEFINE
 std::unique_ptr<int32_t> H265Utils::GetSliceQpY(
     std::unique_ptr<struct H265RtpParser::RtpState> const& rtp,
-    const H265BitstreamParserState* bitstream_parser_state) {
+    const H265BitstreamParserState* bitstream_parser_state) noexcept {
   // get the actual NAL header (not the RTP one)
   std::unique_ptr<struct H265NalUnitPayloadParser::NalUnitPayloadState>*
       payload;
@@ -89,10 +89,10 @@ std::unique_ptr<int32_t> H265Utils::GetSliceQpY(
 }
 #endif  // RTP_DEFINE
 
-void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
-                            H265BitstreamParserState* bitstream_parser_state,
-                            std::vector<int32_t>* slice_qp_y_vector) {
-  slice_qp_y_vector->clear();
+std::vector<int32_t> H265Utils::GetSliceQpY(
+    const uint8_t* data, size_t length,
+    H265BitstreamParserState* bitstream_parser_state) noexcept {
+  std::vector<int32_t> slice_qp_y_vector;
 
   // parse the incoming bitstream
   auto bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
@@ -105,9 +105,10 @@ void H265Utils::GetSliceQpY(const uint8_t* data, size_t length,
     auto slice_qp_y_value =
         GetSliceQpYInternal(nal_unit_type, payload, bitstream_parser_state);
     if (slice_qp_y_value != nullptr) {
-      slice_qp_y_vector->push_back(*slice_qp_y_value);
+      slice_qp_y_vector.push_back(*slice_qp_y_value);
     }
   }
+  return slice_qp_y_vector;
 }
 
 }  // namespace h265nal
