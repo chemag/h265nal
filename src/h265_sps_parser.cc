@@ -84,9 +84,34 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(&(sps->pic_width_in_luma_samples))) {
     return nullptr;
   }
+  // Rec. ITU-T H.265 v5 (02/2018) Page 78
+  // "pic_width_in_luma_samples shall not be equal to 0 and shall be an
+  // integer multiple of MinCbSizeY."
+  uint32_t MinCbSizeY = sps->getMinCbSizeY();
+  if ((sps->pic_width_in_luma_samples == 0) ||
+      ((MinCbSizeY * (sps->pic_width_in_luma_samples / MinCbSizeY)) !=
+       sps->pic_width_in_luma_samples)) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: invalid sps->pic_width_in_luma_samples: %i\n",
+            sps->pic_width_in_luma_samples);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // pic_height_in_luma_samples  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(&(sps->pic_height_in_luma_samples))) {
+    return nullptr;
+  }
+  // Rec. ITU-T H.265 v5 (02/2018) Page 78
+  // "pic_height_in_luma_samples shall not be equal to 0 and shall be an
+  // integer multiple of MinCbSizeY."
+  if ((sps->pic_height_in_luma_samples == 0) ||
+      ((MinCbSizeY * (sps->pic_height_in_luma_samples / MinCbSizeY)) !=
+       sps->pic_height_in_luma_samples)) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "error: invalid sps->pic_height_in_luma_samples: %i\n",
+            sps->pic_height_in_luma_samples);
+#endif  // FPRINT_ERRORS
     return nullptr;
   }
 
