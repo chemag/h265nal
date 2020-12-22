@@ -178,7 +178,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     case VPS_NUT: {
       // video_parameter_set_rbsp()
       nal_unit_payload->vps = H265VpsParser::ParseVps(bit_buffer);
-      if (nal_unit_payload->vps.get() != nullptr) {
+      if (nal_unit_payload->vps != nullptr) {
         uint32_t vps_id = nal_unit_payload->vps->vps_video_parameter_set_id;
         bitstream_parser_state->vps[vps_id] = nal_unit_payload->vps;
       }
@@ -187,7 +187,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     case SPS_NUT: {
       // seq_parameter_set_rbsp()
       nal_unit_payload->sps = H265SpsParser::ParseSps(bit_buffer);
-      if (nal_unit_payload->sps.get() != nullptr) {
+      if (nal_unit_payload->sps != nullptr) {
         uint32_t sps_id = nal_unit_payload->sps->sps_seq_parameter_set_id;
         bitstream_parser_state->sps[sps_id] = nal_unit_payload->sps;
       }
@@ -196,7 +196,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     case PPS_NUT: {
       // pic_parameter_set_rbsp()
       nal_unit_payload->pps = H265PpsParser::ParsePps(bit_buffer);
-      if (nal_unit_payload->pps.get() != nullptr) {
+      if (nal_unit_payload->pps != nullptr) {
         uint32_t pps_id = nal_unit_payload->pps->pps_pic_parameter_set_id;
         bitstream_parser_state->pps[pps_id] = nal_unit_payload->pps;
       }

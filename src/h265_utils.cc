@@ -43,7 +43,7 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
 
   // check the PPS exists in the bitstream parser state
   auto pps = bitstream_parser_state->GetPps(pps_id);
-  if (pps.get() == nullptr) {
+  if (pps == nullptr) {
     return nullptr;
   }
   const auto init_qp_minus26 = pps->init_qp_minus26;
