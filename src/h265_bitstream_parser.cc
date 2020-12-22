@@ -90,14 +90,21 @@ H265BitstreamParser::ParseBitstream(
   // process each of the NAL units
   for (const NaluIndex& nalu_index : nalu_indices) {
     // (2) parse the NAL units, and add them to the vector
-    bitstream->nal_units.push_back(H265NalUnitParser::ParseNalUnit(
+    auto nal_unit = H265NalUnitParser::ParseNalUnit(
         &data[nalu_index.payload_start_offset], nalu_index.payload_size,
-        bitstream_parser_state));
-    if (bitstream->nal_units.back() != nullptr) {
-      // store the offset
-      bitstream->nal_units.back()->offset = nalu_index.payload_start_offset;
-      bitstream->nal_units.back()->length = nalu_index.payload_size;
+        bitstream_parser_state);
+    if (nal_unit == nullptr) {
+      // cannot parse the NalUnit
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "Could not parse a buffer into a NalUnit\n");
+#endif  // FPRINT_ERRORS
+      continue;
     }
+    // store the offset
+    nal_unit->offset = nalu_index.payload_start_offset;
+    nal_unit->length = nalu_index.payload_size;
+
+    bitstream->nal_units.push_back(std::move(nal_unit));
   }
 
   return bitstream;
