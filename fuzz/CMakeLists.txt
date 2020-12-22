@@ -10,8 +10,8 @@ include_directories(PUBLIC ../webrtc)
 include_directories(PUBLIC /usr/local/include)
 link_directories(/usr/local/lib)
 
-add_compile_options(-fsanitize=address,fuzzer)
-add_link_options(-fsanitize=address,fuzzer)
+add_compile_options(-fsanitize=address,fuzzer,undefined)
+add_link_options(-fsanitize=address,fuzzer,undefined)
 
 #target_include_directories(h265_profile_tier_level_parser_fuzzer PUBLIC /usr/local/include ${CMAKE_CURRENT_SOURCE_DIR} webrtc)
 
