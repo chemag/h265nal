@@ -654,7 +654,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
 bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
     isValidNumEntryPointOffsets(
-        uint32_t num_entry_point_offsets,
+        uint32_t num_entry_point_offsets_value,
         std::shared_ptr<struct H265SpsParser::SpsState> sps,
         std::shared_ptr<struct H265PpsParser::PpsState> pps) noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 100
@@ -663,7 +663,7 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
   //   is equal to 1, the value of num_entry_point_offsets shall be in the
   //   range of 0 to PicHeightInCtbsY - 1, inclusive.
   if (tiles_enabled_flag == 0 && entropy_coding_sync_enabled_flag == 1) {
-    return (num_entry_point_offsets <= (sps->getPicHeightInCtbsY() - 1));
+    return (num_entry_point_offsets_value <= (sps->getPicHeightInCtbsY() - 1));
   }
 
   // - Otherwise, if tiles_enabled_flag is equal to 1 and
@@ -675,7 +675,7 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
     uint32_t max_num_entry_point_offsets =
         ((pps->num_tile_columns_minus1 + 1) * (pps->num_tile_rows_minus1 + 1) -
          1);
-    return (num_entry_point_offsets <= max_num_entry_point_offsets);
+    return (num_entry_point_offsets_value <= max_num_entry_point_offsets);
   }
 
   // - Otherwise, when tiles_enabled_flag is equal to 1 and
@@ -685,13 +685,13 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
   if (tiles_enabled_flag == 1 && entropy_coding_sync_enabled_flag == 1) {
     uint32_t max_num_entry_point_offsets =
         ((pps->num_tile_columns_minus1 + 1) * (sps->getPicHeightInCtbsY() - 1));
-    return (num_entry_point_offsets <= max_num_entry_point_offsets);
+    return (num_entry_point_offsets_value <= max_num_entry_point_offsets);
   }
 
   // TODO(chemag): not clear what to do in other cases. As the same paragraph
   // contains "When not present, the value of num_entry_point_offsets is
   // inferred to be equal to 0.", we will check for zero here.
-  return (num_entry_point_offsets == 0);
+  return (num_entry_point_offsets_value == 0);
 }
 
 #ifdef FDUMP_DEFINE

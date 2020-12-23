@@ -123,7 +123,7 @@ class H265SliceSegmentHeaderParser {
 
     // Limits Check
     bool isValidNumEntryPointOffsets(
-        uint32_t num_entry_point_offsets,
+        uint32_t num_entry_point_offsets_value,
         std::shared_ptr<struct H265SpsParser::SpsState> sps,
         std::shared_ptr<struct H265PpsParser::PpsState> pps) noexcept;
   };
