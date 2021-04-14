@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "h265_profile_tier_level_parser.h"
+#include "h265_sps_range_extension_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "h265_vui_parameters_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -92,7 +93,8 @@ class H265SpsParser {
     uint32_t sps_3d_extension_flag = 0;
     uint32_t sps_scc_extension_flag = 0;
     uint32_t sps_extension_4bits = 0;
-    // sps_range_extension( )
+    std::unique_ptr<struct H265SpsRangeExtensionParser::SpsRangeExtensionState>
+        sps_range_extension;
     // sps_multilayer_extension( )
     // sps_3d_extension( )
     // sps_scc_extension( )
