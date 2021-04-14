@@ -26,6 +26,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_vps_parser.h h265_vps_parser.cc
       h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
       h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
+      h265_sps_multilayer_extension_parser.h h265_sps_multilayer_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
       h265_pps_parser.h h265_pps_parser.cc
@@ -43,6 +44,7 @@ else()
       h265_vps_parser.h h265_vps_parser.cc
       h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
       h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
+      h265_sps_multilayer_extension_parser.h h265_sps_multilayer_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
       h265_pps_parser.h h265_pps_parser.cc
