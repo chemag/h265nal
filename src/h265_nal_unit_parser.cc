@@ -342,13 +342,19 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       // reserved, non-IRAP pictures
       break;
     case VPS_NUT:
-      vps->fdump(outfp, indent_level);
+      if (vps) {
+        vps->fdump(outfp, indent_level);
+      }
       break;
     case SPS_NUT:
-      sps->fdump(outfp, indent_level);
+      if (sps) {
+        sps->fdump(outfp, indent_level);
+      }
       break;
     case PPS_NUT:
-      pps->fdump(outfp, indent_level);
+      if (pps) {
+        pps->fdump(outfp, indent_level);
+      }
       break;
     case AUD_NUT:
       aud->fdump(outfp, indent_level);
