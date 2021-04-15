@@ -404,11 +404,9 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   if (sps->sps_scc_extension_flag) {
     // sps_scc_extension()
-    // TODO(chemag): add support for sps_scc_extension()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented sps_scc_extension() in sps\n");
-#endif  // FPRINT_ERRORS
-    return nullptr;
+    sps->sps_scc_extension = H265SpsSccExtensionParser::ParseSpsSccExtension(
+        bit_buffer, sps->chroma_format_idc, sps->bit_depth_luma_minus8,
+        sps->bit_depth_chroma_minus8);
   }
 
   if (sps->sps_extension_4bits) {
@@ -675,8 +673,8 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
 
   if (sps_scc_extension_flag) {
     // sps_scc_extension()
-    // TODO(chemag): add support for sps_scc_extension()
-    fprintf(stderr, "error: unimplemented sps_scc_extension_flag() in sps\n");
+    fdump_indent_level(outfp, indent_level);
+    sps_scc_extension->fdump(outfp, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

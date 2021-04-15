@@ -12,6 +12,7 @@
 #include "h265_profile_tier_level_parser.h"
 #include "h265_sps_multilayer_extension_parser.h"
 #include "h265_sps_range_extension_parser.h"
+#include "h265_sps_scc_extension_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "h265_vui_parameters_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -101,7 +102,8 @@ class H265SpsParser {
         sps_multilayer_extension;
     // sps_multilayer_extension( )
     // sps_3d_extension( )
-    // sps_scc_extension( )
+    std::unique_ptr<struct H265SpsSccExtensionParser::SpsSccExtensionState>
+        sps_scc_extension;
     uint32_t sps_extension_data_flag = 0;
 
     // derived values
