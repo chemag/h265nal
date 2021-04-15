@@ -82,14 +82,18 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   }
 
   for (uint32_t i = 0; i < maxNumSubLayersMinus1; i++) {
-    profile_tier_level->sub_layer.push_back(
-        H265ProfileInfoParser::ParseProfileInfo(bit_buffer));
-
-    // sub_layer_level_idc  u(8)
-    if (!bit_buffer->ReadBits(&bits_tmp, 8)) {
-      return nullptr;
+    if (profile_tier_level->sub_layer_profile_present_flag[i]) {
+      profile_tier_level->sub_layer.push_back(
+          H265ProfileInfoParser::ParseProfileInfo(bit_buffer));
     }
-    profile_tier_level->sub_layer_level_idc.push_back(bits_tmp);
+
+    if (profile_tier_level->sub_layer_profile_present_flag[i]) {
+      // sub_layer_level_idc  u(8)
+      if (!bit_buffer->ReadBits(&bits_tmp, 8)) {
+        return nullptr;
+      }
+      profile_tier_level->sub_layer_level_idc.push_back(bits_tmp);
+    }
   }
 
   return profile_tier_level;
@@ -231,6 +235,26 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
       profile_info->reserved_zero_34bits =
           ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
     }
+  } else if (profile_info->profile_idc == 2 ||
+             profile_info->profile_compatibility_flag[2] == 1) {
+    // reserved_zero_7bits  u(7)
+    if (!bit_buffer->ReadBits(&profile_info->reserved_zero_7bits, 7)) {
+      return nullptr;
+    }
+    // one_picture_only_constraint_flag  u(1)
+    if (!bit_buffer->ReadBits(&profile_info->one_picture_only_constraint_flag,
+                              1)) {
+      return nullptr;
+    }
+    // reserved_zero_35bits  u(35)
+    if (!bit_buffer->ReadBits(&bits_tmp_hi, 3)) {
+      return nullptr;
+    }
+    if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+      return nullptr;
+    }
+    profile_info->reserved_zero_35bits =
+        ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
   } else {
     // reserved_zero_43bits  u(43)
     if (!bit_buffer->ReadBits(&bits_tmp_hi, 11)) {
@@ -317,6 +341,10 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
   fprintf(outfp, "reserved_zero_33bits: %" PRIu64 "", reserved_zero_33bits);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_34bits: %" PRIu64 "", reserved_zero_34bits);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "reserved_zero_7bits: %" PRIu32 "", reserved_zero_7bits);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "reserved_zero_35bits: %" PRIu64 "", reserved_zero_35bits);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_43bits: %" PRIu64 "", reserved_zero_43bits);
   fdump_indent_level(outfp, indent_level);

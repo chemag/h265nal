@@ -54,6 +54,8 @@ class H265ProfileInfoParser {
     uint32_t max_14bit_constraint_flag = 0;
     uint64_t reserved_zero_33bits = 0;
     uint64_t reserved_zero_34bits = 0;
+    uint32_t reserved_zero_7bits = 0;
+    uint64_t reserved_zero_35bits = 0;
     uint64_t reserved_zero_43bits = 0;
     uint32_t inbld_flag = 0;
     uint32_t reserved_zero_bit = 0;
