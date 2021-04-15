@@ -85,7 +85,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   }
 
   // init_qp_minus26  se(v)
-  if (!bit_buffer->ReadExponentialGolomb(&(pps->init_qp_minus26))) {
+  if (!bit_buffer->ReadSignedExponentialGolomb(&(pps->init_qp_minus26))) {
     return nullptr;
   }
 

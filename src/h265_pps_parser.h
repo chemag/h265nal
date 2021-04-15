@@ -42,7 +42,7 @@ class H265PpsParser {
     uint32_t cabac_init_present_flag = 0;
     uint32_t num_ref_idx_l0_default_active_minus1 = 0;
     uint32_t num_ref_idx_l1_default_active_minus1 = 0;
-    uint32_t init_qp_minus26 = 0;
+    int32_t init_qp_minus26 = 0;
     uint32_t constrained_intra_pred_flag = 0;
     uint32_t transform_skip_enabled_flag = 0;
     uint32_t cu_qp_delta_enabled_flag = 0;

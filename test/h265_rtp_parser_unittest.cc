@@ -118,9 +118,9 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
   EXPECT_EQ(736,
             bitstream_parser_state.sps[sps_id]->pic_height_in_luma_samples);
   auto &pps = rtp_ap->nal_unit_payloads[2]->pps;
-  EXPECT_EQ(8, pps->init_qp_minus26);
+  EXPECT_EQ(-4, pps->init_qp_minus26);
   auto pps_id = pps->pps_pic_parameter_set_id;
-  EXPECT_EQ(8, bitstream_parser_state.pps[pps_id]->init_qp_minus26);
+  EXPECT_EQ(-4, bitstream_parser_state.pps[pps_id]->init_qp_minus26);
 
   // FU (Aggregation Packet) containing the start of an IDR_W_RADL.
   const uint8_t buffer2[] = {
@@ -154,7 +154,7 @@ TEST_F(H265RtpParserTest, TestSampleApAndFu) {
 
   auto slice_qpy = H265Utils::GetSliceQpY(rtp, &bitstream_parser_state);
   EXPECT_TRUE(slice_qpy != nullptr);
-  EXPECT_EQ(47, *slice_qpy);
+  EXPECT_EQ(35, *slice_qpy);
 }
 
 }  // namespace h265nal
