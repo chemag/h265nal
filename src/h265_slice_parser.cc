@@ -619,7 +619,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
            i++) {
         // entry_point_offset_minus1[i]  u(v)
         if (!bit_buffer->ReadBits(&bits_tmp,
-                                  slice_segment_header->offset_len_minus1)) {
+                                  slice_segment_header->offset_len_minus1 + 1)) {
           return nullptr;
         }
         slice_segment_header->entry_point_offset_minus1.push_back(bits_tmp);
