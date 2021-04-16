@@ -180,8 +180,10 @@ bool BitBuffer::ReadExponentialGolomb(uint32_t* val) {
   }
   // Store off the current byte/bit offset, in case we want to restore them due
   // to a failed parse.
+/*
   size_t original_byte_offset = byte_offset_;
   size_t original_bit_offset = bit_offset_;
+*/
 
   // Count the number of leading 0 bits by peeking/consuming them one at a time.
   size_t zero_bit_count = 0;
