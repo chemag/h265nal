@@ -32,9 +32,6 @@ H265SpsRangeExtensionParser::ParseSpsRangeExtension(const uint8_t* data,
 std::unique_ptr<H265SpsRangeExtensionParser::SpsRangeExtensionState>
 H265SpsRangeExtensionParser::ParseSpsRangeExtension(
     rtc::BitBuffer* bit_buffer) noexcept {
-  uint32_t bits_tmp;
-  uint32_t golomb_tmp;
-
   // H265 sps_range_extension(() NAL Unit.
   // Section 7.3.2.2.2 ("Sequence parameter set range extension syntax") of
   // the H.265 standard for a complete description.

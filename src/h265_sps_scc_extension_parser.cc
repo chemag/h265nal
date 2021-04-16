@@ -36,7 +36,6 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
     rtc::BitBuffer* bit_buffer, uint32_t chroma_format_idc,
     uint32_t bit_depth_luma_minus8, uint32_t bit_depth_chroma_minus8) noexcept {
   uint32_t bits_tmp;
-  uint32_t golomb_tmp;
 
   // H265 sps_scc_extension(() NAL Unit.
   // Section 7.3.2.2.2 ("Sequence parameter set range extension syntax") of

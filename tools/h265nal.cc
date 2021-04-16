@@ -64,7 +64,6 @@ enum {
 
 arg_options *parse_args(int argc, char **argv) {
   int c;
-  char *endptr;
   static arg_options options;
 
   // set default options
@@ -188,7 +187,7 @@ int main(int argc, char **argv) {
            (options->infile == NULL) ? "null" : options->infile);
     printf("options->outfile = %s\n",
            (options->outfile == NULL) ? "null" : options->outfile);
-    for (uint32_t i = 0; i < options->nrem; ++i) {
+    for (int32_t i = 0; i < options->nrem; ++i) {
       printf("options->rem[%i] = %s\n", i, options->rem[i]);
     }
   }
