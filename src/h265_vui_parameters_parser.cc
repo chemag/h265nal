@@ -47,11 +47,11 @@ H265VuiParametersParser::ParseVuiParameters(
     }
     if (vui->aspect_ratio_idc == AR_EXTENDED_SAR) {
       // sar_width  u(16)
-      if (!bit_buffer->ReadBits(&(vui->sar_width), 8)) {
+      if (!bit_buffer->ReadBits(&(vui->sar_width), 16)) {
         return nullptr;
       }
       // sar_height  u(16)
-      if (!bit_buffer->ReadBits(&(vui->sar_height), 8)) {
+      if (!bit_buffer->ReadBits(&(vui->sar_height), 16)) {
         return nullptr;
       }
     }

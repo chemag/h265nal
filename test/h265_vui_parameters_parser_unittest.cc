@@ -58,4 +58,40 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
   EXPECT_EQ(8, vui_parameters->log2_max_mv_length_vertical);
 }
 
+TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters2) {
+  // VUI
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xff, 0x80, 0x40, 0x00, 0x3a, 0xb4, 0x04, 0x00,
+      0x00, 0x0f, 0xa4, 0x00, 0x01, 0xd4, 0xc0, 0x20
+  };
+  // fuzzer::conv: begin
+  auto vui_parameters =
+      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(vui_parameters != nullptr);
+
+  EXPECT_EQ(1, vui_parameters->aspect_ratio_info_present_flag);
+  EXPECT_EQ(255, vui_parameters->aspect_ratio_idc);
+  EXPECT_EQ(128, vui_parameters->sar_width);
+  EXPECT_EQ(117, vui_parameters->sar_height);
+  EXPECT_EQ(0, vui_parameters->overscan_info_present_flag);
+  EXPECT_EQ(1, vui_parameters->video_signal_type_present_flag);
+  EXPECT_EQ(5, vui_parameters->video_format);
+  EXPECT_EQ(0, vui_parameters->video_full_range_flag);
+  EXPECT_EQ(0, vui_parameters->colour_description_present_flag);
+  EXPECT_EQ(0, vui_parameters->chroma_loc_info_present_flag);
+  EXPECT_EQ(0, vui_parameters->neutral_chroma_indication_flag);
+  EXPECT_EQ(0, vui_parameters->field_seq_flag);
+  EXPECT_EQ(0, vui_parameters->frame_field_info_present_flag);
+  EXPECT_EQ(0, vui_parameters->default_display_window_flag);
+  EXPECT_EQ(1, vui_parameters->vui_timing_info_present_flag);
+  EXPECT_EQ(1001, vui_parameters->vui_num_units_in_tick);
+  EXPECT_EQ(30000, vui_parameters->vui_time_scale);
+  EXPECT_EQ(0, vui_parameters->vui_poc_proportional_to_timing_flag);
+  EXPECT_EQ(0, vui_parameters->vui_hrd_parameters_present_flag);
+  EXPECT_EQ(0, vui_parameters->bitstream_restriction_flag);
+}
+
 }  // namespace h265nal
