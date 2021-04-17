@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_pred_weight_table_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 
 namespace h265nal {
@@ -449,7 +450,10 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           (slice_segment_header->weighted_bipred_flag &&
            slice_segment_header->slice_type == SliceType_B)) {
         // pred_weight_table()
-        // TODO(chemag): add support for pred_weight_table()
+        slice_segment_header->pred_weight_table =
+            H265PredWeightTableParser::ParsePredWeightTable(
+                bit_buffer, slice_segment_header->ChromaArrayType,
+                slice_segment_header->num_ref_idx_l0_active_minus1);
       }
 
       // five_minus_max_num_merge_cand  ue(v)
@@ -461,8 +465,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       slice_segment_header->motion_vector_resolution_control_idc = 0;
       if (bitstream_parser_state->sps[sps_id]->sps_scc_extension_flag) {
         slice_segment_header->motion_vector_resolution_control_idc =
-             bitstream_parser_state->sps[sps_id]->
-                 sps_scc_extension->motion_vector_resolution_control_idc;
+            bitstream_parser_state->sps[sps_id]
+                ->sps_scc_extension->motion_vector_resolution_control_idc;
       }
       if (slice_segment_header->motion_vector_resolution_control_idc == 2) {
         // use_integer_mv_flag  u(1)
@@ -618,8 +622,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       for (uint32_t i = 0; i < slice_segment_header->num_entry_point_offsets;
            i++) {
         // entry_point_offset_minus1[i]  u(v)
-        if (!bit_buffer->ReadBits(&bits_tmp,
-                                  slice_segment_header->offset_len_minus1 + 1)) {
+        if (!bit_buffer->ReadBits(
+                &bits_tmp, slice_segment_header->offset_len_minus1 + 1)) {
           return nullptr;
         }
         slice_segment_header->entry_point_offset_minus1.push_back(bits_tmp);
@@ -870,7 +874,8 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
 
       if ((weighted_pred_flag && slice_type == SliceType_P) ||
           (weighted_bipred_flag && slice_type == SliceType_B)) {
-        // TODO(chemag): add support for pred_weight_table()
+        fdump_indent_level(outfp, indent_level);
+        pred_weight_table->fdump(outfp, indent_level);
       }
 
       fdump_indent_level(outfp, indent_level);

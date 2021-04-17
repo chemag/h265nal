@@ -24,6 +24,9 @@ target_link_libraries(h265_vps_parser_fuzzer PUBLIC h265nal)
 add_executable(h265_vui_parameters_parser_fuzzer h265_vui_parameters_parser_fuzzer.cc)
 target_link_libraries(h265_vui_parameters_parser_fuzzer PUBLIC h265nal)
 
+add_executable(h265_pred_weight_table_parser_fuzzer h265_pred_weight_table_parser_fuzzer.cc)
+target_link_libraries(h265_pred_weight_table_parser_fuzzer PUBLIC h265nal)
+
 add_executable(h265_st_ref_pic_set_parser_fuzzer h265_st_ref_pic_set_parser_fuzzer.cc)
 target_link_libraries(h265_st_ref_pic_set_parser_fuzzer PUBLIC h265nal)
 

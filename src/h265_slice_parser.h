@@ -11,6 +11,7 @@
 
 #include "h265_bitstream_parser_state.h"
 #include "h265_pps_parser.h"
+#include "h265_pred_weight_table_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
 #include "rtc_base/bit_buffer.h"
@@ -98,9 +99,11 @@ class H265SliceSegmentHeaderParser {
     // ref_pic_lists_modification()
     uint32_t mvd_l1_zero_flag = 0;
     uint32_t cabac_init_flag = 0;
-    uint32_t collocated_from_l0_flag = 0;
+    // default value is 1 (page 99 of 02/2018 standard)
+    uint32_t collocated_from_l0_flag = 1;
     uint32_t collocated_ref_idx = 0;
-    // pred_weight_table()
+    std::unique_ptr<struct H265PredWeightTableParser::PredWeightTableState>
+        pred_weight_table;
     uint32_t five_minus_max_num_merge_cand = 0;
     uint32_t use_integer_mv_flag = 0;
     int32_t slice_qp_delta = 0;
