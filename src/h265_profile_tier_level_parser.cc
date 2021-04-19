@@ -293,62 +293,87 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
 #ifdef FDUMP_DEFINE
 void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
                                                     int indent_level) const {
+  fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "profile_space: %i", profile_space);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "tier_flag: %i", tier_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "profile_idc: %i", profile_idc);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "profile_compatibility_flag {");
   for (const uint32_t& v : profile_compatibility_flag) {
     fprintf(outfp, " %i", v);
   }
   fprintf(outfp, " }");
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "progressive_source_flag: %i", progressive_source_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "interlaced_source_flag: %i", interlaced_source_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "non_packed_constraint_flag: %i", non_packed_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "frame_only_constraint_flag: %i", frame_only_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_12bit_constraint_flag: %i", max_12bit_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_10bit_constraint_flag: %i", max_10bit_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_8bit_constraint_flag: %i", max_8bit_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_422chroma_constraint_flag: %i",
           max_422chroma_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_420chroma_constraint_flag: %i",
           max_420chroma_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_monochrome_constraint_flag: %i",
           max_monochrome_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "intra_constraint_flag: %i", intra_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "one_picture_only_constraint_flag: %i",
           one_picture_only_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "lower_bit_rate_constraint_flag: %i",
           lower_bit_rate_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_14bit_constraint_flag: %i", max_14bit_constraint_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_33bits: %" PRIu64 "", reserved_zero_33bits);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_34bits: %" PRIu64 "", reserved_zero_34bits);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_7bits: %" PRIu32 "", reserved_zero_7bits);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_35bits: %" PRIu64 "", reserved_zero_35bits);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_43bits: %" PRIu64 "", reserved_zero_43bits);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "inbld_flag: %i", inbld_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved_zero_bit: %i", reserved_zero_bit);
 }
@@ -363,7 +388,6 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
     fprintf(outfp, "general {");
     indent_level = indent_level_incr(indent_level);
 
-    fdump_indent_level(outfp, indent_level);
     general->fdump(outfp, indent_level);
 
     indent_level = indent_level_decr(indent_level);
@@ -398,21 +422,17 @@ void H265ProfileTierLevelParser::ProfileTierLevelState::fdump(
   }
 
   if (maxNumSubLayersMinus1 > 0) {
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "sub_layer {");
-    indent_level = indent_level_incr(indent_level);
-
     for (auto& v : sub_layer) {
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "{");
+      fprintf(outfp, "sub_layer {");
+      indent_level = indent_level_incr(indent_level);
+
       v->fdump(outfp, indent_level);
+
+      indent_level = indent_level_decr(indent_level);
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "}");
     }
-
-    indent_level = indent_level_decr(indent_level);
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "}");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "sub_layer_level_idc {");

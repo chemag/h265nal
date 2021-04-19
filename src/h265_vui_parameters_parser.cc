@@ -248,129 +248,167 @@ void H265VuiParametersParser::VuiParametersState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "vui_parameters {");
   indent_level = indent_level_incr(indent_level);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "aspect_ratio_info_present_flag: %i",
           aspect_ratio_info_present_flag);
-  fdump_indent_level(outfp, indent_level);
+
   if (aspect_ratio_info_present_flag) {
-    fprintf(outfp, "aspect_ratio_idc: %i", aspect_ratio_idc);
     fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "aspect_ratio_idc: %i", aspect_ratio_idc);
+
     if (aspect_ratio_idc == AR_EXTENDED_SAR) {
+      fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "sar_width: %i", sar_width);
+
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "sar_height: %i", sar_height);
-      fdump_indent_level(outfp, indent_level);
     }
   }
-  fprintf(outfp, "overscan_info_present_flag: %i", overscan_info_present_flag);
+
   fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "overscan_info_present_flag: %i", overscan_info_present_flag);
+
   if (overscan_info_present_flag) {
-    fprintf(outfp, "overscan_appropriate_flag: %i", overscan_appropriate_flag);
     fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "overscan_appropriate_flag: %i", overscan_appropriate_flag);
   }
+
+  fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "video_signal_type_present_flag: %i",
           video_signal_type_present_flag);
-  fdump_indent_level(outfp, indent_level);
+
   if (video_signal_type_present_flag) {
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "video_format: %i", video_format);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "video_full_range_flag: %i", video_full_range_flag);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "colour_description_present_flag: %i",
             colour_description_present_flag);
-    fdump_indent_level(outfp, indent_level);
+
     if (colour_description_present_flag) {
+      fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "colour_primaries: %i", colour_primaries);
+
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "transfer_characteristics: %i", transfer_characteristics);
+
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "matrix_coeffs: %i", matrix_coeffs);
-      fdump_indent_level(outfp, indent_level);
     }
   }
+
+  fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "chroma_loc_info_present_flag: %i",
           chroma_loc_info_present_flag);
-  fdump_indent_level(outfp, indent_level);
+
   if (chroma_loc_info_present_flag) {
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "chroma_sample_loc_type_top_field: %i",
             chroma_sample_loc_type_top_field);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "chroma_sample_loc_type_bottom_field: %i",
             chroma_sample_loc_type_bottom_field);
-    fdump_indent_level(outfp, indent_level);
   }
+
+  fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "neutral_chroma_indication_flag: %i",
           neutral_chroma_indication_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "field_seq_flag: %i", field_seq_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "frame_field_info_present_flag: %i",
           frame_field_info_present_flag);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "default_display_window_flag: %i",
           default_display_window_flag);
-  fdump_indent_level(outfp, indent_level);
 
   if (default_display_window_flag) {
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "def_disp_win_left_offset: %i", def_disp_win_left_offset);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "def_disp_win_right_offset: %i", def_disp_win_right_offset);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "def_disp_win_top_offset: %i", def_disp_win_top_offset);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "def_disp_win_bottom_offset: %i",
             def_disp_win_bottom_offset);
-    fdump_indent_level(outfp, indent_level);
   }
+
+  fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "vui_timing_info_present_flag: %i",
           vui_timing_info_present_flag);
-  fdump_indent_level(outfp, indent_level);
+
   if (vui_timing_info_present_flag) {
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "vui_num_units_in_tick: %i", vui_num_units_in_tick);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "vui_time_scale: %i", vui_time_scale);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "vui_poc_proportional_to_timing_flag: %i",
             vui_poc_proportional_to_timing_flag);
-    fdump_indent_level(outfp, indent_level);
+
     if (vui_poc_proportional_to_timing_flag) {
+      fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "vui_num_ticks_poc_diff_one_minus1: %i",
               vui_num_ticks_poc_diff_one_minus1);
-      fdump_indent_level(outfp, indent_level);
     }
+
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "vui_hrd_parameters_present_flag: %i",
             vui_hrd_parameters_present_flag);
-    fdump_indent_level(outfp, indent_level);
+
     if (vui_hrd_parameters_present_flag) {
       // hrd_parameters( 1, sps_max_sub_layers_minus1 )
       // TODO(chemag): add support for hrd_parameters()
     }
   }
-  fprintf(outfp, "bitstream_restriction_flag: %i", bitstream_restriction_flag);
+
   fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "bitstream_restriction_flag: %i", bitstream_restriction_flag);
+
   if (bitstream_restriction_flag) {
+    fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "tiles_fixed_structure_flag: %i",
             tiles_fixed_structure_flag);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "motion_vectors_over_pic_boundaries_flag: %i",
             motion_vectors_over_pic_boundaries_flag);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "restricted_ref_pic_lists_flag: %i",
             restricted_ref_pic_lists_flag);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "min_spatial_segmentation_idc: %i",
             min_spatial_segmentation_idc);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "max_bytes_per_pic_denom: %i", max_bytes_per_pic_denom);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "max_bits_per_min_cu_denom: %i", max_bits_per_min_cu_denom);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "log2_max_mv_length_horizontal: %i",
             log2_max_mv_length_horizontal);
+
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "log2_max_mv_length_vertical: %i",
             log2_max_mv_length_vertical);
-    fdump_indent_level(outfp, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);

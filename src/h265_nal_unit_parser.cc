@@ -277,14 +277,19 @@ void H265NalUnitHeaderParser::NalUnitHeaderState::fdump(
     FILE* outfp, int indent_level) const {
   fprintf(outfp, "nal_unit_header {");
   indent_level = indent_level_incr(indent_level);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "forbidden_zero_bit: %i", forbidden_zero_bit);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "nal_unit_type: %i", nal_unit_type);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "nuh_layer_id: %i", nuh_layer_id);
+
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "nuh_temporal_id_plus1: %i", nuh_temporal_id_plus1);
+
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
