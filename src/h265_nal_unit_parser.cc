@@ -209,17 +209,22 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     }
     case EOS_NUT:
       // end_of_seq_rbsp()
+      // TODO(chemag): add support for end_of_seq(()
       break;
     case EOB_NUT:
       // end_of_bitstream_rbsp()
+      // TODO(chemag): add support for end_of_bitstream(()
       break;
     case FD_NUT:
       // filler_data_rbsp()
+      // TODO(chemag): add support for filler_data()
       break;
     case PREFIX_SEI_NUT:
       // sei_rbsp()
+      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
       break;
     case SUFFIX_SEI_NUT:
+      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
       // sei_rbsp()
       break;
     case RSV_NVCL41:
@@ -366,18 +371,23 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       break;
     case EOS_NUT:
       // end_of_seq_rbsp()
+      // TODO(chemag): add support for end_of_seq(()
       break;
     case EOB_NUT:
       // end_of_bitstream_rbsp()
+      // TODO(chemag): add support for end_of_bitstream(()
       break;
     case FD_NUT:
       // filler_data_rbsp()
+      // TODO(chemag): add support for filler_data()
       break;
     case PREFIX_SEI_NUT:
       // sei_rbsp()
+      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
       break;
     case SUFFIX_SEI_NUT:
       // sei_rbsp()
+      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:
