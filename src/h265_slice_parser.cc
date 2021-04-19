@@ -504,12 +504,13 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
     }
 
-    // TODO(chemag): add support for pps_scc_extension()
-    // uint32_t pps_slice_act_qp_offsets_present_flag =
-    //    bitstream_parser_state->pps[pps_id]->pps_scc_extension(
-    //        pps_slice_act_qp_offsets_present_flag;
-    uint32_t pps_slice_act_qp_offsets_present_flag = 0;
-    if (pps_slice_act_qp_offsets_present_flag) {
+    slice_segment_header->pps_slice_act_qp_offsets_present_flag = 0;
+    if (bitstream_parser_state->pps[pps_id]->pps_scc_extension_flag) {
+      slice_segment_header->pps_slice_act_qp_offsets_present_flag =
+          bitstream_parser_state->pps[pps_id]
+              ->pps_scc_extension->pps_slice_act_qp_offsets_present_flag;
+    }
+    if (slice_segment_header->pps_slice_act_qp_offsets_present_flag) {
       // slice_act_y_qp_offset  se(v)
       if (!bit_buffer->ReadSignedExponentialGolomb(
               &(slice_segment_header->slice_act_y_qp_offset))) {

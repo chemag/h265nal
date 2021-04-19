@@ -42,6 +42,9 @@ target_link_libraries(h265_sps_range_extension_parser_fuzzer PUBLIC h265nal)
 add_executable(h265_sps_parser_fuzzer h265_sps_parser_fuzzer.cc)
 target_link_libraries(h265_sps_parser_fuzzer PUBLIC h265nal)
 
+add_executable(h265_pps_scc_extension_parser_fuzzer h265_pps_scc_extension_parser_fuzzer.cc)
+target_link_libraries(h265_pps_scc_extension_parser_fuzzer PUBLIC h265nal)
+
 add_executable(h265_pps_parser_fuzzer h265_pps_parser_fuzzer.cc)
 target_link_libraries(h265_pps_parser_fuzzer PUBLIC h265nal)
 

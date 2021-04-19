@@ -12,6 +12,7 @@ all: \
     h265_sps_multilayer_extension_parser_fuzzer.cc \
     h265_sps_range_extension_parser_fuzzer.cc \
     h265_sps_parser_fuzzer.cc \
+    h265_pps_scc_extension_parser_fuzzer.cc \
     h265_pps_parser_fuzzer.cc \
     h265_aud_parser_fuzzer.cc \
     h265_rtp_single_parser_fuzzer.cc \
@@ -49,6 +50,9 @@ h265_sps_range_extension_parser_fuzzer.cc: ../test/h265_sps_range_extension_pars
 
 h265_sps_parser_fuzzer.cc: ../test/h265_sps_parser_unittest.cc
 	./converter.py ../test/h265_sps_parser_unittest.cc ./
+
+h265_pps_scc_extension_parser_fuzzer.cc: ../test/h265_pps_scc_extension_parser_unittest.cc
+	./converter.py ../test/h265_pps_scc_extension_parser_unittest.cc ./
 
 h265_pps_parser_fuzzer.cc: ../test/h265_pps_parser_unittest.cc
 	./converter.py ../test/h265_pps_parser_unittest.cc ./
@@ -90,7 +94,8 @@ fuzz:
 	-../build/fuzz/h265_sps_multilayer_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_multilayer_extension_parser_fuzzer/ corpus/h265_sps_multilayer_extension_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_sps_range_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_range_extension_parser_fuzzer/ corpus/h265_sps_range_extension_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_sps_parser_fuzzer -artifact_prefix=corpus/h265_sps_parser_fuzzer/ corpus/h265_sps_parser_fuzzer/ -runs=$(RUNS)
-	-../build/fuzz/h265_pps_parser_fuzzer -artifact_prefix=corpus/h265_pps_parser_fuzzer/ corpus/h265_pps_parser_fuzzer/ -runs=$(RUNS)
+	-../build/fuzz/h265_pps_scc_extension_parser_fuzzer -artifact_prefix=corpus/h265_pps_scc_extension_parser_fuzzer/ corpus/h265_pps_scc_extension_parser_fuzzer/ -runs=$(RUNS)
+	p../build/fuzz/h265_pps_parser_fuzzer -artifact_prefix=corpus/h265_pps_parser_fuzzer/ corpus/h265_pps_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_aud_parser_fuzzer -artifact_prefix=corpus/h265_aud_parser_fuzzer/ corpus/h265_aud_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_rtp_single_parser_fuzzer -artifact_prefix=corpus/h265_rtp_single_parser_fuzzer/ corpus/h265_rtp_single_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_rtp_parser_fuzzer -artifact_prefix=corpus/h265_rtp_parser_fuzzer/ corpus/h265_rtp_parser_fuzzer/ -runs=$(RUNS)

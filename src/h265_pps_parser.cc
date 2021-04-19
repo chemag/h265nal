@@ -320,11 +320,9 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   }
 
   if (pps->pps_scc_extension_flag) {
-    // pps_scc_extension()
-    // TODO(chemag): add support for pps_scc_extension()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented pps_scc_extension() in pps\n");
-#endif  // FPRINT_ERRORS
+    // pps_range_extension()
+    pps->pps_scc_extension =
+        H265PpsSccExtensionParser::ParsePpsSccExtension(bit_buffer);
     return nullptr;
   }
 
@@ -546,8 +544,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
 
   if (pps_scc_extension_flag) {
     // pps_scc_extension()
-    // TODO(chemag): add support for pps_scc_extension()
-    fprintf(stderr, "error: unimplemented pps_scc_extension_flag() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    pps_scc_extension->fdump(outfp, indent_level);
   }
 
   indent_level = indent_level_decr(indent_level);
