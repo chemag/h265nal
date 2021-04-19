@@ -401,6 +401,11 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           slice_segment_header->NumPicTotalCurr > 1) {
         // ref_pic_lists_modification()
         // TODO(chemag): add support for ref_pic_lists_modification()
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "error: unimplemented ref_pic_lists_modification in "
+                "slice_header\n");
+#endif  // FPRINT_ERRORS
       }
 
       if (slice_segment_header->slice_type == SliceType_B) {
@@ -501,7 +506,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
     // TODO(chemag): add support for pps_scc_extension()
     // uint32_t pps_slice_act_qp_offsets_present_flag =
-    //    bitstream_parser_state->pps[pps_id]->pps_scc_extension(.
+    //    bitstream_parser_state->pps[pps_id]->pps_scc_extension(
     //        pps_slice_act_qp_offsets_present_flag;
     uint32_t pps_slice_act_qp_offsets_present_flag = 0;
     if (pps_slice_act_qp_offsets_present_flag) {

@@ -37,9 +37,9 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
     uint32_t bit_depth_luma_minus8, uint32_t bit_depth_chroma_minus8) noexcept {
   uint32_t bits_tmp;
 
-  // H265 sps_scc_extension(() NAL Unit.
-  // Section 7.3.2.2.2 ("Sequence parameter set range extension syntax") of
-  // the H.265 standard for a complete description.
+  // H265 sps_scc_extension() NAL Unit.
+  // Section 7.3.2.2.3 ("Sequence parameter set screen content coding extension
+  // syntax") of the H.265 standard for a complete description.
   auto sps_scc_extension = std::make_unique<SpsSccExtensionState>();
 
   // sps_curr_pic_ref_enabled_flag  u(1)
@@ -88,19 +88,19 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
       uint32_t BitDepth_C = 8 + bit_depth_chroma_minus8;  // Eq 7-6
 
       for (uint32_t comp = 0; comp < numComps; comp++) {
-        sps_scc_extension->sps_palette_predictor_initializer.emplace_back();
+        sps_scc_extension->sps_palette_predictor_initializers.emplace_back();
         for (uint32_t i = 0;
              i <=
              sps_scc_extension->sps_num_palette_predictor_initializers_minus1;
              i++) {
-          // sps_palette_predictor_initializer[i][j]  u(v)
-          // sps_palette_predictor_initializer[0][*] -> BitDepth_Y
-          // sps_palette_predictor_initializer[1,2][*] -> BitDepth_C
+          // sps_palette_predictor_initializers[i][j]  u(v)
+          // sps_palette_predictor_initializers[0][*] -> BitDepth_Y
+          // sps_palette_predictor_initializers[1,2][*] -> BitDepth_C
           uint32_t bit_depth = (comp == 0) ? BitDepth_Y : BitDepth_C;
           if (!bit_buffer->ReadBits(&bits_tmp, bit_depth)) {
             return nullptr;
           }
-          sps_scc_extension->sps_palette_predictor_initializer[i].push_back(
+          sps_scc_extension->sps_palette_predictor_initializers[i].push_back(
               bits_tmp);
         }
       }
@@ -153,9 +153,9 @@ void H265SpsSccExtensionParser::SpsSccExtensionState::fdump(
               sps_num_palette_predictor_initializers_minus1);
 
       fdump_indent_level(outfp, indent_level);
-      fprintf(outfp, "sps_palette_predictor_initializer {");
+      fprintf(outfp, "sps_palette_predictor_initializers {");
       for (const std::vector<uint32_t>& vv :
-           sps_palette_predictor_initializer) {
+           sps_palette_predictor_initializers) {
         fprintf(outfp, " {");
         for (const uint32_t& v : vv) {
           fprintf(outfp, " %i", v);

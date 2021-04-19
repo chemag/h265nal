@@ -39,7 +39,7 @@ class H265SpsSccExtensionParser {
     uint32_t delta_palette_max_predictor_size = 0;
     uint32_t sps_palette_predictor_initializers_present_flag = 0;
     uint32_t sps_num_palette_predictor_initializers_minus1 = 0;
-    std::vector<std::vector<uint32_t>> sps_palette_predictor_initializer;
+    std::vector<std::vector<uint32_t>> sps_palette_predictor_initializers;
     uint32_t motion_vector_resolution_control_idc = 0;
     uint32_t intra_boundary_filtering_disabled_flag = 0;
   };

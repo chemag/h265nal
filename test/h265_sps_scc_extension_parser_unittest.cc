@@ -39,7 +39,7 @@ TEST_F(H265SpsSccExtensionParserTest, TestSampleSpsSccExtension) {
             sps_scc_extension->sps_palette_predictor_initializers_present_flag);
   EXPECT_EQ(0,
             sps_scc_extension->sps_num_palette_predictor_initializers_minus1);
-  EXPECT_EQ(0, sps_scc_extension->sps_palette_predictor_initializer.size());
+  EXPECT_EQ(0, sps_scc_extension->sps_palette_predictor_initializers.size());
   EXPECT_EQ(0, sps_scc_extension->motion_vector_resolution_control_idc);
   EXPECT_EQ(0, sps_scc_extension->intra_boundary_filtering_disabled_flag);
 }

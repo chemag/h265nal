@@ -33,7 +33,7 @@ H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
 std::unique_ptr<H265SpsMultilayerExtensionParser::SpsMultilayerExtensionState>
 H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
     rtc::BitBuffer* bit_buffer) noexcept {
-  // H265 sps_multilayer_extension(() NAL Unit.
+  // H265 sps_multilayer_extension() NAL Unit.
   // Section F.7.3.2.2.4 ("Sequence parameter set multilayer extension syntax")
   // of the H.265 standard for a complete description.
   auto sps_multilayer_extension =

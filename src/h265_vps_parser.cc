@@ -309,22 +309,25 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "vps_num_hrd_parameters: %i", vps_num_hrd_parameters);
 
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "hrd_layer_set_idx {");
-  for (const uint32_t& v : hrd_layer_set_idx) {
-    fprintf(outfp, " %i", v);
-  }
-  fprintf(outfp, " }");
+  if (vps_num_hrd_parameters > 0) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "hrd_layer_set_idx {");
+    for (const uint32_t& v : hrd_layer_set_idx) {
+      fprintf(outfp, " %i", v);
+    }
+    fprintf(outfp, " }");
 
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "cprms_present_flag {");
-  for (const uint32_t& v : cprms_present_flag) {
-    fprintf(outfp, " %i", v);
-  }
-  fprintf(outfp, " }");
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "cprms_present_flag {");
+    for (const uint32_t& v : cprms_present_flag) {
+      fprintf(outfp, " %i", v);
+    }
+    fprintf(outfp, " }");
 
-  // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
-  // TODO(chemag): add support for hrd_parameters()
+    // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
+    // TODO(chemag): add support for hrd_parameters()
+    fprintf(stderr, "error: unimplemented hrd_parameters() in vps\n");
+  }
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "vps_extension_flag: %i", vps_extension_flag);
