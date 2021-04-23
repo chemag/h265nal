@@ -109,14 +109,16 @@ nal_unit {
 
 # 4. Programmatic Integration Operation
 
-There are 2 ways to integrate the parser in your C++ parser:
+There are 3 ways to integrate the parser in your C++ parser:
 
-## 4.1. Annex B H265 File Parsing
-If you just have a binary blob with Annex B format (e.g. you read
-a .265 file from a file, and want to convert the read blob into a set of
-parsed NAL units), use the `H265BitstreamParser::ParseBitstream()` method.
+## 4.1. Annex B H265, Full-File Parsing
+If you just have a binary blob with the full contents of a file in Annex B
+format, use the `H265BitstreamParser::ParseBitstream()` method. This case
+is useful for example when you have an Annex B format file (a file with
+`.265` extension). You read the whole file in memory, and then get convert
+the read blob into a set of parsed NAL units.
 
-The following code has been copied from `tools/h265nal.cc`.
+The following code has been copied from `tools/h265nal.cc`:
 
 ```
 // read your .265 file into the vector `buffer`
@@ -149,7 +151,59 @@ other NAL units (VPS, SPS, PPS), it will be stored into the
 `BitstreamParserState` object that is passed around.
 
 
-## 4.2. RTP Packet Parsing
+## 4.2. NAL-Unit Parsing
+If you have a series of binary blobs with NAL units, use the
+`H265NalUnitParser::ParseNalUnit()` method. This case is useful for example
+if you have a producer of NAL units (e.g. an encoder), and you want to
+parse them as soon as they are produced.
+
+The following code has been copied from `src/h265_bitstream_parser.cc`:
+
+```
+// keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
+h265nal::H265BitstreamParserState bitstream_parser_state;
+
+// create bitstream parser
+std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+
+while (1) {
+  const uint8_t* data = ...;  // get pointer to the NAL start
+	size_t length = ...;  // get NAL size
+
+  auto nal_unit = H265NalUnitParser::ParseNalUnit(
+      data, length, bitstream_parser_state);
+
+  // check whether the parser was successful
+	if (nal_unit == nullptr) {
+    // cannot parse the NalUnit
+    continue;
+  }
+
+  // check the parser offset
+  auto offset = nalu_index.payload_start_offset;
+  auto length = nalu_index.payload_size;
+}
+```
+
+The `H265NalUnitParser::ParseNalUnit()` function receives a generic
+binary string (`data` and `length`) that contains a NAL unit, plus
+a `H265BitstreamParserState` object that keeps all the VPS/SPS/PPS it
+ever sees. It then parses the NAL unit, and returns it (including the
+parsing offsets).
+
+It will also updates the input `H265BitstreamParserState` object if it
+sees any VPS/PPS/SPS. This is important if the parsed NAL unit has state
+that needs to be used to parse other NAL units (VPS, SPS, PPS): In that
+case it will be stored into the `BitstreamParserState` object that is
+passed around.
+
+Note that `H265NalUnitParser::ParseNalUnit()` will only parse 1 NAL unit.
+There are some producers that will instead produce multiple NAL units
+in the output buffer. For example, an h265 encoder producing a key frame
+may return 4 NAL units (VPS, PPS, SPS, and slice header).
+
+
+## 4.3. RTP Packet Parsing
 If you want to just pass consecutive RTP packets (rfc7798 format), and get
 information on their contents, use the `H265RtpParser::ParseRtp` method.
 
@@ -201,21 +255,27 @@ Requires gtests, gmock.
 The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
 
 
-# 6. TODO
+# 6. Other
+The [fuzz](fuzz/README.md) directory contains information on fuzzing the
+parser.
+
+
+# 7. TODO
 
 List of tasks:
 * add lacking parsers (e.g. SEI)
 * remove TODO entries from the code
 * move headers to separate `include/` file to allow easier programmatic
-  integration.
+  integration
+* add a set of Annex B files for testing
 
 
-# 7. Limitations
+# 8. Limitations
 
 * no support for PACI (rfc7798 Section 4.4.4)
 
 
-# 8. License
+# 9. License
 
 h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
 
