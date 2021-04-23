@@ -112,7 +112,8 @@ H265BitstreamParser::ParseBitstream(
 
 std::unique_ptr<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
-                                    bool add_offset, bool add_length) noexcept {
+                                    bool add_offset, bool add_length,
+                                    bool add_parsed_length) noexcept {
   // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
   H265BitstreamParserState bitstream_parser_state;
 
@@ -130,6 +131,7 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   }
   bitstream->add_offset = add_offset;
   bitstream->add_length = add_length;
+  bitstream->add_parsed_length = add_parsed_length;
   return bitstream;
 }
 
@@ -137,7 +139,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
 void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
   for (auto& nal_unit : nal_units) {
-    nal_unit->fdump(outfp, indent_level, add_offset, add_length);
+    nal_unit->fdump(outfp, indent_level, add_offset, add_length,
+                    add_parsed_length);
     fprintf(outfp, "\n");
   }
 }

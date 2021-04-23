@@ -35,6 +35,7 @@ class H265BitstreamParser {
 
     bool add_offset;
     bool add_length;
+    bool add_parsed_length;
     // NAL units
     std::vector<std::unique_ptr<struct H265NalUnitParser::NalUnitState>>
         nal_units;
@@ -47,8 +48,8 @@ class H265BitstreamParser {
 
   // Unpack RBSP and parse bitstream (internal state)
   static std::unique_ptr<BitstreamState> ParseBitstream(
-      const uint8_t* data, size_t length, bool add_offset,
-      bool add_length) noexcept;
+      const uint8_t* data, size_t length, bool add_offset, bool add_length,
+      bool add_parsed_length) noexcept;
 
   struct NaluIndex {
     // Start index of NALU, including start sequence.

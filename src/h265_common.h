@@ -100,6 +100,7 @@ std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length);
 
 // Syntax functions and descriptors) (Section 7.2)
 bool byte_aligned(rtc::BitBuffer *bit_buffer);
+int get_current_offset(rtc::BitBuffer *bit_buffer);
 bool more_rbsp_data(rtc::BitBuffer *bit_buffer);
 bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer);
 

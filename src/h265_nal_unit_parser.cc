@@ -58,6 +58,9 @@ H265NalUnitParser::ParseNalUnit(
       bit_buffer, nal_unit->nal_unit_header->nal_unit_type,
       bitstream_parser_state);
 
+  // update the parsed length
+  nal_unit->parsed_length = get_current_offset(bit_buffer);
+
   return nal_unit;
 }
 
@@ -221,11 +224,12 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       break;
     case PREFIX_SEI_NUT:
       // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
+      // TODO(chemag): add support for supplemental_enhancement_information()
+      // (sei)
       break;
     case SUFFIX_SEI_NUT:
-      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
-      // sei_rbsp()
+      // TODO(chemag): add support for supplemental_enhancement_information()
+      // (sei) sei_rbsp()
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:
@@ -246,8 +250,8 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
 
 #ifdef FDUMP_DEFINE
 void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
-                                            bool add_offset,
-                                            bool add_length) const {
+                                            bool add_offset, bool add_length,
+                                            bool add_parsed_length) const {
   fprintf(outfp, "nal_unit {");
   indent_level = indent_level_incr(indent_level);
 
@@ -261,6 +265,12 @@ void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
   if (add_length) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "length: %zu", length);
+  }
+
+  // nal unit parsed length (starting at NAL unit header)
+  if (add_parsed_length) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "parsed_length: 0x%08zx", parsed_length);
   }
 
   // header
@@ -383,11 +393,13 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       break;
     case PREFIX_SEI_NUT:
       // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
+      // TODO(chemag): add support for supplemental_enhancement_information()
+      // (sei)
       break;
     case SUFFIX_SEI_NUT:
       // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information() (sei)
+      // TODO(chemag): add support for supplemental_enhancement_information()
+      // (sei)
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:

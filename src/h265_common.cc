@@ -74,6 +74,13 @@ bool byte_aligned(rtc::BitBuffer *bit_buffer) {
   return (out_bit_offset == 0);
 }
 
+int get_current_offset(rtc::BitBuffer *bit_buffer) {
+  size_t out_byte_offset, out_bit_offset;
+  bit_buffer->GetCurrentOffset(&out_byte_offset, &out_bit_offset);
+
+  return out_byte_offset + ((out_bit_offset == 0) ? 0 : 1);
+}
+
 bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
   // If there is no more data in the raw byte sequence payload (RBSP), the
   // return value of more_rbsp_data() is equal to FALSE.

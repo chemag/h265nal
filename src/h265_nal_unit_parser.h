@@ -97,12 +97,16 @@ class H265NalUnitParser {
     NalUnitState& operator=(NalUnitState&&) = delete;
 
 #ifdef FDUMP_DEFINE
-    void fdump(FILE* outfp, int indent_level, bool add_offset,
-               bool add_length) const;
+    void fdump(FILE* outfp, int indent_level, bool add_offset, bool add_length,
+               bool add_parsed_length) const;
 #endif  // FDUMP_DEFINE
 
+    // NAL Unit offset in the full blob
     size_t offset;
+    // NAL Unit length
     size_t length;
+    // NAL Unit parsed length
+    size_t parsed_length;
 
     std::unique_ptr<struct H265NalUnitHeaderParser::NalUnitHeaderState>
         nal_unit_header;

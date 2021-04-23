@@ -34,6 +34,9 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
 
   EXPECT_TRUE(nal_unit != nullptr);
 
+  // check the parsed length
+  EXPECT_EQ(20, nal_unit->parsed_length);
+
   // check the header
   EXPECT_EQ(0, nal_unit->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT, nal_unit->nal_unit_header->nal_unit_type);
