@@ -25,4 +25,20 @@ grep: src/other: Is a directory
       1  TODO(chemag): calculate NumPicTotalCurr support (page 99)
 ```
 
+## 2. comparison with ffmpeg BSF
+
+```
+$ ffmpeg -i ~/work/video/h265/encoder/akiyo.kvazaar.qp_05.265 -c:v copy -bsf:v trace_headers -f null - >& /tmp/kvazaar.bsf.05.txt
+$ ./build/tools/h265nal --noas-one-line ~/work/video/h265/encoder/akiyo.kvazaar.qp_05.265 > /tmp/kvazaar.h265nal.05.txt
+```
+
+and for the latter:
+
+```
+:%s/^\[[^\]]*\] [0-9]*  */    /
+:%s/^\[[^\]]*\] [0-9]* *//
+:%s/    *[0-1]* = /: /
+```
+
+then meld.
 
