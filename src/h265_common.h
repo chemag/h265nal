@@ -66,6 +66,20 @@ enum NalUnitType : uint8_t {
   // 48-63: unspecified
   AP = 48,
   FU = 49,
+  UNSPEC50 = 50,
+  UNSPEC51 = 51,
+  UNSPEC52 = 52,
+  UNSPEC53 = 53,
+  UNSPEC54 = 54,
+  UNSPEC55 = 55,
+  UNSPEC56 = 56,
+  UNSPEC57 = 57,
+  UNSPEC58 = 58,
+  UNSPEC59 = 59,
+  UNSPEC60 = 60,
+  UNSPEC61 = 61,
+  UNSPEC62 = 62,
+  UNSPEC63 = 63,
 };
 
 namespace h265limits {
@@ -87,6 +101,12 @@ const uint32_t VPS_NUM_LAYER_SETS_MINUS1_MAX = 1023;
 
 // Slice detector
 bool IsSliceSegment(uint32_t nal_unit_type);
+
+bool IsNalUnitTypeVcl(uint32_t nal_unit_type);
+
+bool IsNalUnitTypeNonVcl(uint32_t nal_unit_type);
+
+bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type);
 
 // Methods for parsing RBSP. See section 7.4.1 of the H265 spec.
 //

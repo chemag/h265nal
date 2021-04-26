@@ -38,6 +38,116 @@ bool IsSliceSegment(uint32_t nal_unit_type) {
   return false;
 }
 
+bool IsNalUnitTypeVcl(uint32_t nal_unit_type) {
+  // payload (Table 7-1, Section 7.4.2.2)
+  switch (nal_unit_type) {
+    case TRAIL_N:
+    case TRAIL_R:
+    case TSA_N:
+    case TSA_R:
+    case STSA_N:
+    case STSA_R:
+    case RADL_N:
+    case RADL_R:
+    case RASL_N:
+    case RASL_R:
+    case RSV_VCL_N10:
+    case RSV_VCL_R11:
+    case RSV_VCL_N12:
+    case RSV_VCL_R13:
+    case RSV_VCL_N14:
+    case RSV_VCL_R15:
+    case BLA_W_LP:
+    case BLA_W_RADL:
+    case BLA_N_LP:
+    case IDR_W_RADL:
+    case IDR_N_LP:
+    case CRA_NUT:
+    case RSV_IRAP_VCL22:
+    case RSV_IRAP_VCL23:
+    case RSV_VCL24:
+    case RSV_VCL25:
+    case RSV_VCL26:
+    case RSV_VCL27:
+    case RSV_VCL28:
+    case RSV_VCL29:
+    case RSV_VCL30:
+    case RSV_VCL31:
+      return true;
+    default:
+      break;
+  }
+  return false;
+}
+
+bool IsNalUnitTypeNonVcl(uint32_t nal_unit_type) {
+  // payload (Table 7-1, Section 7.4.2.2)
+  switch (nal_unit_type) {
+    case VPS_NUT:
+    case SPS_NUT:
+    case PPS_NUT:
+    case AUD_NUT:
+    case EOS_NUT:
+    case EOB_NUT:
+    case FD_NUT:
+    case PREFIX_SEI_NUT:
+    case SUFFIX_SEI_NUT:
+    case RSV_NVCL41:
+    case RSV_NVCL42:
+    case RSV_NVCL43:
+    case RSV_NVCL44:
+    case RSV_NVCL45:
+    case RSV_NVCL46:
+    case RSV_NVCL47:
+    case AP:
+    case FU:
+    case UNSPEC50:
+    case UNSPEC51:
+    case UNSPEC52:
+    case UNSPEC53:
+    case UNSPEC54:
+    case UNSPEC55:
+    case UNSPEC56:
+    case UNSPEC57:
+    case UNSPEC58:
+    case UNSPEC59:
+    case UNSPEC60:
+    case UNSPEC61:
+    case UNSPEC62:
+    case UNSPEC63:
+      return true;
+    default:
+      break;
+  }
+  return false;
+}
+
+bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type) {
+  // payload (Table 7-1, Section 7.4.2.2)
+  switch (nal_unit_type) {
+    case AP:
+    case FU:
+    case UNSPEC50:
+    case UNSPEC51:
+    case UNSPEC52:
+    case UNSPEC53:
+    case UNSPEC54:
+    case UNSPEC55:
+    case UNSPEC56:
+    case UNSPEC57:
+    case UNSPEC58:
+    case UNSPEC59:
+    case UNSPEC60:
+    case UNSPEC61:
+    case UNSPEC62:
+    case UNSPEC63:
+      return true;
+    default:
+      break;
+  }
+  return false;
+}
+
 std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
   std::vector<uint8_t> out;
   out.reserve(length);
