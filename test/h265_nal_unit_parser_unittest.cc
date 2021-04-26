@@ -118,4 +118,19 @@ TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
   EXPECT_TRUE(nal_unit == nullptr);
 }
 
+class H265NalUnitHeaderParserTest : public ::testing::Test {
+ public:
+  H265NalUnitHeaderParserTest() {}
+  ~H265NalUnitHeaderParserTest() override {}
+};
+
+TEST_F(H265NalUnitHeaderParserTest, VerifParseNaluType) {
+  const uint8_t buffer[] = {0x20, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60,
+                            0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
+                            0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
+  NalUnitType naluType;
+  H265NalUnitHeaderParser::GetNalUnitType(buffer, arraysize(buffer), naluType);
+  EXPECT_EQ(NalUnitType::BLA_W_LP, naluType);
+}
+
 }  // namespace h265nal
