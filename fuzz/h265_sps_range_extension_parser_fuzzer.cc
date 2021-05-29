@@ -15,7 +15,7 @@
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   auto sps_range_extension =
-      h265nal::H265SpsRangeExtensionParser::ParseSpsRangeExtension(buffer,
-                                                          arraysize(buffer));
+      h265nal::H265SpsRangeExtensionParser::ParseSpsRangeExtension(data,
+                                                          size);
   return 0;
 }
