@@ -35,7 +35,7 @@ H265VuiParametersParser::ParseVuiParameters(
   // a complete description.
   auto vui = std::make_unique<VuiParametersState>();
 
-  // vui_video_parameter_set_id  u(1)
+  // aspect_ratio_info_present_flag  u(1)
   if (!bit_buffer->ReadBits(&(vui->aspect_ratio_info_present_flag), 1)) {
     return nullptr;
   }
