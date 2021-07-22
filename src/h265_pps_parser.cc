@@ -11,8 +11,8 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_pps_scc_extension_parser.h"
 #include "h265_profile_tier_level_parser.h"
-#include "h265_vui_parameters_parser.h"
 
 namespace h265nal {
 
