@@ -32,7 +32,6 @@ TEST_F(H265PpsParserTest, TestSamplePPS) {
   EXPECT_TRUE(pps != nullptr);
 
   EXPECT_EQ(0, pps->pps_pic_parameter_set_id);
-  EXPECT_EQ(0, pps->pps_pic_parameter_set_id);
   EXPECT_EQ(0, pps->pps_seq_parameter_set_id);
   EXPECT_EQ(0, pps->dependent_slice_segments_enabled_flag);
   EXPECT_EQ(0, pps->output_flag_present_flag);
