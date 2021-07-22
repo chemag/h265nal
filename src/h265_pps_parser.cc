@@ -33,7 +33,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   uint32_t golomb_tmp;
 
   // H265 PPS NAL Unit (pic_parameter_set_rbsp()) parser.
-  // Section 7.3.2.3 ("Parameter parameter set data syntax") of the H.265
+  // Section 7.3.2.3 ("Picture parameter set data syntax") of the H.265
   // standard for a complete description.
   auto pps = std::make_shared<PpsState>();
 
