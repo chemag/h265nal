@@ -9,6 +9,9 @@ This document describes h265nal, a simpler H265 NAL unit parser.
 Final goal it to create a binary that accepts a file in h265 Annex B format
 (.265) and dumps the contents of the parsed NALs.
 
+[h264nal](https://github.com/chemag/h264nal) is a similar project to parse
+H264 NAL units.
+
 
 # 2. Install Instructions
 
