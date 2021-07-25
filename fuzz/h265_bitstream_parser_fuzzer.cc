@@ -16,9 +16,11 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  {
   // init the BitstreamParserState
   h265nal::H265BitstreamParserState bitstream_parser_state;
   auto bitstream = h265nal::H265BitstreamParser::ParseBitstream(
       data, size, &bitstream_parser_state);
+  }
   return 0;
 }
