@@ -127,10 +127,12 @@ def parse_input(lines, debug):
             # begin code mode
             data_mode = False
             code_mode = True
+            lines_code.append('  {\n')
             continue
         elif 'fuzzer::conv: end' in line:
             # end code mode
             code_mode = False
+            lines_code.append('  }\n')
             continue
         if data_mode:
             lines_data[-1].append(line)

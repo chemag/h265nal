@@ -3,7 +3,7 @@
 We decided to use the unittests (which show how to test each of the
 parsers, and even provides some interesting input cases) to auto-generate
 both the fuzzers (the cpp files that contain the fuzzing glue) and the
-corpus. 
+corpus.
 
 We provide a script (`converter.py`) that parses unittests in order to
 auto-generate both the fuzzers (in the libfuzzer's case this means the
