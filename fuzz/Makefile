@@ -82,7 +82,7 @@ h265_nal_unit_parser_fuzzer.cc: ../test/h265_nal_unit_parser_unittest.cc
 	./converter.py ../test/h265_nal_unit_parser_unittest.cc ./
 
 
-RUNS=1000000
+RUNS?=1000000
 
 fuzz:
 	-../build/fuzz/h265_profile_tier_level_parser_fuzzer -artifact_prefix=corpus/h265_profile_tier_level_parser_fuzzer/ corpus/h265_profile_tier_level_parser_fuzzer/ -runs=$(RUNS)
