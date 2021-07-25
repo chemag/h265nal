@@ -100,7 +100,7 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
           if (!bit_buffer->ReadBits(&bits_tmp, bit_depth)) {
             return nullptr;
           }
-          sps_scc_extension->sps_palette_predictor_initializers[i].push_back(
+          sps_scc_extension->sps_palette_predictor_initializers[comp].push_back(
               bits_tmp);
         }
       }

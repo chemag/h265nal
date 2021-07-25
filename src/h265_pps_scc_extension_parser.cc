@@ -133,7 +133,7 @@ H265PpsSccExtensionParser::ParsePpsSccExtension(
           if (!bit_buffer->ReadBits(&bits_tmp, bit_depth)) {
             return nullptr;
           }
-          pps_scc_extension->pps_palette_predictor_initializers[i].push_back(
+          pps_scc_extension->pps_palette_predictor_initializers[comp].push_back(
               bits_tmp);
         }
       }
