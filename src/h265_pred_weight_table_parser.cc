@@ -106,13 +106,13 @@ H265PredWeightTableParser::ParsePredWeightTable(
         if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
           return nullptr;
         }
-        pred_weight_table->delta_chroma_weight_l0[i].push_back(sgolomb_tmp);
+        pred_weight_table->delta_chroma_weight_l0.back().push_back(sgolomb_tmp);
 
         // delta_chroma_offset_l0[i][j]  se(v)
         if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
           return nullptr;
         }
-        pred_weight_table->delta_chroma_offset_l0[i].push_back(sgolomb_tmp);
+        pred_weight_table->delta_chroma_offset_l0.back().push_back(sgolomb_tmp);
       }
     }
   }
