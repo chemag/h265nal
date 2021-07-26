@@ -43,9 +43,7 @@ TEST_F(H265CommonTest, TestIsNalUnitTypeUnspecified) {
   EXPECT_TRUE(IsNalUnitTypeUnspecified(UNSPEC63));
   EXPECT_FALSE(IsNalUnitTypeUnspecified(BLA_W_LP));
   EXPECT_FALSE(IsNalUnitTypeUnspecified(RSV_NVCL47));
-
 }
-
 
 struct H265CommonMoreRbspDataParameterTestData {
   int line;

@@ -9,12 +9,12 @@
 #include <memory>
 
 #include "h265_aud_parser.h"
+#include "h265_common.h"
 #include "h265_pps_parser.h"
 #include "h265_slice_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
 #include "rtc_base/bit_buffer.h"
-#include "h265_common.h"
 
 namespace h265nal {
 
@@ -48,7 +48,7 @@ class H265NalUnitHeaderParser {
       rtc::BitBuffer* bit_buffer) noexcept;
   // Parses nalu type from the given buffer
   static bool GetNalUnitType(const uint8_t* data, const size_t length,
-      NalUnitType& naluType) noexcept;
+                             NalUnitType& naluType) noexcept;
 };
 
 // A class for parsing out an H265 NAL Unit Payload.

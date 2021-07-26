@@ -24,8 +24,8 @@ TEST_F(H265PredWeightTableParserTest, TestSamplePredWeightTable1) {
   // fuzzer::conv: data
   const uint8_t buffer[] = {0x10, 0xc6};
   // fuzzer::conv: begin
-  auto pred_weight_table =
-      H265PredWeightTableParser::ParsePredWeightTable(buffer, arraysize(buffer), 1, 0);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      buffer, arraysize(buffer), 1, 0);
   // fuzzer::conv: end
 
   EXPECT_TRUE(pred_weight_table != nullptr);
@@ -43,8 +43,8 @@ TEST_F(H265PredWeightTableParserTest, TestSamplePredWeightTable2) {
   // fuzzer::conv: data
   const uint8_t buffer[] = {0x10, 0xc0, 0x60};
   // fuzzer::conv: begin
-  auto pred_weight_table =
-      H265PredWeightTableParser::ParsePredWeightTable(buffer, arraysize(buffer), 1, 2);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      buffer, arraysize(buffer), 1, 2);
   // fuzzer::conv: end
 
   EXPECT_TRUE(pred_weight_table != nullptr);

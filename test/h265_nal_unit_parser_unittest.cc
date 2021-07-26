@@ -113,8 +113,8 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
 TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
   const uint8_t buffer[] = {};
   H265BitstreamParserState bitstream_parser_state;
-  auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, 0,
-                                                  &bitstream_parser_state);
+  auto nal_unit =
+      H265NalUnitParser::ParseNalUnit(buffer, 0, &bitstream_parser_state);
   EXPECT_TRUE(nal_unit == nullptr);
 }
 

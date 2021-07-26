@@ -31,8 +31,10 @@ TEST_F(H265PpsSccExtensionParserTest, TestSamplePpsSccExtension) {
   EXPECT_TRUE(pps_scc_extension != nullptr);
 
   EXPECT_EQ(0, pps_scc_extension->pps_curr_pic_ref_enabled_flag);
-  EXPECT_EQ(0, pps_scc_extension->residual_adaptive_colour_transform_enabled_flag);
-  EXPECT_EQ(0, pps_scc_extension->pps_palette_predictor_initializer_present_flag);
+  EXPECT_EQ(0,
+            pps_scc_extension->residual_adaptive_colour_transform_enabled_flag);
+  EXPECT_EQ(0,
+            pps_scc_extension->pps_palette_predictor_initializer_present_flag);
   EXPECT_EQ(0, pps_scc_extension->pps_palette_predictor_initializers.size());
 }
 

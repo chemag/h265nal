@@ -74,8 +74,9 @@ H265NalUnitHeaderParser::ParseNalUnitHeader(const uint8_t* data,
   return ParseNalUnitHeader(&bit_buffer);
 }
 
-bool H265NalUnitHeaderParser::GetNalUnitType(const uint8_t* data, const size_t length,
-      NalUnitType& naluType) noexcept {
+bool H265NalUnitHeaderParser::GetNalUnitType(const uint8_t* data,
+                                             const size_t length,
+                                             NalUnitType& naluType) noexcept {
   rtc::BitBuffer bitBuffer(data, length);
   auto naluHeader = ParseNalUnitHeader(&bitBuffer);
   if (!naluHeader) {
