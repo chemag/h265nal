@@ -99,21 +99,25 @@ H265PredWeightTableParser::ParsePredWeightTable(
       }
       pred_weight_table->luma_offset_l0.push_back(sgolomb_tmp);
     }
-    if (pred_weight_table->chroma_weight_l0_flag[i]) {
-      pred_weight_table->delta_chroma_weight_l0.emplace_back();
-      pred_weight_table->delta_chroma_offset_l0.emplace_back();
-      for (int j = 0; i < 2; ++j) {
-        // delta_chroma_weight_l0[i][j]  se(v)
-        if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
-          return nullptr;
-        }
-        pred_weight_table->delta_chroma_weight_l0.back().push_back(sgolomb_tmp);
+    if (pred_weight_table->ChromaArrayType != 0) {
+      if (pred_weight_table->chroma_weight_l0_flag[i]) {
+        pred_weight_table->delta_chroma_weight_l0.emplace_back();
+        pred_weight_table->delta_chroma_offset_l0.emplace_back();
+        for (int j = 0; i < 2; ++j) {
+          // delta_chroma_weight_l0[i][j]  se(v)
+          if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+            return nullptr;
+          }
+          pred_weight_table->delta_chroma_weight_l0.back().push_back(
+              sgolomb_tmp);
 
-        // delta_chroma_offset_l0[i][j]  se(v)
-        if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
-          return nullptr;
+          // delta_chroma_offset_l0[i][j]  se(v)
+          if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+            return nullptr;
+          }
+          pred_weight_table->delta_chroma_offset_l0.back().push_back(
+              sgolomb_tmp);
         }
-        pred_weight_table->delta_chroma_offset_l0.back().push_back(sgolomb_tmp);
       }
     }
   }
@@ -152,45 +156,43 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
     fprintf(outfp, " }");
   }
 
-  if (ChromaArrayType != 0) {
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "delta_luma_weight_l0 {");
-    for (const uint32_t& v : delta_luma_weight_l0) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
-  }
-
-  if (ChromaArrayType != 0) {
-    fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "luma_offset_l0 {");
-    for (const uint32_t& v : luma_offset_l0) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
-  }
-
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "delta_chroma_weight_l0 {");
-  for (const std::vector<uint32_t>& vv : delta_chroma_weight_l0) {
-    fprintf(outfp, " {");
-    for (const uint32_t& v : vv) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
+  fprintf(outfp, "delta_luma_weight_l0 {");
+  for (const uint32_t& v : delta_luma_weight_l0) {
+    fprintf(outfp, " %i", v);
   }
   fprintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "delta_chroma_offset_l0 {");
-  for (const std::vector<uint32_t>& vv : delta_chroma_offset_l0) {
-    fprintf(outfp, " {");
-    for (const uint32_t& v : vv) {
-      fprintf(outfp, " %i", v);
+  fprintf(outfp, "luma_offset_l0 {");
+  for (const uint32_t& v : luma_offset_l0) {
+    fprintf(outfp, " %i", v);
+  }
+  fprintf(outfp, " }");
+
+  if (ChromaArrayType != 0) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "delta_chroma_weight_l0 {");
+    for (const std::vector<uint32_t>& vv : delta_chroma_weight_l0) {
+      fprintf(outfp, " {");
+      for (const uint32_t& v : vv) {
+        fprintf(outfp, " %i", v);
+      }
+      fprintf(outfp, " }");
+    }
+    fprintf(outfp, " }");
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "delta_chroma_offset_l0 {");
+    for (const std::vector<uint32_t>& vv : delta_chroma_offset_l0) {
+      fprintf(outfp, " {");
+      for (const uint32_t& v : vv) {
+        fprintf(outfp, " %i", v);
+      }
+      fprintf(outfp, " }");
     }
     fprintf(outfp, " }");
   }
-  fprintf(outfp, " }");
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
