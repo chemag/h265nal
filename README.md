@@ -117,9 +117,9 @@ There are 3 ways to integrate the parser in your C++ parser:
 ## 4.1. Annex B H265, Full-File Parsing
 If you just have a binary blob with the full contents of a file in Annex B
 format, use the `H265BitstreamParser::ParseBitstream()` method. This case
-is useful for example when you have an Annex B format file (a file with
-`.265` extension). You read the whole file in memory, and then get convert
-the read blob into a set of parsed NAL units.
+is useful, for example, when you have an Annex B format file (a file with
+`.265` or `.h265` extension). You read the whole file in memory, and then
+convert the read blob into a set of parsed NAL units.
 
 The following code has been copied from `tools/h265nal.cc`:
 
@@ -127,31 +127,22 @@ The following code has been copied from `tools/h265nal.cc`:
 // read your .265 file into the vector `buffer`
 std::vector<uint8_t> buffer(size);
 
-// keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
-h265nal::H265BitstreamParserState bitstream_parser_state;
-
-// create bitstream parser
-std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
-
-// parse the file
-bitstream = h265nal::H265BitstreamParser::ParseBitstream(
-      buffer.data(), buffer.size(), &bitstream_parser_state);
+// create bitstream parser from the file
+std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
+      h265nal::H265BitstreamParser::ParseBitstream(
+          buffer.data(), buffer.size(), options->add_offset,
+          options->add_length, options->add_parsed_length);
 ```
 
 The `H265BitstreamParser::ParseBitstream()` function receives a generic
 binary string (`data` and `length`) that you read from the file, plus
-a `H265BitstreamParserState` object that keeps all the VPS/SPS/PPS it
-ever sees. It then:
+some options (whether to add options, length, and parsed length to each
+NAL units).
+
+It then:
 
 * (1) splits the input string into a vector of NAL units, and
 * (2) parses the NAL units, and add them to the vector
-
-It will also updates the input `H265BitstreamParserState` object if it
-sees any VPS/PPS/SPS.
-
-Note that, if the parsed NAL unit has state that needs to be used to parse
-other NAL units (VPS, SPS, PPS), it will be stored into the
-`BitstreamParserState` object that is passed around.
 
 
 ## 4.2. NAL-Unit Parsing
@@ -160,7 +151,8 @@ If you have a series of binary blobs with NAL units, use the
 if you have a producer of NAL units (e.g. an encoder), and you want to
 parse them as soon as they are produced.
 
-The following code has been copied from `src/h265_bitstream_parser.cc`:
+The following code has been copied from `H265BitstreamParser::ParseBitstream()`
+in `src/h265_bitstream_parser.cc`:
 
 ```
 // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
@@ -194,7 +186,7 @@ a `H265BitstreamParserState` object that keeps all the VPS/SPS/PPS it
 ever sees. It then parses the NAL unit, and returns it (including the
 parsing offsets).
 
-It will also updates the input `H265BitstreamParserState` object if it
+It will also update the input `H265BitstreamParserState` object if it
 sees any VPS/PPS/SPS. This is important if the parsed NAL unit has state
 that needs to be used to parse other NAL units (VPS, SPS, PPS): In that
 case it will be stored into the `BitstreamParserState` object that is
