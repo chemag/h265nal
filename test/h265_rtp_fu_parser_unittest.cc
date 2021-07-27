@@ -29,7 +29,17 @@ TEST_F(H265RtpFuParserTest, TestSampleStart) {
     0x58, 0x24, 0x68, 0xe0
   };
   // fuzzer::conv: begin
+  // get some mock state
   H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->sample_adaptive_offset_enabled_flag = 1;
+  sps->chroma_format_idc = 1;
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  bitstream_parser_state.pps[0] = pps;
+
   auto rtp_fu = H265RtpFuParser::ParseRtpFu(buffer, arraysize(buffer),
                                             &bitstream_parser_state);
   // fuzzer::conv: end
@@ -47,6 +57,22 @@ TEST_F(H265RtpFuParserTest, TestSampleStart) {
   EXPECT_EQ(1, rtp_fu->s_bit);
   EXPECT_EQ(0, rtp_fu->e_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL, rtp_fu->fu_type);
+
+  // check some values
+  auto& nal_unit_payload = rtp_fu->nal_unit_payload;
+  ASSERT_TRUE(nal_unit_payload != nullptr);
+
+  auto& slice_segment_layer = nal_unit_payload->slice_segment_layer;
+  ASSERT_TRUE(slice_segment_layer != nullptr);
+
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
+  ASSERT_TRUE(slice_segment_header != nullptr);
+
+  EXPECT_EQ(NalUnitType::IDR_W_RADL, slice_segment_header->nal_unit_type);
+  EXPECT_EQ(1, slice_segment_header->first_slice_segment_in_pic_flag);
+  EXPECT_EQ(0, slice_segment_header->no_output_of_prior_pics_flag);
+  EXPECT_EQ(0, slice_segment_header->slice_pic_parameter_set_id);
+  EXPECT_EQ(2, slice_segment_header->slice_type);
 }
 
 TEST_F(H265RtpFuParserTest, TestSampleMiddle) {
