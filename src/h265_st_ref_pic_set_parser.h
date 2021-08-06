@@ -49,15 +49,25 @@ class H265StRefPicSetParser {
     std::vector<uint32_t> used_by_curr_pic_s0_flag;
     std::vector<uint32_t> delta_poc_s1_minus1;
     std::vector<uint32_t> used_by_curr_pic_s1_flag;
+
+    // helper functions
+    void DeriveValues(
+        const std::vector<std::unique_ptr<struct StRefPicSetState>>*
+            st_ref_pic_set_state_vector,
+        const uint32_t RefRpsIdx) noexcept;
   };
 
   // Unpack RBSP and parse StRefPicSet state from the supplied buffer.
   static std::unique_ptr<StRefPicSetState> ParseStRefPicSet(
       const uint8_t* data, size_t length, uint32_t stRpsIdx,
-      uint32_t num_short_term_ref_pic_sets) noexcept;
+      uint32_t num_short_term_ref_pic_sets,
+      const std::vector<std::unique_ptr<struct StRefPicSetState>>*
+          st_ref_pic_set_state_vector) noexcept;
   static std::unique_ptr<StRefPicSetState> ParseStRefPicSet(
       rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
-      uint32_t num_short_term_ref_pic_sets) noexcept;
+      uint32_t num_short_term_ref_pic_sets,
+      const std::vector<std::unique_ptr<struct StRefPicSetState>>*
+          st_ref_pic_set_state_vector) noexcept;
 };
 
 }  // namespace h265nal

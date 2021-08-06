@@ -234,10 +234,13 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
         // st_ref_pic_set(num_short_term_ref_pic_sets)
+        const auto& st_ref_pic_set =
+            bitstream_parser_state->sps[sps_id]->st_ref_pic_set;
         slice_segment_header->st_ref_pic_set =
             H265StRefPicSetParser::ParseStRefPicSet(
                 bit_buffer, false,
-                slice_segment_header->num_short_term_ref_pic_sets);
+                slice_segment_header->num_short_term_ref_pic_sets,
+                &st_ref_pic_set);
 
       } else if (slice_segment_header->num_short_term_ref_pic_sets > 1) {
         // Ceil(Log2(num_short_term_ref_pic_sets));
