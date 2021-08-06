@@ -14,7 +14,9 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  {
   auto pps_scc_extension = h265nal::H265PpsSccExtensionParser::ParsePpsSccExtension(
       data, size);
+  }
   return 0;
 }

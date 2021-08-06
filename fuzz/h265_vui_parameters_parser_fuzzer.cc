@@ -14,7 +14,13 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  {
   auto vui_parameters =
       h265nal::H265VuiParametersParser::ParseVuiParameters(data, size);
+  }
+  {
+  auto vui_parameters =
+      h265nal::H265VuiParametersParser::ParseVuiParameters(data, size);
+  }
   return 0;
 }

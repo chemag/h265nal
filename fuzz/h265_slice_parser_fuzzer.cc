@@ -18,6 +18,7 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  {
   // get some mock state
   h265nal::H265BitstreamParserState bitstream_parser_state;
   auto vps = std::make_shared<h265nal::H265VpsParser::VpsState>();
@@ -32,5 +33,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
       h265nal::H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
           data, size, h265nal::NalUnitType::IDR_W_RADL,
           &bitstream_parser_state);
+  }
   return 0;
 }
