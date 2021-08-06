@@ -28,6 +28,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_pred_weight_table_parser.h h265_pred_weight_table_parser.cc
       h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
       h265_sps_multilayer_extension_parser.h h265_sps_multilayer_extension_parser.cc
+      h265_sps_3d_extension_parser.h h265_sps_3d_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_scc_extension_parser.h h265_sps_scc_extension_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
@@ -49,6 +50,7 @@ else()
       h265_pred_weight_table_parser.h h265_pred_weight_table_parser.cc
       h265_st_ref_pic_set_parser.h h265_st_ref_pic_set_parser.cc
       h265_sps_multilayer_extension_parser.h h265_sps_multilayer_extension_parser.cc
+      h265_sps_3d_extension_parser.h h265_sps_3d_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_scc_extension_parser.h h265_sps_scc_extension_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
