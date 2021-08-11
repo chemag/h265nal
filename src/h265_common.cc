@@ -4,6 +4,7 @@
 
 #include "h265_common.h"
 
+#include <arpa/inet.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -272,5 +273,71 @@ void fdump_indent_level(FILE *outfp, int indent_level) {
   fprintf(outfp, "%*s", 2 * indent_level, "");
 }
 #endif  // FDUMP_DEFINE
+
+std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
+    rtc::BitBuffer *bit_buffer) noexcept {
+  // save the bit buffer current state
+  size_t byte_offset = 0;
+  size_t bit_offset = 0;
+  bit_buffer->GetCurrentOffset(&byte_offset, &bit_offset);
+
+  auto checksum = std::make_shared<NaluChecksum>();
+  // implement simple IP-like checksum (extended from 16/32 to 32/64 bits)
+  // Inspired in https://stackoverflow.com/questions/26774761
+
+  // Our algorithm is simple, using a 64 bit accumulator (sum), we add
+  // sequential 32 bit words to it, and at the end, fold back all the
+  // carry bits from the top 32 bits into the lower 32 bits.
+
+  uint64_t sum = 0;
+
+  uint32_t val = 0;
+  while (bit_buffer->ReadUInt32(&val)) {
+    sum += val;
+  }
+
+  // check if there are unread bytes
+  int i = 0;
+  uint8_t val8 = 0;
+  val = 0;
+  while (bit_buffer->RemainingBitCount() > 0) {
+    (void)bit_buffer->ReadUInt8(&val8);
+    val |= (val8 << (8 * (3 - i)));
+    i += 1;
+  }
+  if (i > 0) {
+    sum += val;
+  }
+
+  // add back carry outs from top 32 bits to low 32 bits
+  // add hi 32 to low 32
+  sum = (sum >> 32) + (sum & 0xffffffff);
+  // add carry
+  sum += (sum >> 32);
+  // truncate to 32 bits and get one's complement
+  uint32_t answer = ~sum;
+
+  // write sum into (generic) checksum buffer (network order)
+  *(reinterpret_cast<uint32_t *>(checksum->checksum)) = htonl(answer);
+  checksum->length = 4;
+
+  // return the bit buffer to the original state
+  bit_buffer->Seek(byte_offset, bit_offset);
+
+  return checksum;
+}
+
+void NaluChecksum::fdump(char *output, int output_len) const {
+  int i = 0;
+  int oi = 0;
+  while (i < length) {
+    // make sure there is space in the output buffer
+    if (oi + 2 >= output_len) {
+      output[output_len - 1] = '\0';
+      break;
+    }
+    oi += sprintf(output + oi, "%02x", static_cast<u_char>(checksum[i++]));
+  }
+}
 
 }  // namespace h265nal

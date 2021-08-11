@@ -28,6 +28,7 @@ typedef struct arg_options {
   bool add_offset;
   bool add_length;
   bool add_parsed_length;
+  bool add_checksum;
   char *str;
   char *infile;
   char *outfile;
@@ -48,6 +49,9 @@ void usage(char *name) {
   fprintf(stderr, "\t--noadd-length:\tReset add_length flag\n");
   fprintf(stderr, "\t--add-parsed-length:\tSet add_parsed_length flag\n");
   fprintf(stderr, "\t--noadd-parsed-length:\tReset add_parsed_length flag\n");
+  fprintf(stderr, "\t--add-checksum:\tSet add_checksum flag\n");
+  fprintf(stderr,
+          "\t--noadd-checksum:\tReset add_checksum flag\n");
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -64,6 +68,8 @@ enum {
   NO_ADD_LENGTH_FLAG_OPTION,
   ADD_PARSED_LENGTH_FLAG_OPTION,
   NO_ADD_PARSED_LENGTH_FLAG_OPTION,
+  ADD_CHECKSUM_FLAG_OPTION,
+  NO_ADD_CHECKSUM_FLAG_OPTION,
   VERSION_OPTION
 };
 
@@ -77,6 +83,7 @@ arg_options *parse_args(int argc, char **argv) {
   options.add_offset = false;
   options.add_length = false;
   options.add_parsed_length = false;
+  options.add_checksum = false;
   options.infile = nullptr;
   options.outfile = nullptr;
 
@@ -98,6 +105,8 @@ arg_options *parse_args(int argc, char **argv) {
       {"add-parsed-length", no_argument, NULL, ADD_PARSED_LENGTH_FLAG_OPTION},
       {"noadd-parsed-length", no_argument, NULL,
        NO_ADD_PARSED_LENGTH_FLAG_OPTION},
+      {"add-checksum", no_argument, NULL, ADD_CHECKSUM_FLAG_OPTION},
+      {"noadd-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {NULL, 0, NULL, 0}};
 
@@ -154,6 +163,14 @@ arg_options *parse_args(int argc, char **argv) {
 
       case NO_ADD_PARSED_LENGTH_FLAG_OPTION:
         options.add_parsed_length = false;
+        break;
+
+      case ADD_CHECKSUM_FLAG_OPTION:
+        options.add_checksum = true;
+        break;
+
+      case NO_ADD_CHECKSUM_FLAG_OPTION:
+        options.add_checksum = false;
         break;
 
       case VERSION_OPTION:
@@ -228,7 +245,8 @@ int main(int argc, char **argv) {
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
       h265nal::H265BitstreamParser::ParseBitstream(
           buffer.data(), buffer.size(), options->add_offset,
-          options->add_length, options->add_parsed_length);
+          options->add_length, options->add_parsed_length,
+          options->add_checksum);
 
 #ifdef FDUMP_DEFINE
   // get outfile file descriptor

@@ -29,13 +29,25 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
   // fuzzer::conv: begin
   H265BitstreamParserState bitstream_parser_state;
   auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
-                                                  &bitstream_parser_state);
+                                                  &bitstream_parser_state,
+                                                  /* add checksum */ true);
   // fuzzer::conv: end
 
   EXPECT_TRUE(nal_unit != nullptr);
 
   // check the parsed length
   EXPECT_EQ(20, nal_unit->parsed_length);
+
+  // check the checksum
+  EXPECT_THAT(std::vector<char>(nal_unit->checksum->GetChecksum(),
+                                nal_unit->checksum->GetChecksum() +
+                                    nal_unit->checksum->GetLength()),
+              ::testing::ElementsAreArray({0xbf, 0xa2, 0x45, 0x94}));
+
+  // test the checksum's ascii dumper
+  char checksum_printable[64] = {};
+  nal_unit->checksum->fdump(checksum_printable, 64);
+  EXPECT_STREQ(checksum_printable, "bfa24594");
 
   // check the header
   EXPECT_EQ(0, nal_unit->nal_unit_header->forbidden_zero_bit);
@@ -114,7 +126,8 @@ TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
   const uint8_t buffer[] = {};
   H265BitstreamParserState bitstream_parser_state;
   auto nal_unit =
-      H265NalUnitParser::ParseNalUnit(buffer, 0, &bitstream_parser_state);
+      H265NalUnitParser::ParseNalUnit(buffer, 0, &bitstream_parser_state,
+                                      /* add_checksum */ false);
   EXPECT_TRUE(nal_unit == nullptr);
 }
 

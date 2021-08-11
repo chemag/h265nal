@@ -96,7 +96,7 @@ std::vector<int32_t> H265Utils::GetSliceQpY(
 
   // parse the incoming bitstream
   auto bitstream_state = h265nal::H265BitstreamParser::ParseBitstream(
-      data, length, bitstream_parser_state);
+      data, length, bitstream_parser_state, /* add_checksum */ false);
   // get all possible QP values
   for (auto& nal_unit : bitstream_state->nal_units) {
     uint32_t nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;

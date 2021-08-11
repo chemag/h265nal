@@ -81,7 +81,8 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data,
 std::unique_ptr<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(
     const uint8_t* data, size_t length,
-    H265BitstreamParserState* bitstream_parser_state) noexcept {
+    H265BitstreamParserState* bitstream_parser_state,
+    bool add_checksum) noexcept {
   auto bitstream = std::make_unique<BitstreamState>();
 
   // (1) split the input string into a vector of NAL units
@@ -92,7 +93,7 @@ H265BitstreamParser::ParseBitstream(
     // (2) parse the NAL units, and add them to the vector
     auto nal_unit = H265NalUnitParser::ParseNalUnit(
         &data[nalu_index.payload_start_offset], nalu_index.payload_size,
-        bitstream_parser_state);
+        bitstream_parser_state, add_checksum);
     if (nal_unit == nullptr) {
       // cannot parse the NalUnit
 #ifdef FPRINT_ERRORS
@@ -113,7 +114,8 @@ H265BitstreamParser::ParseBitstream(
 std::unique_ptr<H265BitstreamParser::BitstreamState>
 H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
                                     bool add_offset, bool add_length,
-                                    bool add_parsed_length) noexcept {
+                                    bool add_parsed_length,
+                                    bool add_checksum) noexcept {
   // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
   H265BitstreamParserState bitstream_parser_state;
 
@@ -121,7 +123,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   auto bitstream = std::make_unique<BitstreamState>();
 
   // parse the file
-  bitstream = ParseBitstream(data, length, &bitstream_parser_state);
+  bitstream =
+      ParseBitstream(data, length, &bitstream_parser_state, add_checksum);
   if (bitstream == nullptr) {
     // did not work
 #ifdef FPRINT_ERRORS
@@ -132,6 +135,7 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   bitstream->add_offset = add_offset;
   bitstream->add_length = add_length;
   bitstream->add_parsed_length = add_parsed_length;
+  bitstream->add_checksum = add_checksum;
   return bitstream;
 }
 
@@ -140,7 +144,7 @@ void H265BitstreamParser::BitstreamState::fdump(FILE* outfp,
                                                 int indent_level) const {
   for (auto& nal_unit : nal_units) {
     nal_unit->fdump(outfp, indent_level, add_offset, add_length,
-                    add_parsed_length);
+                    add_parsed_length, add_checksum);
     fprintf(outfp, "\n");
   }
 }

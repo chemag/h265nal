@@ -61,7 +61,8 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   H265BitstreamParserState bitstream_parser_state;
 
   auto bitstream = H265BitstreamParser::ParseBitstream(
-      buffer, arraysize(buffer), &bitstream_parser_state);
+      buffer, arraysize(buffer), &bitstream_parser_state,
+      /* add_checksum */ true);
   // fuzzer::conv: end
 
   EXPECT_TRUE(bitstream != nullptr);
@@ -78,6 +79,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
   EXPECT_EQ(
       1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xbf, 0xa2, 0x45, 0x94}));
 
   // check the 2nd NAL unit
   index += 1;
@@ -88,6 +94,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
   EXPECT_EQ(
       1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x00, 0x3d, 0xc2, 0x9d}));
 
   // check the 3rd NAL unit
   index += 1;
@@ -98,6 +109,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
   EXPECT_EQ(
       1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xfb, 0xfc, 0x2f, 0x0b}));
 
   // check the 4th NAL unit
   index += 1;
@@ -108,6 +124,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
   EXPECT_EQ(
       1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x6c, 0x88, 0x0c, 0xe4}));
 }
 
 TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
@@ -115,8 +136,10 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   bool add_offset = true;
   bool add_length = true;
   bool add_parsed_length = true;
+  bool add_checksum = true;
   auto bitstream = H265BitstreamParser::ParseBitstream(
-      buffer, arraysize(buffer), add_offset, add_length, add_parsed_length);
+      buffer, arraysize(buffer), add_offset, add_length, add_parsed_length,
+      add_checksum);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there are 4 NAL units
@@ -132,6 +155,12 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   EXPECT_EQ(counter, bitstream->nal_units[index]->offset);
   EXPECT_EQ(length, bitstream->nal_units[index]->length);
   EXPECT_EQ(20, bitstream->nal_units[index]->parsed_length);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xbf, 0xa2, 0x45, 0x94}));
+
   index += 1;
   counter += length;
   // 2nd NAL unit
@@ -140,6 +169,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   EXPECT_EQ(counter, bitstream->nal_units[index]->offset);
   EXPECT_EQ(length, bitstream->nal_units[index]->length);
   EXPECT_EQ(36, bitstream->nal_units[index]->parsed_length);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x00, 0x3d, 0xc2, 0x9d}));
   index += 1;
   counter += length;
   // 3rd NAL unit
@@ -148,6 +182,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   EXPECT_EQ(counter, bitstream->nal_units[index]->offset);
   EXPECT_EQ(length, bitstream->nal_units[index]->length);
   EXPECT_EQ(7, bitstream->nal_units[index]->parsed_length);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xfb, 0xfc, 0x2f, 0x0b}));
   index += 1;
   counter += length;
   // 4th NAL unit
@@ -156,6 +195,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   EXPECT_EQ(counter, bitstream->nal_units[index]->offset);
   EXPECT_EQ(length, bitstream->nal_units[index]->length);
   EXPECT_EQ(5, bitstream->nal_units[index]->parsed_length);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x6c, 0x88, 0x0c, 0xe4}));
   // index += 1;
   // counter += length;
 }
@@ -250,69 +294,108 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // 0. parse buffer0
   auto bitstream = H265BitstreamParser::ParseBitstream(
-      buffer0, arraysize(buffer0), &bitstream_parser_state);
+      buffer0, arraysize(buffer0), &bitstream_parser_state,
+      /* add_checksum */ true);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there are 4 NAL units
   EXPECT_EQ(4, bitstream->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->forbidden_zero_bit);
+  int index = 0;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,
-            bitstream->nal_units[0]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xbf, 0xa2, 0x45, 0x94}));
 
   // check the 2nd NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[1]->nal_unit_header->forbidden_zero_bit);
+  index += 1;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::SPS_NUT,
-            bitstream->nal_units[1]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[1]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[1]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x00, 0x3d, 0xc2, 0x9d}));
 
   // check the 3rd NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[2]->nal_unit_header->forbidden_zero_bit);
+  index += 1;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::PPS_NUT,
-            bitstream->nal_units[2]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[2]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[2]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xfb, 0xfc, 0x2f, 0x0b}));
 
   // check the 4th NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[3]->nal_unit_header->forbidden_zero_bit);
+  index += 1;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL,
-            bitstream->nal_units[3]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[3]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[3]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x09, 0x54, 0xa9, 0x47}));
 
   // 1. parse buffer1
   bitstream = H265BitstreamParser::ParseBitstream(buffer1, arraysize(buffer1),
-                                                  &bitstream_parser_state);
+                                                  &bitstream_parser_state,
+                                                  /* add_checksum */ true);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there is 1 NAL units
   EXPECT_EQ(1, bitstream->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->forbidden_zero_bit);
+  index = 0;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
-            bitstream->nal_units[0]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0xd9, 0xbf, 0xa1, 0xe8}));
 
   // 2. parse buffer2
   bitstream = H265BitstreamParser::ParseBitstream(buffer2, arraysize(buffer2),
-                                                  &bitstream_parser_state);
+                                                  &bitstream_parser_state,
+                                                  /* add_checksum */ true);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there is 1 NAL units
   EXPECT_EQ(1, bitstream->nal_units.size());
 
   // check the 1st NAL unit
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->forbidden_zero_bit);
+  index = 0;
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
-            bitstream->nal_units[0]->nal_unit_header->nal_unit_type);
-  EXPECT_EQ(0, bitstream->nal_units[0]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[0]->nal_unit_header->nuh_temporal_id_plus1);
+            bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
+  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
+  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_THAT(
+      std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
+                        bitstream->nal_units[index]->checksum->GetChecksum() +
+                            bitstream->nal_units[index]->checksum->GetLength()),
+      ::testing::ElementsAreArray({0x82, 0x2a, 0xff, 0x1c}));
 }
 
 TEST_F(H265BitstreamParserTest, TestMultipleBuffersGetSliceQpY) {

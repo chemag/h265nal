@@ -131,4 +131,17 @@ int indent_level_decr(int indent_level);
 void fdump_indent_level(FILE *outfp, int indent_level);
 #endif  // FDUMP_DEFINE
 
+class NaluChecksum {
+ public:
+  static std::shared_ptr<NaluChecksum> GetNaluChecksum(
+      rtc::BitBuffer *bit_buffer) noexcept;
+  void fdump(char *output, int output_len) const;
+  const char *GetChecksum() { return checksum; };
+  int GetLength() { return length; };
+
+ private:
+  char checksum[32];
+  int length;
+};
+
 }  // namespace h265nal
