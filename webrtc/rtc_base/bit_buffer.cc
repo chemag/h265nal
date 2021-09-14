@@ -235,23 +235,6 @@ bool BitBuffer::Seek(size_t byte_offset, size_t bit_offset) {
   return true;
 }
 
-bool BitBuffer::GetLastBitOffset(uint32_t bit_val, size_t* out_byte_offset,
-                                 size_t* out_bit_offset) {
-  for (int byte_offset = byte_count_ - 1; byte_offset >= 0; --byte_offset) {
-    const uint8_t byte = *(bytes_ + byte_offset);
-    for (int bit_offset = 8 - 1; bit_offset >= 0; --bit_offset) {
-      uint32_t mask = 0x80 >> bit_offset;
-      uint32_t bit = (byte & mask) >> (7 - bit_offset);
-      if (bit == bit_val) {
-        *out_byte_offset = byte_offset;
-        *out_bit_offset = bit_offset;
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
 BitBufferWriter::BitBufferWriter(uint8_t* bytes, size_t byte_count)
     : BitBuffer(bytes, byte_count), writable_bytes_(bytes) {}
 

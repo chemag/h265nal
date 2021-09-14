@@ -33,13 +33,6 @@ class BitBuffer {
   // bit offset is the offset into the current byte, in the range [0,7].
   void GetCurrentOffset(size_t* out_byte_offset, size_t* out_bit_offset);
 
-  // Gets the offset (in bytes/bits, from the start of the buffer) of the
-  // last bit set to `bit_val`. Returns false if the bit does not exist
-  // in the buffer.
-  // The bit offset is the offset into the current byte, in the range [0,7].
-  bool GetLastBitOffset(uint32_t bit_val, size_t* out_byte_offset,
-                        size_t* out_bit_offset);
-
   // The remaining bits in the byte buffer.
   uint64_t RemainingBitCount() const;
 
