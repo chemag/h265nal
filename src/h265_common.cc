@@ -193,42 +193,57 @@ int get_current_offset(rtc::BitBuffer *bit_buffer) {
 }
 
 bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
-  // If there is no more data in the raw byte sequence payload (RBSP), the
-  // return value of more_rbsp_data() is equal to FALSE.
-  if (bit_buffer->RemainingBitCount() == 0) {
+  // > If there is no more data in the raw byte sequence payload (RBSP), the
+  // > return value of more_rbsp_data() is equal to FALSE.
+  uint64_t remaining_bitcount = bit_buffer->RemainingBitCount();
+  if (remaining_bitcount == 0) {
     return false;
   }
 
-  // Otherwise, the RBSP data are searched for the last (least significant,
-  // right-most) bit equal to 1 that is present in the RBSP.
-  size_t last_one_byte_offset = 0;
-  size_t last_one_bit_offset = 0;
-  if (!bit_buffer->GetLastBitOffset(1, &last_one_byte_offset,
-                                    &last_one_bit_offset)) {
-    // no 1 bit in the full bit buffer
-    return false;
-  }
+  // > Otherwise, the RBSP data is searched for the last (least significant,
+  // > right-most) bit equal to 1 that is present in the RBSP. Given the
+  // > position of this bit, which is the first bit (rbsp_stop_one_bit) of
+  // > the rbsp_trailing_bits() syntax structure, the following applies:
+  // > - If there is more data in an RBSP before the rbsp_trailing_bits()
+  // >   syntax structure, the return value of more_rbsp_data() is equal to
+  // >   TRUE.
+  // > - Otherwise, the return value of more_rbsp_data() is equal to FALSE.
+  // > The method for enabling determination of whether there is more data
+  // > in the RBSP is specified by the application (or in Annex B for
+  // > applications that use the byte stream format).
 
-  // Given the position of this bit, which is the first bit (rbsp_stop_one_bit)
-  // of the rbsp_trailing_bits() syntax structure, the following applies:
-
-  // - If there is more data in an RBSP before the rbsp_trailing_bits()
-  // syntax structure, the return value of more_rbsp_data() is equal to TRUE.
-  size_t cur_byte_offset = 0;
-  size_t cur_bit_offset = 0;
-  bit_buffer->GetCurrentOffset(&cur_byte_offset, &cur_bit_offset);
-  if ((last_one_byte_offset > cur_byte_offset) ||
-      ((last_one_byte_offset == cur_byte_offset) &&
-       (last_one_bit_offset > cur_bit_offset))) {
+  // Here we do the following simplification:
+  // (1) We know that rbsp_trailing_bits() is limited to at most 1 byte. Its
+  // definition is:
+  // > rbsp_trailing_bits() {
+  // >   rbsp_stop_one_bit // equal to 1
+  // >   while( !byte_aligned() )
+  // >     rbsp_alignment_zero_bit // equal to 0
+  // >   }
+  // where byte_aligned() is a Bool stating whether the position of the
+  // bitstream is in a byte boundary. So, if there is more than 1 byte
+  // left (8 bits left), clearly "there is more data in the RBSP before the
+  // rbsp_trailing_bits()"
+  if (remaining_bitcount > 8) {
     return true;
   }
 
-  // - Otherwise, the return value of more_rbsp_data() is equal to FALSE.
+  // (2) if we are indeed in the last byte, we just need to know whether the
+  // rest of the byte is [1, 0, ..., 0]. For that, we want to peek in the
+  // bit buffer (not read).
+  // So we first read (peek) the remaining bits.
+  uint32_t remaining_bits;
+  if (!bit_buffer->PeekBits(&remaining_bits, remaining_bitcount)) {
+    // this should not happen: we do not have remaining_bits bits left.
   return false;
+  }
+  // and then check for the actual values to be 100..000
+  bool is_rbsp_trailing_bits =
+      (remaining_bits == (1 << (remaining_bitcount - 1)));
 
-  // The method for enabling determination of whether there is more data
-  // in the RBSP is specified by the application (or in Annex B for
-  // applications that use the byte stream format).
+  // if the actual values to be 100..000, we are already at the
+  // rbsp_trailing_bits, which means there is no more RBSP data
+  return !is_rbsp_trailing_bits;
 }
 
 bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
