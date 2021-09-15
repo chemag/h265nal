@@ -185,6 +185,8 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
           return nullptr;
         }
         vps->cprms_present_flag.push_back(golomb_tmp);
+      } else {
+        vps->cprms_present_flag.push_back(0);
       }
       // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
       // TODO(chemag): add support for hrd_parameters()
