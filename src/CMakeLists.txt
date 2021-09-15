@@ -23,6 +23,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_common.h h265_common.cc
       h265_utils.h h265_utils.cc
       h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
+      h265_hrd_parameters_parser.h h265_hrd_parameters_parser.cc
       h265_vps_parser.h h265_vps_parser.cc
       h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
       h265_pred_weight_table_parser.h h265_pred_weight_table_parser.cc
@@ -45,6 +46,7 @@ else()
       h265_common.h h265_common.cc
       h265_utils.h h265_utils.cc
       h265_profile_tier_level_parser.h h265_profile_tier_level_parser.cc
+      h265_hrd_parameters_parser.h h265_hrd_parameters_parser.cc
       h265_vps_parser.h h265_vps_parser.cc
       h265_vui_parameters_parser.h h265_vui_parameters_parser.cc
       h265_pred_weight_table_parser.h h265_pred_weight_table_parser.cc

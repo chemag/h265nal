@@ -30,6 +30,12 @@ target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
 
+add_executable(h265_hrd_parameters_parser_unittest h265_hrd_parameters_parser_unittest.cc)
+add_test(h265_hrd_parameters_parser_unittest h265_hrd_parameters_parser_unittest)
+target_link_libraries(h265_hrd_parameters_parser_unittest PUBLIC h265nal)
+target_link_libraries(h265_hrd_parameters_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
+target_link_libraries(h265_hrd_parameters_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
 add_executable(h265_vps_parser_unittest h265_vps_parser_unittest.cc)
 add_test(h265_vps_parser_unittest h265_vps_parser_unittest)
 target_link_libraries(h265_vps_parser_unittest PUBLIC h265nal)
