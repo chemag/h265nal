@@ -346,8 +346,8 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   if (sps->vui_parameters_present_flag) {
     // vui_parameters()
-    sps->vui_parameters =
-        H265VuiParametersParser::ParseVuiParameters(bit_buffer);
+    sps->vui_parameters = H265VuiParametersParser::ParseVuiParameters(
+        bit_buffer, sps->sps_max_sub_layers_minus1);
   }
 
   // sps_extension_present_flag  u(1)

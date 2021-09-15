@@ -26,8 +26,10 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
       0x2b, 0x05, 0x06, 0x06, 0x02, 0xed, 0x0a, 0x12
   };
   // fuzzer::conv: begin
+  uint32_t sps_max_sub_layers_minus1 = 0;
   auto vui_parameters =
-      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer));
+      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer),
+                                                  sps_max_sub_layers_minus1);
   // fuzzer::conv: end
 
   EXPECT_TRUE(vui_parameters != nullptr);
@@ -66,8 +68,10 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters2) {
       0x00, 0x0f, 0xa4, 0x00, 0x01, 0xd4, 0xc0, 0x20
   };
   // fuzzer::conv: begin
+  uint32_t sps_max_sub_layers_minus1 = 0;
   auto vui_parameters =
-      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer));
+      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer),
+                                                  sps_max_sub_layers_minus1);
   // fuzzer::conv: end
 
   EXPECT_TRUE(vui_parameters != nullptr);

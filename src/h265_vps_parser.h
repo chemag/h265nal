@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "h265_hrd_parameters_parser.h"
 #include "h265_profile_tier_level_parser.h"
 #include "rtc_base/bit_buffer.h"
 
@@ -55,6 +56,8 @@ class H265VpsParser {
     uint32_t vps_poc_proportional_to_timing_flag = 0;
     uint32_t vps_num_ticks_poc_diff_one_minus1 = 0;
     uint32_t vps_num_hrd_parameters = 0;
+    std::unique_ptr<struct H265HrdParametersParser::HrdParametersState>
+        hrd_parameters;
     std::vector<uint32_t> hrd_layer_set_idx;
     std::vector<uint32_t> cprms_present_flag;
     uint32_t vps_extension_flag = 0;

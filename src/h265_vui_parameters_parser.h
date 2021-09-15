@@ -8,6 +8,7 @@
 
 #include <memory>
 
+#include "h265_hrd_parameters_parser.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -52,6 +53,10 @@ class H265VuiParametersParser {
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
 
+    // input
+    uint32_t sps_max_sub_layers_minus1 = 0;
+
+    // content
     uint32_t aspect_ratio_info_present_flag = 0;
     uint32_t aspect_ratio_idc = 0;
     uint32_t sar_width = 0;
@@ -82,7 +87,8 @@ class H265VuiParametersParser {
     uint32_t vui_poc_proportional_to_timing_flag = 0;
     uint32_t vui_num_ticks_poc_diff_one_minus1 = 0;
     uint32_t vui_hrd_parameters_present_flag = 0;
-    // hrd_parameters( 1, sps_max_sub_layers_minus1 )
+    std::unique_ptr<struct H265HrdParametersParser::HrdParametersState>
+        hrd_parameters;
     uint32_t bitstream_restriction_flag = 0;
     uint32_t tiles_fixed_structure_flag = 0;
     uint32_t motion_vectors_over_pic_boundaries_flag = 0;
@@ -96,9 +102,10 @@ class H265VuiParametersParser {
 
   // Unpack RBSP and parse VIU Parameters state from the supplied buffer.
   static std::unique_ptr<VuiParametersState> ParseVuiParameters(
-      const uint8_t* data, size_t length) noexcept;
+      const uint8_t* data, size_t length,
+      uint32_t sps_max_sub_layers_minus1) noexcept;
   static std::unique_ptr<VuiParametersState> ParseVuiParameters(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      rtc::BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept;
 };
 
 }  // namespace h265nal

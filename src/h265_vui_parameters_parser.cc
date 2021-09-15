@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_hrd_parameters_parser.h"
 
 namespace h265nal {
 
@@ -20,20 +21,24 @@ namespace h265nal {
 
 // Unpack RBSP and parse VUI Parameters state from the supplied buffer.
 std::unique_ptr<H265VuiParametersParser::VuiParametersState>
-H265VuiParametersParser::ParseVuiParameters(const uint8_t* data,
-                                            size_t length) noexcept {
+H265VuiParametersParser::ParseVuiParameters(
+    const uint8_t* data, size_t length,
+    uint32_t sps_max_sub_layers_minus1) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
-  return ParseVuiParameters(&bit_buffer);
+  return ParseVuiParameters(&bit_buffer, sps_max_sub_layers_minus1);
 }
 
 std::unique_ptr<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    rtc::BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept {
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for
   // a complete description.
   auto vui = std::make_unique<VuiParametersState>();
+
+  // input
+  vui->sps_max_sub_layers_minus1 = sps_max_sub_layers_minus1;
 
   // aspect_ratio_info_present_flag  u(1)
   if (!bit_buffer->ReadBits(&(vui->aspect_ratio_info_present_flag), 1)) {
@@ -188,12 +193,9 @@ H265VuiParametersParser::ParseVuiParameters(
       return nullptr;
     }
     if (vui->vui_hrd_parameters_present_flag) {
-      // hrd_parameters( 1, sps_max_sub_layers_minus1 )
-      // TODO(chemag): add support for hrd_parameters()
-#ifdef FPRINT_ERRORS
-      fprintf(stderr, "error: unimplemented hrd_parameters in vui\n");
-#endif  // FPRINT_ERRORS
-      return nullptr;
+      // hrd_parameters(1, sps_max_sub_layers_minus1)
+      vui->hrd_parameters = H265HrdParametersParser::ParseHrdParameters(
+          bit_buffer, 1, vui->sps_max_sub_layers_minus1);
     }
   }
 
@@ -371,8 +373,9 @@ void H265VuiParametersParser::VuiParametersState::fdump(
             vui_hrd_parameters_present_flag);
 
     if (vui_hrd_parameters_present_flag) {
-      // hrd_parameters( 1, sps_max_sub_layers_minus1 )
-      // TODO(chemag): add support for hrd_parameters()
+      // hrd_parameters(1, sps_max_sub_layers_minus1)
+      fdump_indent_level(outfp, indent_level);
+      hrd_parameters->fdump(outfp, indent_level);
     }
   }
 

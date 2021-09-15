@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_hrd_parameters_parser.h"
 
 namespace h265nal {
 
@@ -188,12 +189,11 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
       } else {
         vps->cprms_present_flag.push_back(0);
       }
+
       // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
-      // TODO(chemag): add support for hrd_parameters()
-#ifdef FPRINT_ERRORS
-      fprintf(stderr, "error: unimplemented hrd_parameters in vps\n");
-#endif  // FPRINT_ERRORS
-      return nullptr;
+      vps->hrd_parameters = H265HrdParametersParser::ParseHrdParameters(
+          bit_buffer, vps->cprms_present_flag[i],
+          vps->vps_max_sub_layers_minus1);
     }
   }
 
@@ -327,8 +327,8 @@ void H265VpsParser::VpsState::fdump(FILE* outfp, int indent_level) const {
     fprintf(outfp, " }");
 
     // hrd_parameters(cprms_present_flag[i], vps_max_sub_layers_minus1)
-    // TODO(chemag): add support for hrd_parameters()
-    fprintf(stderr, "error: unimplemented hrd_parameters() in vps\n");
+    fdump_indent_level(outfp, indent_level);
+    hrd_parameters->fdump(outfp, indent_level);
   }
 
   fdump_indent_level(outfp, indent_level);
