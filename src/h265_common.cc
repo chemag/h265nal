@@ -235,7 +235,7 @@ bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
   uint32_t remaining_bits;
   if (!bit_buffer->PeekBits(&remaining_bits, remaining_bitcount)) {
     // this should not happen: we do not have remaining_bits bits left.
-  return false;
+    return false;
   }
   // and then check for the actual values to be 100..000
   bool is_rbsp_trailing_bits =
