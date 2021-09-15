@@ -27,9 +27,8 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters) {
   };
   // fuzzer::conv: begin
   uint32_t sps_max_sub_layers_minus1 = 0;
-  auto vui_parameters =
-      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer),
-                                                  sps_max_sub_layers_minus1);
+  auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
+      buffer, arraysize(buffer), sps_max_sub_layers_minus1);
   // fuzzer::conv: end
 
   EXPECT_TRUE(vui_parameters != nullptr);
@@ -69,9 +68,8 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters2) {
   };
   // fuzzer::conv: begin
   uint32_t sps_max_sub_layers_minus1 = 0;
-  auto vui_parameters =
-      H265VuiParametersParser::ParseVuiParameters(buffer, arraysize(buffer),
-                                                  sps_max_sub_layers_minus1);
+  auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
+      buffer, arraysize(buffer), sps_max_sub_layers_minus1);
   // fuzzer::conv: end
 
   EXPECT_TRUE(vui_parameters != nullptr);
@@ -96,6 +94,66 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters2) {
   EXPECT_EQ(0, vui_parameters->vui_poc_proportional_to_timing_flag);
   EXPECT_EQ(0, vui_parameters->vui_hrd_parameters_present_flag);
   EXPECT_EQ(0, vui_parameters->bitstream_restriction_flag);
+}
+
+TEST_F(H265VuiParametersParserTest, TestSampleVuiParametersNvenc) {
+  // VUI
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00,
+                            0x00, 0x1e, 0x30, 0x02, 0xef, 0x28, 0x80, 0x00};
+  // fuzzer::conv: begin
+  uint32_t sps_max_sub_layers_minus1 = 0;
+  auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
+      buffer, arraysize(buffer), sps_max_sub_layers_minus1);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(vui_parameters != nullptr);
+
+  EXPECT_EQ(1, vui_parameters->aspect_ratio_info_present_flag);
+  EXPECT_EQ(1, vui_parameters->aspect_ratio_idc);
+  EXPECT_EQ(0, vui_parameters->sar_width);
+  EXPECT_EQ(0, vui_parameters->sar_height);
+
+  EXPECT_EQ(0, vui_parameters->overscan_info_present_flag);
+  EXPECT_EQ(0, vui_parameters->video_signal_type_present_flag);
+  EXPECT_EQ(0, vui_parameters->video_format);
+  EXPECT_EQ(0, vui_parameters->video_full_range_flag);
+  EXPECT_EQ(0, vui_parameters->colour_description_present_flag);
+  EXPECT_EQ(0, vui_parameters->chroma_loc_info_present_flag);
+  EXPECT_EQ(0, vui_parameters->neutral_chroma_indication_flag);
+  EXPECT_EQ(0, vui_parameters->field_seq_flag);
+  EXPECT_EQ(0, vui_parameters->frame_field_info_present_flag);
+  EXPECT_EQ(0, vui_parameters->default_display_window_flag);
+  EXPECT_EQ(1, vui_parameters->vui_timing_info_present_flag);
+  EXPECT_EQ(1, vui_parameters->vui_num_units_in_tick);
+  EXPECT_EQ(60, vui_parameters->vui_time_scale);
+  EXPECT_EQ(0, vui_parameters->vui_poc_proportional_to_timing_flag);
+  EXPECT_EQ(1, vui_parameters->vui_hrd_parameters_present_flag);
+  EXPECT_EQ(0, vui_parameters->bitstream_restriction_flag);
+  auto& hrd_parameters = vui_parameters->hrd_parameters;
+  EXPECT_TRUE(hrd_parameters != nullptr);
+  EXPECT_EQ(1, hrd_parameters->nal_hrd_parameters_present_flag);
+  EXPECT_EQ(0, hrd_parameters->vcl_hrd_parameters_present_flag);
+  EXPECT_EQ(0, hrd_parameters->sub_pic_hrd_params_present_flag);
+  EXPECT_EQ(0, hrd_parameters->tick_divisor_minus2);
+  EXPECT_EQ(0, hrd_parameters->du_cpb_removal_delay_increment_length_minus1);
+  EXPECT_EQ(0, hrd_parameters->sub_pic_cpb_params_in_pic_timing_sei_flag);
+  EXPECT_EQ(0, hrd_parameters->dpb_output_delay_du_length_minus1);
+  EXPECT_EQ(0, hrd_parameters->bit_rate_scale);
+  EXPECT_EQ(0, hrd_parameters->cpb_size_scale);
+  EXPECT_EQ(0, hrd_parameters->cpb_size_du_scale);
+  EXPECT_EQ(23, hrd_parameters->initial_cpb_removal_delay_length_minus1);
+  EXPECT_EQ(15, hrd_parameters->au_cpb_removal_delay_length_minus1);
+  EXPECT_EQ(5, hrd_parameters->dpb_output_delay_length_minus1);
+  EXPECT_THAT(hrd_parameters->fixed_pic_rate_general_flag,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(hrd_parameters->fixed_pic_rate_within_cvs_flag,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(hrd_parameters->elemental_duration_in_tc_minus1,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(hrd_parameters->low_delay_hrd_flag,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(hrd_parameters->cpb_cnt_minus1, ::testing::ElementsAreArray({0}));
 }
 
 }  // namespace h265nal
