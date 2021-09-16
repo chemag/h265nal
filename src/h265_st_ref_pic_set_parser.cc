@@ -86,7 +86,7 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
   }
 
   num_negative_pics = i;
-  for (uint32_t i = 0; i < num_negative_pics; i++) {
+  for (i = 0; i < num_negative_pics; i++) {
     delta_poc_s0_minus1.push_back(
         -(delta_poc_s0[i] - (i == 0 ? 0 : delta_poc_s0[i - 1])) - 1);
     used_by_curr_pic_s0_flag.push_back(used_by_curr_pic_s0[i]);
@@ -116,7 +116,7 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
   }
 
   num_positive_pics = i;
-  for (uint32_t i = 0; i < num_positive_pics; i++) {
+  for (i = 0; i < num_positive_pics; i++) {
     delta_poc_s1_minus1.push_back(delta_poc_s1[i] -
                                   (i == 0 ? 0 : delta_poc_s1[i - 1]) - 1);
     used_by_curr_pic_s1_flag.push_back(used_by_curr_pic_s1[i]);
