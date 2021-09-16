@@ -296,9 +296,14 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   for (uint32_t i = 0; i < sps->num_short_term_ref_pic_sets; i++) {
     // st_ref_pic_set(i)
-    sps->st_ref_pic_set.push_back(H265StRefPicSetParser::ParseStRefPicSet(
+    auto st_ref_pic_set_item = H265StRefPicSetParser::ParseStRefPicSet(
         bit_buffer, i, sps->num_short_term_ref_pic_sets,
-        &(sps->st_ref_pic_set)));
+        &(sps->st_ref_pic_set));
+    if (st_ref_pic_set_item == nullptr) {
+      // not enough bits for the st_ref_pic_set
+      return nullptr;
+    }
+    sps->st_ref_pic_set.push_back(std::move(st_ref_pic_set_item));
   }
 
   // long_term_ref_pics_present_flag  u(1)
