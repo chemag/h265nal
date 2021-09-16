@@ -128,6 +128,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     // non-existent PPS id
     return nullptr;
   }
+  auto& pps = bitstream_parser_state->pps[pps_id];
 
   uint32_t sps_id =
       bitstream_parser_state->pps[pps_id]->pps_seq_parameter_set_id;
@@ -136,11 +137,11 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     // non-existent SPS id
     return nullptr;
   }
+  auto& sps = bitstream_parser_state->sps[sps_id];
 
   if (!slice_segment_header->first_slice_segment_in_pic_flag) {
     slice_segment_header->dependent_slice_segments_enabled_flag =
-        bitstream_parser_state->pps[pps_id]
-            ->dependent_slice_segments_enabled_flag;
+        pps->dependent_slice_segments_enabled_flag;
     if (slice_segment_header->dependent_slice_segments_enabled_flag) {
       // dependent_slice_segment_flag  u(1)
       if (!bit_buffer->ReadBits(
@@ -148,8 +149,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         return nullptr;
       }
     }
-    size_t PicSizeInCtbsY =
-        bitstream_parser_state->sps[sps_id]->getPicSizeInCtbsY();
+    size_t PicSizeInCtbsY = sps->getPicSizeInCtbsY();
     size_t slice_segment_address_len = static_cast<size_t>(
         std::ceil(std::log2(static_cast<float>(PicSizeInCtbsY))));
     // range: 0 to PicSizeInCtbsY - 1
@@ -162,7 +162,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
   if (!slice_segment_header->dependent_slice_segment_flag) {
     slice_segment_header->num_extra_slice_header_bits =
-        bitstream_parser_state->pps[pps_id]->num_extra_slice_header_bits;
+        pps->num_extra_slice_header_bits;
     for (uint32_t i = 0; i < slice_segment_header->num_extra_slice_header_bits;
          i++) {
       // slice_reserved_flag[i]  u(1)
@@ -179,7 +179,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->output_flag_present_flag =
-        bitstream_parser_state->pps[pps_id]->output_flag_present_flag;
+        pps->output_flag_present_flag;
     if (slice_segment_header->output_flag_present_flag) {
       // pic_output_flag  u(1)
       if (!bit_buffer->ReadBits(&(slice_segment_header->pic_output_flag), 1)) {
@@ -188,7 +188,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->separate_colour_plane_flag =
-        bitstream_parser_state->sps[sps_id]->separate_colour_plane_flag;
+        sps->separate_colour_plane_flag;
     if (slice_segment_header->separate_colour_plane_flag == 1) {
       // colour_plane_id  u(2)
       if (!bit_buffer->ReadBits(&(slice_segment_header->colour_plane_id), 2)) {
@@ -202,8 +202,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       // slice_pic_order_cnt_lsb shall be in the range of 0 to
       // MaxPicOrderCntLsb - 1, inclusive.
       slice_segment_header->log2_max_pic_order_cnt_lsb_minus4 =
-          bitstream_parser_state->sps[sps_id]
-              ->log2_max_pic_order_cnt_lsb_minus4;
+          sps->log2_max_pic_order_cnt_lsb_minus4;
       size_t slice_pic_order_cnt_lsb_len =
           slice_segment_header->log2_max_pic_order_cnt_lsb_minus4 + 4;
       // slice_pic_order_cnt_lsb  u(v)
@@ -220,7 +219,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->num_short_term_ref_pic_sets =
-          bitstream_parser_state->sps[sps_id]->num_short_term_ref_pic_sets;
+          sps->num_short_term_ref_pic_sets;
       if (slice_segment_header->num_short_term_ref_pic_sets >
           h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX) {
 #ifdef FPRINT_ERRORS
@@ -234,8 +233,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
         // st_ref_pic_set(num_short_term_ref_pic_sets)
-        const auto& st_ref_pic_set =
-            bitstream_parser_state->sps[sps_id]->st_ref_pic_set;
+        const auto& st_ref_pic_set = sps->st_ref_pic_set;
         slice_segment_header->st_ref_pic_set =
             H265StRefPicSetParser::ParseStRefPicSet(
                 bit_buffer, false,
@@ -256,10 +254,10 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->long_term_ref_pics_present_flag =
-          bitstream_parser_state->sps[sps_id]->long_term_ref_pics_present_flag;
+          sps->long_term_ref_pics_present_flag;
       if (slice_segment_header->long_term_ref_pics_present_flag) {
         slice_segment_header->num_long_term_ref_pics_sps =
-            bitstream_parser_state->sps[sps_id]->num_long_term_ref_pics_sps;
+            sps->num_long_term_ref_pics_sps;
         if (slice_segment_header->num_long_term_ref_pics_sps > 0) {
           // num_long_term_sps  ue(v)
           if (!bit_buffer->ReadExponentialGolomb(
@@ -329,7 +327,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->sps_temporal_mvp_enabled_flag =
-          bitstream_parser_state->sps[sps_id]->sps_temporal_mvp_enabled_flag;
+          sps->sps_temporal_mvp_enabled_flag;
       if (slice_segment_header->sps_temporal_mvp_enabled_flag) {
         // slice_temporal_mvp_enabled_flag  u(1)
         if (!bit_buffer->ReadBits(
@@ -340,8 +338,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->sample_adaptive_offset_enabled_flag =
-        bitstream_parser_state->sps[sps_id]
-            ->sample_adaptive_offset_enabled_flag;
+        sps->sample_adaptive_offset_enabled_flag;
     if (slice_segment_header->sample_adaptive_offset_enabled_flag) {
       // slice_sao_luma_flag  u(1)
       if (!bit_buffer->ReadBits(&(slice_segment_header->slice_sao_luma_flag),
@@ -355,8 +352,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       //   set equal to chroma_format_idc.
       // - Otherwise (separate_colour_plane_flag is equal to 1),
       //   ChromaArrayType is set equal to 0.
-      uint32_t chroma_format_idc =
-          bitstream_parser_state->sps[sps_id]->chroma_format_idc;
+      uint32_t chroma_format_idc = sps->chroma_format_idc;
       if (slice_segment_header->separate_colour_plane_flag == 0) {
         slice_segment_header->ChromaArrayType = chroma_format_idc;
       } else {
@@ -397,7 +393,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->lists_modification_present_flag =
-          bitstream_parser_state->pps[pps_id]->lists_modification_present_flag;
+          pps->lists_modification_present_flag;
       // TODO(chemag): calculate NumPicTotalCurr support (page 99)
       slice_segment_header->NumPicTotalCurr = 0;
       if (slice_segment_header->lists_modification_present_flag &&
@@ -420,7 +416,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->cabac_init_present_flag =
-          bitstream_parser_state->pps[pps_id]->cabac_init_present_flag;
+          pps->cabac_init_present_flag;
       if (slice_segment_header->cabac_init_present_flag) {
         // cabac_init_flag  u(1)
         if (!bit_buffer->ReadBits(&(slice_segment_header->cabac_init_flag),
@@ -449,10 +445,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         }
       }
 
-      slice_segment_header->weighted_pred_flag =
-          bitstream_parser_state->pps[pps_id]->weighted_pred_flag;
-      slice_segment_header->weighted_bipred_flag =
-          bitstream_parser_state->pps[pps_id]->weighted_bipred_flag;
+      slice_segment_header->weighted_pred_flag = pps->weighted_pred_flag;
+      slice_segment_header->weighted_bipred_flag = pps->weighted_bipred_flag;
       if ((slice_segment_header->weighted_pred_flag &&
            slice_segment_header->slice_type == SliceType_P) ||
           (slice_segment_header->weighted_bipred_flag &&
@@ -471,11 +465,10 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
 
       slice_segment_header->motion_vector_resolution_control_idc = 0;
-      if (bitstream_parser_state->sps[sps_id]->sps_scc_extension_flag) {
-        if (bitstream_parser_state->sps[sps_id]->sps_scc_extension != nullptr) {
+      if (sps->sps_scc_extension_flag) {
+        if (sps->sps_scc_extension != nullptr) {
           slice_segment_header->motion_vector_resolution_control_idc =
-              bitstream_parser_state->sps[sps_id]
-                  ->sps_scc_extension->motion_vector_resolution_control_idc;
+              sps->sps_scc_extension->motion_vector_resolution_control_idc;
         }
       }
       if (slice_segment_header->motion_vector_resolution_control_idc == 2) {
@@ -493,8 +486,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->pps_slice_chroma_qp_offsets_present_flag =
-        bitstream_parser_state->pps[pps_id]
-            ->pps_slice_chroma_qp_offsets_present_flag;
+        pps->pps_slice_chroma_qp_offsets_present_flag;
     if (slice_segment_header->pps_slice_chroma_qp_offsets_present_flag) {
       // slice_cb_qp_offset  se(v)
       if (!bit_buffer->ReadSignedExponentialGolomb(
@@ -510,10 +502,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->pps_slice_act_qp_offsets_present_flag = 0;
-    if (bitstream_parser_state->pps[pps_id]->pps_scc_extension_flag) {
+    if (pps->pps_scc_extension_flag) {
       slice_segment_header->pps_slice_act_qp_offsets_present_flag =
-          bitstream_parser_state->pps[pps_id]
-              ->pps_scc_extension->pps_slice_act_qp_offsets_present_flag;
+          pps->pps_scc_extension->pps_slice_act_qp_offsets_present_flag;
     }
     if (slice_segment_header->pps_slice_act_qp_offsets_present_flag) {
       // slice_act_y_qp_offset  se(v)
@@ -537,8 +528,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
     // TODO(chemag): add support for pps_range_extension()
     // slice_segment_header->chroma_qp_offset_list_enabled_flag =
-    //    bitstream_parser_state->pps[pps_id]->pps_range_extension(.
-    //        chroma_qp_offset_list_enabled_flag;
+    //    pps->pps_range_extension->chroma_qp_offset_list_enabled_flag;
     slice_segment_header->chroma_qp_offset_list_enabled_flag = 0;
     if (slice_segment_header->chroma_qp_offset_list_enabled_flag) {
       // cu_chroma_qp_offset_enabled_flag  u(1)
@@ -549,8 +539,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->deblocking_filter_override_enabled_flag =
-        bitstream_parser_state->pps[pps_id]
-            ->deblocking_filter_override_enabled_flag;
+        pps->deblocking_filter_override_enabled_flag;
     if (slice_segment_header->deblocking_filter_override_enabled_flag) {
       // deblocking_filter_override_flag  u(1)
       if (!bit_buffer->ReadBits(
@@ -583,8 +572,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
 
     slice_segment_header->pps_loop_filter_across_slices_enabled_flag =
-        bitstream_parser_state->pps[pps_id]
-            ->pps_loop_filter_across_slices_enabled_flag;
+        pps->pps_loop_filter_across_slices_enabled_flag;
     if (slice_segment_header->pps_loop_filter_across_slices_enabled_flag &&
         (slice_segment_header->slice_sao_luma_flag ||
          slice_segment_header->slice_sao_chroma_flag ||
@@ -599,10 +587,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     }
   }
 
-  slice_segment_header->tiles_enabled_flag =
-      bitstream_parser_state->pps[pps_id]->tiles_enabled_flag;
+  slice_segment_header->tiles_enabled_flag = pps->tiles_enabled_flag;
   slice_segment_header->entropy_coding_sync_enabled_flag =
-      bitstream_parser_state->pps[pps_id]->entropy_coding_sync_enabled_flag;
+      pps->entropy_coding_sync_enabled_flag;
   if (slice_segment_header->tiles_enabled_flag ||
       slice_segment_header->entropy_coding_sync_enabled_flag) {
     // num_entry_point_offsets  ue(v)
@@ -611,9 +598,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       return nullptr;
     }
     if (!slice_segment_header->isValidNumEntryPointOffsets(
-            slice_segment_header->num_entry_point_offsets,
-            bitstream_parser_state->sps[sps_id],
-            bitstream_parser_state->pps[pps_id])) {
+            slice_segment_header->num_entry_point_offsets, sps, pps)) {
 #ifdef FPRINT_ERRORS
       fprintf(stderr,
               "error: invalid slice_segment_header->num_entry_point_offsets: "
@@ -643,8 +628,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   }
 
   slice_segment_header->slice_segment_header_extension_present_flag =
-      bitstream_parser_state->pps[pps_id]
-          ->slice_segment_header_extension_present_flag;
+      pps->slice_segment_header_extension_present_flag;
   if (slice_segment_header->slice_segment_header_extension_present_flag) {
     // slice_segment_header_extension_length  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
