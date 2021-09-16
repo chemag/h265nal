@@ -22,7 +22,8 @@ class H265HrdParametersParserTest : public ::testing::Test {
 TEST_F(H265HrdParametersParserTest, TestSampleHrdParameters) {
   // fuzzer::conv: data
   const uint8_t buffer[] = {
-      0x80, 0x17, 0x79, 0x44, 0x00,
+      0x80, 0x17, 0x79, 0x44, 0x00, 0x05, 0xb8, 0xd8,
+      0x00, 0x07, 0xa1, 0x20, 0x40, 0x00
   };
   // fuzzer::conv: begin
   uint32_t commonInfPresentFlag = 1;
@@ -55,6 +56,21 @@ TEST_F(H265HrdParametersParserTest, TestSampleHrdParameters) {
   EXPECT_THAT(hrd_parameters->low_delay_hrd_flag,
               ::testing::ElementsAreArray({0}));
   EXPECT_THAT(hrd_parameters->cpb_cnt_minus1, ::testing::ElementsAreArray({0}));
+
+  auto& sub_layer_hrd_parameters_vector = hrd_parameters->sub_layer_hrd_parameters_vector;
+  EXPECT_EQ(1, sub_layer_hrd_parameters_vector.size());
+  auto& sub_layer_hrd_parameters = hrd_parameters->sub_layer_hrd_parameters_vector[0];
+  EXPECT_TRUE(sub_layer_hrd_parameters != nullptr);
+  EXPECT_THAT(sub_layer_hrd_parameters->bit_rate_value_minus1,
+              ::testing::ElementsAreArray({46874}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cpb_size_value_minus1,
+              ::testing::ElementsAreArray({124999}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cpb_size_du_value_minus1,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(sub_layer_hrd_parameters->bit_rate_du_value_minus1,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cbr_flag,
+              ::testing::ElementsAreArray({0}));
 }
 
 }  // namespace h265nal

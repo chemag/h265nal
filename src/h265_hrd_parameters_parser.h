@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "h265_sub_layer_hrd_parameters_parser.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -54,7 +55,9 @@ class H265HrdParametersParser {
     std::vector<uint32_t> elemental_duration_in_tc_minus1;
     std::vector<uint32_t> low_delay_hrd_flag;
     std::vector<uint32_t> cpb_cnt_minus1;
-    // TODO(chemag): add support for sub_layer_hrd_parameters()
+    std::vector<std::unique_ptr<
+        struct H265SubLayerHrdParametersParser::SubLayerHrdParametersState>>
+        sub_layer_hrd_parameters_vector;
   };
 
   // Unpack RBSP and parse VPS state from the supplied buffer.

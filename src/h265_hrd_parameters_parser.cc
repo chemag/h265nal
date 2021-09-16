@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_sub_layer_hrd_parameters_parser.h"
 
 namespace h265nal {
 
@@ -178,18 +179,27 @@ H265HrdParametersParser::ParseHrdParameters(
       hrd_parameters->cpb_cnt_minus1.push_back(0);
     }
 
-    // TODO(chemag): add support for sub_layer_hrd_parameters()
-#if 0
-    if (nal_hrd_parameters_present_flag) {
-      sub_layer_hrd_parameters(i)
+    if (hrd_parameters->nal_hrd_parameters_present_flag) {
+      // sub_layer_hrd_parameters(i)
+      auto CpbCnt = hrd_parameters->cpb_cnt_minus1[i] + 1;
+      auto sub_layer_hrd_parameters =
+          H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
+              bit_buffer, i, CpbCnt,
+              hrd_parameters->sub_pic_hrd_params_present_flag);
+      hrd_parameters->sub_layer_hrd_parameters_vector.push_back(
+          std::move(sub_layer_hrd_parameters));
     }
-#endif
-    // TODO(chemag): add support for sub_layer_hrd_parameters()
-#if 0
-    if (vcl_hrd_parameters_present_flag) {
-      sub_layer_hrd_parameters(i)
+
+    if (hrd_parameters->vcl_hrd_parameters_present_flag) {
+      // sub_layer_hrd_parameters(i)
+      auto CpbCnt = hrd_parameters->cpb_cnt_minus1[i] + 1;
+      auto sub_layer_hrd_parameters =
+          H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
+              bit_buffer, i, CpbCnt,
+              hrd_parameters->sub_pic_hrd_params_present_flag);
+      hrd_parameters->sub_layer_hrd_parameters_vector.push_back(
+          std::move(sub_layer_hrd_parameters));
     }
-#endif
   }
 
   return hrd_parameters;
@@ -292,18 +302,33 @@ void H265HrdParametersParser::HrdParametersState::fdump(
   }
   fprintf(outfp, " }");
 
-  // TODO(chemag): add support for sub_layer_hrd_parameters()
-#if 0
   if (nal_hrd_parameters_present_flag) {
-    sub_layer_hrd_parameters(i)
+    // sublayer_hrd_parameters()
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "sub_layer_hrd_parameters_vector {");
+    indent_level = indent_level_incr(indent_level);
+    for (auto& v : sub_layer_hrd_parameters_vector) {
+      fdump_indent_level(outfp, indent_level);
+      v->fdump(outfp, indent_level);
+    }
+    indent_level = indent_level_decr(indent_level);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "}");
   }
-#endif
-  // TODO(chemag): add support for sub_layer_hrd_parameters()
-#if 0
+
   if (vcl_hrd_parameters_present_flag) {
-    sub_layer_hrd_parameters(i)
+    // sublayer_hrd_parameters()
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "sub_layer_hrd_parameters_vector {");
+    indent_level = indent_level_incr(indent_level);
+    for (auto& v : sub_layer_hrd_parameters_vector) {
+      fdump_indent_level(outfp, indent_level);
+      v->fdump(outfp, indent_level);
+    }
+    indent_level = indent_level_decr(indent_level);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "}");
   }
-#endif
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

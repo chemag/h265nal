@@ -99,8 +99,12 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParameters2) {
 TEST_F(H265VuiParametersParserTest, TestSampleVuiParametersNvenc) {
   // VUI
   // fuzzer::conv: data
-  const uint8_t buffer[] = {0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00,
-                            0x00, 0x1e, 0x30, 0x02, 0xef, 0x28, 0x80, 0x00};
+  const uint8_t buffer[] = {
+      0x80, 0x80, 0x80, 0x00, 0x00, 0x00, 0x80, 0x00,
+      0x00, 0x1e, 0x30, 0x02, 0xef, 0x28, 0x80, 0x00,
+      0xb7, 0x1b, 0x00, 0x00, 0xf4, 0x24, 0x00
+  };
+
   // fuzzer::conv: begin
   uint32_t sps_max_sub_layers_minus1 = 0;
   auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
@@ -154,6 +158,21 @@ TEST_F(H265VuiParametersParserTest, TestSampleVuiParametersNvenc) {
   EXPECT_THAT(hrd_parameters->low_delay_hrd_flag,
               ::testing::ElementsAreArray({0}));
   EXPECT_THAT(hrd_parameters->cpb_cnt_minus1, ::testing::ElementsAreArray({0}));
+
+  auto& sub_layer_hrd_parameters_vector = hrd_parameters->sub_layer_hrd_parameters_vector;
+  EXPECT_EQ(1, sub_layer_hrd_parameters_vector.size());
+  auto& sub_layer_hrd_parameters = hrd_parameters->sub_layer_hrd_parameters_vector[0];
+  EXPECT_TRUE(sub_layer_hrd_parameters != nullptr);
+  EXPECT_THAT(sub_layer_hrd_parameters->bit_rate_value_minus1,
+              ::testing::ElementsAreArray({46874}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cpb_size_value_minus1,
+              ::testing::ElementsAreArray({124999}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cpb_size_du_value_minus1,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(sub_layer_hrd_parameters->bit_rate_du_value_minus1,
+              ::testing::ElementsAreArray({0}));
+  EXPECT_THAT(sub_layer_hrd_parameters->cbr_flag,
+              ::testing::ElementsAreArray({0}));
 }
 
 }  // namespace h265nal
