@@ -27,9 +27,8 @@ TEST_F(H265StRefPicSetParserTest, TestSampleStRefPicSet) {
   // fuzzer::conv: begin
   auto sps = std::make_shared<H265SpsParser::SpsState>();
   sps->num_short_term_ref_pic_sets = 0;
-  auto st_ref_pic_set =
-      H265StRefPicSetParser::ParseStRefPicSet(buffer, arraysize(buffer), 0, 1,
-                                              &(sps->st_ref_pic_set));
+  auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
+      buffer, arraysize(buffer), 0, 1, &(sps->st_ref_pic_set));
   // fuzzer::conv: end
 
   EXPECT_TRUE(st_ref_pic_set != nullptr);

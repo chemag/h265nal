@@ -29,8 +29,10 @@ TEST_F(H265SubLayerHrdParametersParserTest, TestSampleSubLayerHrdParameters) {
   uint32_t subLayerId = 0;
   uint32_t CpbCnt = 1;
   uint32_t sub_pic_hrd_params_present_flag = 0;
-  auto sub_layer_hrd_parameters = H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
-      buffer, arraysize(buffer), subLayerId, CpbCnt, sub_pic_hrd_params_present_flag);
+  auto sub_layer_hrd_parameters =
+      H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
+          buffer, arraysize(buffer), subLayerId, CpbCnt,
+          sub_pic_hrd_params_present_flag);
   // fuzzer::conv: end
 
   EXPECT_TRUE(sub_layer_hrd_parameters != nullptr);

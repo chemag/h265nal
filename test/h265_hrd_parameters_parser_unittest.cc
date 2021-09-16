@@ -57,9 +57,11 @@ TEST_F(H265HrdParametersParserTest, TestSampleHrdParameters) {
               ::testing::ElementsAreArray({0}));
   EXPECT_THAT(hrd_parameters->cpb_cnt_minus1, ::testing::ElementsAreArray({0}));
 
-  auto& sub_layer_hrd_parameters_vector = hrd_parameters->sub_layer_hrd_parameters_vector;
+  auto& sub_layer_hrd_parameters_vector =
+      hrd_parameters->sub_layer_hrd_parameters_vector;
   EXPECT_EQ(1, sub_layer_hrd_parameters_vector.size());
-  auto& sub_layer_hrd_parameters = hrd_parameters->sub_layer_hrd_parameters_vector[0];
+  auto& sub_layer_hrd_parameters =
+      hrd_parameters->sub_layer_hrd_parameters_vector[0];
   EXPECT_TRUE(sub_layer_hrd_parameters != nullptr);
   EXPECT_THAT(sub_layer_hrd_parameters->bit_rate_value_minus1,
               ::testing::ElementsAreArray({46874}));

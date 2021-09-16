@@ -303,11 +303,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 1st NAL unit
   int index = 0;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
@@ -316,11 +318,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 2nd NAL unit
   index += 1;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::SPS_NUT,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
@@ -329,11 +333,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 3rd NAL unit
   index += 1;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::PPS_NUT,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
@@ -342,11 +348,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 4th NAL unit
   index += 1;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::IDR_W_RADL,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
@@ -364,11 +372,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 1st NAL unit
   index = 0;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
@@ -386,11 +396,13 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
 
   // check the 1st NAL unit
   index = 0;
-  EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
+  EXPECT_EQ(0,
+            bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::TRAIL_R,
             bitstream->nal_units[index]->nal_unit_header->nal_unit_type);
   EXPECT_EQ(0, bitstream->nal_units[index]->nal_unit_header->nuh_layer_id);
-  EXPECT_EQ(1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
+  EXPECT_EQ(
+      1, bitstream->nal_units[index]->nal_unit_header->nuh_temporal_id_plus1);
   EXPECT_THAT(
       std::vector<char>(bitstream->nal_units[index]->checksum->GetChecksum(),
                         bitstream->nal_units[index]->checksum->GetChecksum() +
