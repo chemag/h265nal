@@ -472,9 +472,11 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       slice_segment_header->motion_vector_resolution_control_idc = 0;
       if (bitstream_parser_state->sps[sps_id]->sps_scc_extension_flag) {
-        slice_segment_header->motion_vector_resolution_control_idc =
-            bitstream_parser_state->sps[sps_id]
-                ->sps_scc_extension->motion_vector_resolution_control_idc;
+        if (bitstream_parser_state->sps[sps_id]->sps_scc_extension != nullptr) {
+          slice_segment_header->motion_vector_resolution_control_idc =
+              bitstream_parser_state->sps[sps_id]
+                  ->sps_scc_extension->motion_vector_resolution_control_idc;
+        }
       }
       if (slice_segment_header->motion_vector_resolution_control_idc == 2) {
         // use_integer_mv_flag  u(1)
