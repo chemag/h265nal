@@ -129,6 +129,18 @@ class H265NalUnitParser {
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state,
       bool add_checksum) noexcept;
+  static std::unique_ptr<NalUnitState> ParseNalUnit(
+      const uint8_t* data, size_t length,
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept {
+    return ParseNalUnit(data, length, bitstream_parser_state,
+                        /*add_checksum*/ false);
+  }
+  static std::unique_ptr<NalUnitState> ParseNalUnit(
+      rtc::BitBuffer* bit_buffer,
+      struct H265BitstreamParserState* bitstream_parser_state) noexcept {
+    return ParseNalUnit(bit_buffer, bitstream_parser_state,
+                        /*add_checksum*/ false);
+  }
 };
 
 }  // namespace h265nal
