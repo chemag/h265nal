@@ -38,6 +38,9 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
 
   // check some values
   auto& slice_header = payload->slice_segment_layer->slice_segment_header;
+  if (slice_header == nullptr) {
+    return nullptr;
+  }
   auto pps_id = slice_header->slice_pic_parameter_set_id;
   auto slice_qp_delta = slice_header->slice_qp_delta;
 

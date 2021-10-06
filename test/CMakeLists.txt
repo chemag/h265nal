@@ -26,6 +26,12 @@ target_link_libraries(h265_common_unittest PUBLIC h265nal)
 target_link_libraries(h265_common_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_common_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
 
+add_executable(h265_utils_unittest h265_utils_unittest.cc)
+add_test(h265_utils_unittest h265_utils_unittest)
+target_link_libraries(h265_utils_unittest PUBLIC h265nal)
+target_link_libraries(h265_utils_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
+target_link_libraries(h265_utils_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
+
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GTEST_LIBRARY} gtest_main)
 target_link_libraries(h265_profile_tier_level_parser_unittest PUBLIC ${GMOCK_LIBRARY} gmock_main)
