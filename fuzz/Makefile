@@ -3,6 +3,7 @@
 
 
 all: \
+    h265_utils_fuzzer.cc \
     h265_profile_tier_level_parser_fuzzer.cc \
     h265_sub_layer_hrd_parameters_parser_fuzzer.cc \
     h265_hrd_parameters_parser_fuzzer.cc \
@@ -26,6 +27,9 @@ all: \
     h265_bitstream_parser_fuzzer.cc \
     h265_nal_unit_parser_fuzzer.cc
 
+
+h265_utils_fuzzer.cc: ../test/h265_utils_unittest.cc
+	./converter.py ../test/h265_utils_unittest.cc ./
 
 h265_profile_tier_level_parser_fuzzer.cc: ../test/h265_profile_tier_level_parser_unittest.cc
 	./converter.py ../test/h265_profile_tier_level_parser_unittest.cc ./
@@ -98,6 +102,7 @@ h265_nal_unit_parser_fuzzer.cc: ../test/h265_nal_unit_parser_unittest.cc
 RUNS?=1000000
 
 fuzz:
+	-../build/fuzz/h265_utils_fuzzer -artifact_prefix=corpus/h265_utils_fuzzer/ corpus/h265_utils_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_profile_tier_level_parser_fuzzer -artifact_prefix=corpus/h265_profile_tier_level_parser_fuzzer/ corpus/h265_profile_tier_level_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_sub_layer_hrd_parameters_parser_fuzzer -artifact_prefix=corpus/h265_sub_layer_hrd_parameters_parser_fuzzer/ corpus/h265_sub_layer_hrd_parameters_parser_fuzzer/ -runs=$(RUNS)
 	-../build/fuzz/h265_hrd_parameters_parser_fuzzer -artifact_prefix=corpus/h265_hrd_parameters_parser_fuzzer/ corpus/h265_hrd_parameters_parser_fuzzer/ -runs=$(RUNS)

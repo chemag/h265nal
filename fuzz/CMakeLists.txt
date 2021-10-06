@@ -15,6 +15,9 @@ add_link_options(-fsanitize=address,fuzzer,undefined)
 
 #target_include_directories(h265_profile_tier_level_parser_fuzzer PUBLIC /usr/local/include ${CMAKE_CURRENT_SOURCE_DIR} webrtc)
 
+add_executable(h265_utils_fuzzer h265_utils_fuzzer.cc)
+target_link_libraries(h265_utils_fuzzer PUBLIC h265nal)
+
 add_executable(h265_profile_tier_level_parser_fuzzer h265_profile_tier_level_parser_fuzzer.cc)
 target_link_libraries(h265_profile_tier_level_parser_fuzzer PUBLIC h265nal)
 
