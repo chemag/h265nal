@@ -29,6 +29,7 @@ typedef struct arg_options {
   bool add_length;
   bool add_parsed_length;
   bool add_checksum;
+  bool add_contents;
   char *str;
   char *infile;
   char *outfile;
@@ -50,8 +51,9 @@ void usage(char *name) {
   fprintf(stderr, "\t--add-parsed-length:\tSet add_parsed_length flag\n");
   fprintf(stderr, "\t--noadd-parsed-length:\tReset add_parsed_length flag\n");
   fprintf(stderr, "\t--add-checksum:\tSet add_checksum flag\n");
-  fprintf(stderr,
-          "\t--noadd-checksum:\tReset add_checksum flag\n");
+  fprintf(stderr, "\t--noadd-checksum:\tReset add_checksum flag\n");
+  fprintf(stderr, "\t--add-contents:\tSet add_contents flag\n");
+  fprintf(stderr, "\t--noadd-contents:\tReset add_contents flag\n");
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -70,6 +72,8 @@ enum {
   NO_ADD_PARSED_LENGTH_FLAG_OPTION,
   ADD_CHECKSUM_FLAG_OPTION,
   NO_ADD_CHECKSUM_FLAG_OPTION,
+  ADD_CONTENTS_FLAG_OPTION,
+  NO_ADD_CONTENTS_FLAG_OPTION,
   VERSION_OPTION
 };
 
@@ -84,6 +88,7 @@ arg_options *parse_args(int argc, char **argv) {
   options.add_length = false;
   options.add_parsed_length = false;
   options.add_checksum = false;
+  options.add_contents = false;
   options.infile = nullptr;
   options.outfile = nullptr;
 
@@ -107,6 +112,8 @@ arg_options *parse_args(int argc, char **argv) {
        NO_ADD_PARSED_LENGTH_FLAG_OPTION},
       {"add-checksum", no_argument, NULL, ADD_CHECKSUM_FLAG_OPTION},
       {"noadd-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
+      {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
+      {"noadd-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {NULL, 0, NULL, 0}};
 
@@ -173,6 +180,14 @@ arg_options *parse_args(int argc, char **argv) {
         options.add_checksum = false;
         break;
 
+      case ADD_CONTENTS_FLAG_OPTION:
+        options.add_contents = true;
+        break;
+
+      case NO_ADD_CONTENTS_FLAG_OPTION:
+        options.add_contents = false;
+        break;
+
       case VERSION_OPTION:
         printf("version: %s\n", PROJECT_VER);
         exit(0);
@@ -226,6 +241,12 @@ int main(int argc, char **argv) {
     }
   }
 
+  // add_contents requires add_length and add_offset
+  if (options->add_contents) {
+    options->add_offset = true;
+    options->add_length = true;
+  }
+
   // read infile
   // TODO(chemag): read the infile incrementally
   FILE *infp = fopen(options->infile, "rb");
@@ -265,10 +286,20 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
-  for (auto& nal_unit : bitstream->nal_units) {
+  for (auto &nal_unit : bitstream->nal_units) {
     nal_unit->fdump(outfp, indent_level, options->add_offset,
                     options->add_length, options->add_parsed_length,
                     options->add_checksum);
+    if (options->add_contents) {
+      fprintf(outfp, " contents {");
+      for (size_t i = 0; i < nal_unit->length; i++) {
+        fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
+        if ((i + 1) % 16 == 0) {
+          fprintf(outfp, " ");
+        }
+      }
+      fprintf(outfp, " }");
+    }
     fprintf(outfp, "\n");
   }
 #endif  // FDUMP_DEFINE
