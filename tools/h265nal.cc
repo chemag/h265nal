@@ -265,7 +265,12 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
-  bitstream->fdump(outfp, indent_level);
+  for (auto& nal_unit : bitstream->nal_units) {
+    nal_unit->fdump(outfp, indent_level, options->add_offset,
+                    options->add_length, options->add_parsed_length,
+                    options->add_checksum);
+    fprintf(outfp, "\n");
+  }
 #endif  // FDUMP_DEFINE
 
   return 0;
