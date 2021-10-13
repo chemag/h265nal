@@ -293,7 +293,7 @@ int main(int argc, char **argv) {
     if (options->add_contents) {
       fprintf(outfp, " contents {");
       for (size_t i = 0; i < nal_unit->length; i++) {
-        fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
+        fprintf(outfp, " 0x%02x,", buffer[nal_unit->offset + i]);
         if ((i + 1) % 16 == 0) {
           fprintf(outfp, " ");
         }

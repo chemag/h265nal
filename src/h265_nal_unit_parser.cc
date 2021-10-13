@@ -291,7 +291,7 @@ void H265NalUnitParser::NalUnitState::fdump(FILE* outfp, int indent_level,
   // nal unit parsed length (starting at NAL unit header)
   if (add_parsed_length) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "parsed_length: 0x%08zx", parsed_length);
+    fprintf(outfp, "parsed_length: %zu", parsed_length);
   }
 
   // nal unit checksum
