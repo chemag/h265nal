@@ -18,42 +18,59 @@
 
 extern int optind;
 
-// default option values
-constexpr int kDefaultDebug = 0;
 
 typedef struct arg_options {
   int debug;
-  int integer;
   bool as_one_line;
   bool add_offset;
   bool add_length;
   bool add_parsed_length;
   bool add_checksum;
   bool add_contents;
-  char *str;
   char *infile;
   char *outfile;
-  int nrem;
-  char **rem;
 } arg_options;
 
+// default option values
+arg_options DEFAULTS{.debug = 0,
+                     .as_one_line = true,
+                     .add_offset = false,
+                     .add_length = false,
+                     .add_parsed_length = false,
+                     .add_checksum = false,
+                     .add_contents = false,
+                     .infile = nullptr,
+                     .outfile = nullptr};
 void usage(char *name) {
   fprintf(stderr, "usage: %s [options]\n", name);
   fprintf(stderr, "where options are:\n");
-  fprintf(stderr, "\t-d:\t\tIncrease debug verbosity [%i]\n", kDefaultDebug);
+  fprintf(stderr, "\t-d:\t\tIncrease debug verbosity [default: %i]\n",
+          DEFAULTS.debug);
   fprintf(stderr, "\t-q:\t\tZero debug verbosity\n");
-  fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag\n");
-  fprintf(stderr, "\t--noas-one-line:\tReset as_one_line flag\n");
-  fprintf(stderr, "\t--add-offset:\tSet add_offset flag\n");
-  fprintf(stderr, "\t--noadd-offset:\tReset add_offset flag\n");
-  fprintf(stderr, "\t--add-length:\tSet add_length flag\n");
-  fprintf(stderr, "\t--noadd-length:\tReset add_length flag\n");
-  fprintf(stderr, "\t--add-parsed-length:\tSet add_parsed_length flag\n");
-  fprintf(stderr, "\t--noadd-parsed-length:\tReset add_parsed_length flag\n");
-  fprintf(stderr, "\t--add-checksum:\tSet add_checksum flag\n");
-  fprintf(stderr, "\t--noadd-checksum:\tReset add_checksum flag\n");
-  fprintf(stderr, "\t--add-contents:\tSet add_contents flag\n");
-  fprintf(stderr, "\t--noadd-contents:\tReset add_contents flag\n");
+  fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag%s\n",
+          DEFAULTS.as_one_line ? " [default]" : "");
+  fprintf(stderr, "\t--noas-one-line:\tReset as_one_line flag%s\n",
+          !DEFAULTS.as_one_line ? " [default]" : "");
+  fprintf(stderr, "\t--add-offset:\tSet add_offset flag%s\n",
+          DEFAULTS.add_offset ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-offset:\tReset add_offset flag%s\n",
+          !DEFAULTS.add_offset ? " [default]" : "");
+  fprintf(stderr, "\t--add-length:\tSet add_length flag%s\n",
+          DEFAULTS.add_length ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-length:\tReset add_length flag%s\n",
+          !DEFAULTS.add_length ? " [default]" : "");
+  fprintf(stderr, "\t--add-parsed-length:\tSet add_parsed_length flag%s\n",
+          DEFAULTS.add_parsed_length ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-parsed-length:\tReset add_parsed_length flag%s\n",
+          !DEFAULTS.add_parsed_length ? " [default]" : "");
+  fprintf(stderr, "\t--add-checksum:\tSet add_checksum flag%s\n",
+          DEFAULTS.add_checksum ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-checksum:\tReset add_checksum flag%s\n",
+          !DEFAULTS.add_checksum ? " [default]" : "");
+  fprintf(stderr, "\t--add-contents:\tSet add_contents flag%s\n",
+          DEFAULTS.add_contents ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-contents:\tReset add_contents flag%s\n",
+          !DEFAULTS.add_contents ? " [default]" : "");
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -82,15 +99,7 @@ arg_options *parse_args(int argc, char **argv) {
   static arg_options options;
 
   // set default options
-  options.debug = kDefaultDebug;
-  options.as_one_line = true;
-  options.add_offset = false;
-  options.add_length = false;
-  options.add_parsed_length = false;
-  options.add_checksum = false;
-  options.add_contents = false;
-  options.infile = nullptr;
-  options.outfile = nullptr;
+  options = DEFAULTS;
 
   // getopt_long stores the option index here
   int optindex = 0;
@@ -230,15 +239,11 @@ int main(int argc, char **argv) {
 
   // print args
   if (options->debug > 1) {
-    printf("options->integer = %i\n", options->integer);
     printf("options->debug = %i\n", options->debug);
     printf("options->infile = %s\n",
            (options->infile == NULL) ? "null" : options->infile);
     printf("options->outfile = %s\n",
            (options->outfile == NULL) ? "null" : options->outfile);
-    for (int32_t i = 0; i < options->nrem; ++i) {
-      printf("options->rem[%i] = %s\n", i, options->rem[i]);
-    }
   }
 
   // add_contents requires add_length and add_offset
