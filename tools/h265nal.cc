@@ -91,7 +91,8 @@ enum {
   NO_ADD_CHECKSUM_FLAG_OPTION,
   ADD_CONTENTS_FLAG_OPTION,
   NO_ADD_CONTENTS_FLAG_OPTION,
-  VERSION_OPTION
+  VERSION_OPTION,
+  HELP_OPTION
 };
 
 arg_options *parse_args(int argc, char **argv) {
@@ -124,10 +125,11 @@ arg_options *parse_args(int argc, char **argv) {
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
       {"noadd-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
+      {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
 
   // parse arguments
-  while ((c = getopt_long(argc, argv, "d", longopts, &optindex)) != -1) {
+  while ((c = getopt_long(argc, argv, "dh", longopts, &optindex)) != -1) {
     switch (c) {
       case 0:
         // long options that define flag
@@ -201,6 +203,9 @@ arg_options *parse_args(int argc, char **argv) {
         printf("version: %s\n", PROJECT_VER);
         exit(0);
         break;
+      case HELP_OPTION:
+      case 'h':
+        usage(argv[0]);
 
       default:
         printf("Unsupported option: %c\n", c);
