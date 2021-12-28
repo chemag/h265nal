@@ -18,7 +18,6 @@
 
 extern int optind;
 
-
 typedef struct arg_options {
   int debug;
   bool as_one_line;

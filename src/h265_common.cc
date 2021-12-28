@@ -355,7 +355,8 @@ void NaluChecksum::fdump(char *output, int output_len) const {
       output[output_len - 1] = '\0';
       break;
     }
-    oi += sprintf(output + oi, "%02x", static_cast<unsigned char>(checksum[i++]));
+    oi +=
+        sprintf(output + oi, "%02x", static_cast<unsigned char>(checksum[i++]));
   }
 }
 
