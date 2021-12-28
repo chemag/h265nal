@@ -109,7 +109,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     return nullptr;
   }
 
-  if (nal_unit_type >= BLA_W_LP && nal_unit_type <= RSV_IRAP_VCL23) {
+  if (slice_segment_header->nal_unit_type >= BLA_W_LP &&
+      slice_segment_header->nal_unit_type <= RSV_IRAP_VCL23) {
     // no_output_of_prior_pics_flag  u(1)
     if (!bit_buffer->ReadBits(
             &(slice_segment_header->no_output_of_prior_pics_flag), 1)) {
@@ -196,7 +197,8 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
     }
 
-    if (nal_unit_type != IDR_W_RADL && nal_unit_type != IDR_N_LP) {
+    if (slice_segment_header->nal_unit_type != IDR_W_RADL &&
+        slice_segment_header->nal_unit_type != IDR_N_LP) {
       // length of the slice_pic_order_cnt_lsb syntax element is
       // log2_max_pic_order_cnt_lsb_minus4 + 4 bits. The value of the
       // slice_pic_order_cnt_lsb shall be in the range of 0 to
