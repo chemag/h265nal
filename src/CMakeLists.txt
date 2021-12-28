@@ -40,6 +40,8 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_slice_parser.h h265_slice_parser.cc
       h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
       h265_bitstream_parser.h h265_bitstream_parser.cc
+      h265_nal_unit_header_parser.h h265_nal_unit_header_parser.cc
+      h265_nal_unit_payload_parser.h h265_nal_unit_payload_parser.cc
       h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )
 else()
@@ -68,6 +70,8 @@ else()
       h265_slice_parser.h h265_slice_parser.cc
       h265_bitstream_parser_state.h h265_bitstream_parser_state.cc
       h265_bitstream_parser.h h265_bitstream_parser.cc
+      h265_nal_unit_header_parser.h h265_nal_unit_header_parser.cc
+      h265_nal_unit_payload_parser.h h265_nal_unit_payload_parser.cc
       h265_nal_unit_parser.h h265_nal_unit_parser.cc
 )
 endif()
