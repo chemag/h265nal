@@ -33,6 +33,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_sps_3d_extension_parser.h h265_sps_3d_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_scc_extension_parser.h h265_sps_scc_extension_parser.cc
+      h265_scaling_list_data_parser.h h265_scaling_list_data_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
       h265_pps_scc_extension_parser.h h265_pps_scc_extension_parser.cc
       h265_pps_parser.h h265_pps_parser.cc
@@ -59,6 +60,7 @@ else()
       h265_sps_3d_extension_parser.h h265_sps_3d_extension_parser.cc
       h265_sps_range_extension_parser.h h265_sps_range_extension_parser.cc
       h265_sps_scc_extension_parser.h h265_sps_scc_extension_parser.cc
+      h265_scaling_list_data_parser.h h265_scaling_list_data_parser.cc
       h265_sps_parser.h h265_sps_parser.cc
       h265_pps_scc_extension_parser.h h265_pps_scc_extension_parser.cc
       h265_pps_parser.h h265_pps_parser.cc
