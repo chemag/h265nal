@@ -35,12 +35,11 @@ h265_profile_tier_level_parser_fuzzer.cc: ../test/h265_profile_tier_level_parser
 	./converter.py ../test/h265_profile_tier_level_parser_unittest.cc ./
 
 h265_sub_layer_hrd_parameters_parser_fuzzer.cc: ../test/h265_sub_layer_hrd_parameters_parser_unittest.cc
-	./converter.py ../test/h265_hrd_parameters_parser_unittest.cc ./
+	./converter.py ../test/h265_sub_layer_hrd_parameters_parser_unittest.cc ./
 
 h265_hrd_parameters_parser_fuzzer.cc: ../test/h265_hrd_parameters_parser_unittest.cc
 	./converter.py ../test/h265_hrd_parameters_parser_unittest.cc ./
 
-h265_vui_parameters_parser_fuzzer.cc: ../test/h265_vui_parameters_parser_unittest.cc
 h265_vps_parser_fuzzer.cc: ../test/h265_vps_parser_unittest.cc
 	./converter.py ../test/h265_vps_parser_unittest.cc ./
 
