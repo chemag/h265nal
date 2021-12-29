@@ -97,7 +97,7 @@ H265BitstreamParser::ParseBitstream(
     if (nal_unit == nullptr) {
       // cannot parse the NalUnit
 #ifdef FPRINT_ERRORS
-      fprintf(stderr, "Could not parse a buffer into a NalUnit\n");
+      fprintf(stderr, "error: cannot parse buffer into NalUnit\n");
 #endif  // FPRINT_ERRORS
       continue;
     }
