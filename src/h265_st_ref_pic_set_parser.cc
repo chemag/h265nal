@@ -173,6 +173,13 @@ H265StRefPicSetParser::ParseStRefPicSet(
       return nullptr;
     }
 
+    // Section 7.4.8: "The value of delta_idx_minus1 shall be in the range
+    // of 0 to stRpsIdx - 1, inclusive."
+    if (st_ref_pic_set->delta_idx_minus1 > (st_ref_pic_set->stRpsIdx - 1)) {
+      // invalid delta_idx_minus1 value
+      return nullptr;
+    }
+
     // abs_delta_rps_minus1  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
             &(st_ref_pic_set->abs_delta_rps_minus1))) {
