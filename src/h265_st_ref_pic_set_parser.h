@@ -62,12 +62,14 @@ class H265StRefPicSetParser {
       const uint8_t* data, size_t length, uint32_t stRpsIdx,
       uint32_t num_short_term_ref_pic_sets,
       const std::vector<std::unique_ptr<struct StRefPicSetState>>*
-          st_ref_pic_set_state_vector) noexcept;
+          st_ref_pic_set_state_vector,
+      uint32_t max_num_pics) noexcept;
   static std::unique_ptr<StRefPicSetState> ParseStRefPicSet(
       rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
       uint32_t num_short_term_ref_pic_sets,
       const std::vector<std::unique_ptr<struct StRefPicSetState>>*
-          st_ref_pic_set_state_vector) noexcept;
+          st_ref_pic_set_state_vector,
+      uint32_t max_num_pics) noexcept;
 };
 
 }  // namespace h265nal

@@ -295,10 +295,14 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   }
 
   for (uint32_t i = 0; i < sps->num_short_term_ref_pic_sets; i++) {
+    uint32_t max_num_pics = 0;
+    if (!sps->getMaxNumPics(&max_num_pics)) {
+      return nullptr;
+    }
     // st_ref_pic_set(i)
     auto st_ref_pic_set_item = H265StRefPicSetParser::ParseStRefPicSet(
-        bit_buffer, i, sps->num_short_term_ref_pic_sets,
-        &(sps->st_ref_pic_set));
+        bit_buffer, i, sps->num_short_term_ref_pic_sets, &(sps->st_ref_pic_set),
+        max_num_pics);
     if (st_ref_pic_set_item == nullptr) {
       // not enough bits for the st_ref_pic_set
       return nullptr;
@@ -685,6 +689,21 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "}");
 }
 #endif  // FDUMP_DEFINE
+
+bool H265SpsParser::SpsState::getMaxNumPics(uint32_t* max_num_pics) noexcept {
+  if (sps_max_sub_layers_minus1 >= sps_max_dec_pic_buffering_minus1.size()) {
+    // Section 7.4.8: "num_negative_pics specifies the number of entries
+    // in the stRpsIdx-th candidate short-term RPS that have picture order
+    // count values less than the picture order count value of the current
+    // picture. When nuh_layer_id of the current picture is equal to 0, the
+    // value of num_negative_pics shall be in the range of 0 to
+    // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1],
+    // inclusive."""
+    return false;
+  }
+  *max_num_pics = sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1];
+  return true;
+}
 
 uint32_t H265SpsParser::SpsState::getMinCbLog2SizeY() noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-10)

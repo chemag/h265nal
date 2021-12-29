@@ -236,11 +236,15 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
         // st_ref_pic_set(num_short_term_ref_pic_sets)
         const auto& st_ref_pic_set = sps->st_ref_pic_set;
+        uint32_t max_num_pics = 0;
+        if (!sps->getMaxNumPics(&max_num_pics)) {
+          return nullptr;
+        }
         slice_segment_header->st_ref_pic_set =
             H265StRefPicSetParser::ParseStRefPicSet(
                 bit_buffer, slice_segment_header->num_short_term_ref_pic_sets,
                 slice_segment_header->num_short_term_ref_pic_sets,
-                &st_ref_pic_set);
+                &st_ref_pic_set, max_num_pics);
 
       } else if (slice_segment_header->num_short_term_ref_pic_sets > 1) {
         // Ceil(Log2(num_short_term_ref_pic_sets));

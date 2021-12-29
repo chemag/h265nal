@@ -26,11 +26,12 @@ H265StRefPicSetParser::ParseStRefPicSet(
     const uint8_t* data, size_t length, uint32_t stRpsIdx,
     uint32_t num_short_term_ref_pic_sets,
     const std::vector<std::unique_ptr<struct StRefPicSetState>>*
-        st_ref_pic_set_state_vector) noexcept {
+        st_ref_pic_set_state_vector,
+    uint32_t max_num_pics) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseStRefPicSet(&bit_buffer, stRpsIdx, num_short_term_ref_pic_sets,
-                          st_ref_pic_set_state_vector);
+                          st_ref_pic_set_state_vector, max_num_pics);
 }
 
 void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
@@ -128,7 +129,8 @@ H265StRefPicSetParser::ParseStRefPicSet(
     rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
     uint32_t num_short_term_ref_pic_sets,
     const std::vector<std::unique_ptr<struct StRefPicSetState>>*
-        st_ref_pic_set_state_vector) noexcept {
+        st_ref_pic_set_state_vector,
+    uint32_t max_num_pics) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;
 
@@ -222,10 +224,30 @@ H265StRefPicSetParser::ParseStRefPicSet(
             &(st_ref_pic_set->num_negative_pics))) {
       return nullptr;
     }
+    // Section 7.4.8
+    // "When nuh_layer_id of the current picture is equal to 0, the value
+    // of num_negative_pics shall be in the range of 0 to
+    // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1],
+    // inclusive."
+    if (st_ref_pic_set->num_negative_pics > max_num_pics) {
+      // invalid num_negative_pics
+      return nullptr;
+    }
 
     // num_positive_pics  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
             &(st_ref_pic_set->num_positive_pics))) {
+      return nullptr;
+    }
+    // Section 7.4.8
+    // "When nuh_layer_id of the current picture is equal to 0, the value
+    // of num_positive_pics shall be in the range of 0 to
+    // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1] -
+    // num_negative_pics, inclusive."
+
+    if (st_ref_pic_set->num_positive_pics >
+        (max_num_pics - st_ref_pic_set->num_negative_pics)) {
+      // invalid num_positive_pics
       return nullptr;
     }
 

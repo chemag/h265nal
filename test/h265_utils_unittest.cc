@@ -133,6 +133,7 @@ TEST_F(H265UtilsTest, TestGetSliceQpYPFrame) {
   auto sps = std::make_shared<H265SpsParser::SpsState>();
   sps->sample_adaptive_offset_enabled_flag = 1;
   sps->chroma_format_idc = 1;
+  sps->sps_max_dec_pic_buffering_minus1.push_back(6);
   bitstream_parser_state.sps[0] = sps;
   auto pps = std::make_shared<H265PpsParser::PpsState>();
   pps->init_qp_minus26 = 0;
