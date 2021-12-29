@@ -18,7 +18,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   {
   auto sps = std::make_shared<h265nal::H265SpsParser::SpsState>();
   sps->num_short_term_ref_pic_sets = 0;
-  uint32_t max_num_pics = 0;
+  uint32_t max_num_pics = 1;
   auto st_ref_pic_set = h265nal::H265StRefPicSetParser::ParseStRefPicSet(
       data, size, 0, 1, &(sps->st_ref_pic_set), max_num_pics);
   }
