@@ -317,7 +317,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           }
 
           // delta_poc_msb_present_flag[i]  u(1)
-          if (!bit_buffer->ReadBits(&(bits_tmp), 1)) {
+          if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
             return nullptr;
           }
           slice_segment_header->delta_poc_msb_present_flag.push_back(bits_tmp);

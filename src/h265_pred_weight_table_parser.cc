@@ -66,7 +66,7 @@ H265PredWeightTableParser::ParsePredWeightTable(
     // from ffmpeg/libavcodec/cbs_h265_syntax_template.c
     // "1 (is not same POC and same layer_id)"
     // luma_weight_l0_flag[i]  u(1)
-    if (!bit_buffer->ReadBits(&(bits_tmp), 1)) {
+    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
       return nullptr;
     }
     pred_weight_table->luma_weight_l0_flag.push_back(bits_tmp);
@@ -78,7 +78,7 @@ H265PredWeightTableParser::ParsePredWeightTable(
       // from ffmpeg/libavcodec/cbs_h265_syntax_template.c
       // "1 (is not same POC and same layer_id)"
       // chroma_weight_l0_flag[i]  u(1)
-      if (!bit_buffer->ReadBits(&(bits_tmp), 1)) {
+      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
         return nullptr;
       }
       pred_weight_table->chroma_weight_l0_flag.push_back(bits_tmp);
@@ -89,12 +89,12 @@ H265PredWeightTableParser::ParsePredWeightTable(
        ++i) {
     if (pred_weight_table->luma_weight_l0_flag[i]) {
       // delta_luma_weight_l0[i]  se(v)
-      if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+      if (!bit_buffer->ReadSignedExponentialGolomb(&sgolomb_tmp)) {
         return nullptr;
       }
       pred_weight_table->delta_luma_weight_l0.push_back(sgolomb_tmp);
       // luma_offset_l0[i]  se(v)
-      if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+      if (!bit_buffer->ReadSignedExponentialGolomb(&sgolomb_tmp)) {
         return nullptr;
       }
       pred_weight_table->luma_offset_l0.push_back(sgolomb_tmp);
@@ -105,14 +105,14 @@ H265PredWeightTableParser::ParsePredWeightTable(
         pred_weight_table->delta_chroma_offset_l0.emplace_back();
         for (int j = 0; i < 2; ++j) {
           // delta_chroma_weight_l0[i][j]  se(v)
-          if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+          if (!bit_buffer->ReadSignedExponentialGolomb(&sgolomb_tmp)) {
             return nullptr;
           }
           pred_weight_table->delta_chroma_weight_l0.back().push_back(
               sgolomb_tmp);
 
           // delta_chroma_offset_l0[i][j]  se(v)
-          if (!bit_buffer->ReadSignedExponentialGolomb(&(sgolomb_tmp))) {
+          if (!bit_buffer->ReadSignedExponentialGolomb(&sgolomb_tmp)) {
             return nullptr;
           }
           pred_weight_table->delta_chroma_offset_l0.back().push_back(
