@@ -15,6 +15,7 @@
 
 #include "h265_common.h"
 #include "h265_profile_tier_level_parser.h"
+#include "h265_scaling_list_data_parser.h"
 #include "h265_vui_parameters_parser.h"
 
 namespace {
@@ -227,11 +228,8 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     }
     if (sps->sps_scaling_list_data_present_flag) {
       // scaling_list_data()
-      // TODO(chemag): add support for scaling_list_data()
-#ifdef FPRINT_ERRORS
-      fprintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
-#endif  // FPRINT_ERRORS
-      return nullptr;
+      sps->scaling_list_data =
+          H265ScalingListDataParser::ParseScalingListData(bit_buffer);
     }
   }
 
@@ -551,9 +549,8 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
             sps_scaling_list_data_present_flag);
 
     if (sps_scaling_list_data_present_flag) {
-      // scaling_list_data()
-      // TODO(chemag): add support for scaling_list_data()
-      fprintf(stderr, "error: unimplemented scaling_list_data() in sps\n");
+      fdump_indent_level(outfp, indent_level);
+      scaling_list_data->fdump(outfp, indent_level);
     }
   }
 

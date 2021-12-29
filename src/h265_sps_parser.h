@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "h265_profile_tier_level_parser.h"
+#include "h265_scaling_list_data_parser.h"
 #include "h265_sps_3d_extension_parser.h"
 #include "h265_sps_multilayer_extension_parser.h"
 #include "h265_sps_range_extension_parser.h"
@@ -69,7 +70,8 @@ class H265SpsParser {
     uint32_t max_transform_hierarchy_depth_intra = 0;
     uint32_t scaling_list_enabled_flag = 0;
     uint32_t sps_scaling_list_data_present_flag = 0;
-    // scaling_list_data()
+    std::unique_ptr<struct H265ScalingListDataParser::ScalingListDataState>
+        scaling_list_data;
     uint32_t amp_enabled_flag = 0;
     uint32_t sample_adaptive_offset_enabled_flag = 0;
     uint32_t pcm_enabled_flag = 0;
