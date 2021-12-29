@@ -631,8 +631,8 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "vui_parameters_present_flag: %i",
           vui_parameters_present_flag);
 
-  fdump_indent_level(outfp, indent_level);
   if (vui_parameters_present_flag) {
+    fdump_indent_level(outfp, indent_level);
     vui_parameters->fdump(outfp, indent_level);
   }
 
