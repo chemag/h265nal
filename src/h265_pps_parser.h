@@ -11,6 +11,7 @@
 
 #include "h265_pps_scc_extension_parser.h"
 #include "h265_profile_tier_level_parser.h"
+#include "h265_scaling_list_data_parser.h"
 #include "rtc_base/bit_buffer.h"
 
 namespace h265nal {
@@ -69,7 +70,8 @@ class H265PpsParser {
     int32_t pps_beta_offset_div2 = 0;
     int32_t pps_tc_offset_div2 = 0;
     uint32_t pps_scaling_list_data_present_flag = 0;
-    // scaling_list_data()
+    std::unique_ptr<struct H265ScalingListDataParser::ScalingListDataState>
+        scaling_list_data;
     uint32_t lists_modification_present_flag = 0;
     uint32_t log2_parallel_merge_level_minus2 = 0;
     uint32_t slice_segment_header_extension_present_flag = 0;

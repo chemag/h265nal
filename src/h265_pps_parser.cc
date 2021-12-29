@@ -13,6 +13,7 @@
 #include "h265_common.h"
 #include "h265_pps_scc_extension_parser.h"
 #include "h265_profile_tier_level_parser.h"
+#include "h265_scaling_list_data_parser.h"
 
 namespace h265nal {
 
@@ -236,11 +237,8 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   if (pps->pps_scaling_list_data_present_flag) {
     // scaling_list_data()
-    // TODO(chemag): add support for scaling_list_data()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
-#endif  // FPRINT_ERRORS
-    return nullptr;
+    pps->scaling_list_data =
+        H265ScalingListDataParser::ParseScalingListData(bit_buffer);
   }
 
   // lists_modification_present_flag  u(1)
@@ -485,9 +483,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
           pps_scaling_list_data_present_flag);
 
   if (pps_scaling_list_data_present_flag) {
-    // scaling_list_data()
-    // TODO(chemag): add support for scaling_list_data()
-    fprintf(stderr, "error: unimplemented scaling_list_data() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    scaling_list_data->fdump(outfp, indent_level);
   }
 
   fdump_indent_level(outfp, indent_level);
