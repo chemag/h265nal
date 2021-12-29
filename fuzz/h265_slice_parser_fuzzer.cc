@@ -9,6 +9,7 @@
 #include "h265_slice_parser.h"
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
+#include "h265_nal_unit_parser.h"
 #include "h265_pps_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
