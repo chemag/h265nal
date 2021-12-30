@@ -31,15 +31,18 @@ typedef struct arg_options {
 } arg_options;
 
 // default option values
-arg_options DEFAULTS{.debug = 0,
-                     .as_one_line = true,
-                     .add_offset = false,
-                     .add_length = false,
-                     .add_parsed_length = false,
-                     .add_checksum = false,
-                     .add_contents = false,
-                     .infile = nullptr,
-                     .outfile = nullptr};
+arg_options DEFAULTS{
+    .debug = 0,
+    .as_one_line = true,
+    .add_offset = false,
+    .add_length = false,
+    .add_parsed_length = false,
+    .add_checksum = false,
+    .add_contents = false,
+    .infile = nullptr,
+    .outfile = nullptr,
+};
+
 void usage(char *name) {
   fprintf(stderr, "usage: %s [options]\n", name);
   fprintf(stderr, "where options are:\n");
@@ -202,6 +205,7 @@ arg_options *parse_args(int argc, char **argv) {
         printf("version: %s\n", PROJECT_VER);
         exit(0);
         break;
+
       case HELP_OPTION:
       case 'h':
         usage(argv[0]);
