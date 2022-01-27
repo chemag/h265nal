@@ -38,7 +38,7 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
     const std::vector<std::unique_ptr<struct StRefPicSetState>>*
         st_ref_pic_set_state_vector,
     const uint32_t RefRpsIdx) noexcept {
-#define HEVC_MAX_REFS 16
+#define HEVC_MAX_REFS h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX
   int ref_delta_poc_s0[HEVC_MAX_REFS] = {0};
   int ref_delta_poc_s1[HEVC_MAX_REFS] = {0};
   int delta_poc_s0[HEVC_MAX_REFS] = {0};
