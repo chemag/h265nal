@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <algorithm>
 
 #include "h265_common.h"
 
