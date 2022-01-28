@@ -751,8 +751,10 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
 
       if (!short_term_ref_pic_set_sps_flag) {
         fdump_indent_level(outfp, indent_level);
-        st_ref_pic_set->fdump(outfp, indent_level);
 
+        if(st_ref_pic_set) {
+          st_ref_pic_set->fdump(outfp, indent_level);
+        }
       } else if (num_short_term_ref_pic_sets > 1) {
         fdump_indent_level(outfp, indent_level);
         fprintf(outfp, "short_term_ref_pic_set_idx: %i",
