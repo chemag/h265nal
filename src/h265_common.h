@@ -88,6 +88,11 @@ namespace h265limits {
 // 0 to 64, inclusive."
 const uint32_t NUM_SHORT_TERM_REF_PIC_SETS_MAX = 64;
 
+// Rec. ITU-T H.265 F.7.4.8
+// The value of num_positive_pics / num_negative_pics shall be in the range of
+// 0 to MaxDpbSize-1, inclusive.
+const uint32_t HEVC_MAX_DPB_SIZE = 16;
+
 // Rec. ITU-T H.265 v5 (02/2018) Page 74
 // "vps_max_layer_id shall be less than 63 in bitstreams conforming
 // to this version of this Specification."
