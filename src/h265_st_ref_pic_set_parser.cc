@@ -197,8 +197,9 @@ H265StRefPicSetParser::ParseStRefPicSet(
     uint32_t NumDeltaPocs_RefRpsIdx =
         ref->num_negative_pics + ref->num_positive_pics;
 
-    // F.7.4.8: DeltaPoCs shall be in range 0 to MaxDpbSize-1, inclusive
-    if(NumDeltaPocs_RefRpsIdx >= h265limits::HEVC_MAX_DPB_SIZE) {
+    // Section F.7.4.8: DeltaPoCs shall be in range 0 to MaxDpbSize-1,
+    // inclusive
+    if (NumDeltaPocs_RefRpsIdx >= h265limits::HEVC_MAX_DPB_SIZE) {
       return nullptr;
     }
 
