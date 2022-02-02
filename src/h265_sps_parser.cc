@@ -167,6 +167,10 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
       return nullptr;
     }
+    // sps_max_dec_pic_buffering_minus1 shall be in range 0 to MaxDpbSize-1, inclusive
+    if(golomb_tmp >= h265limits::HEVC_MAX_DPB_SIZE) {
+      return nullptr;
+    }
     sps->sps_max_dec_pic_buffering_minus1.push_back(golomb_tmp);
     // sps_max_num_reorder_pics[i]  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
