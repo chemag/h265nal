@@ -188,13 +188,15 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 
   // log2_min_luma_coding_block_size_minus3  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-          &(sps->log2_min_luma_coding_block_size_minus3))) {
+          &(sps->log2_min_luma_coding_block_size_minus3)) ||
+      sps->log2_min_luma_coding_block_size_minus3 > 3) {
     return nullptr;
   }
 
   // log2_diff_max_min_luma_coding_block_size  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-          &(sps->log2_diff_max_min_luma_coding_block_size))) {
+          &(sps->log2_diff_max_min_luma_coding_block_size)) ||
+      sps->log2_diff_max_min_luma_coding_block_size > 3) {
     return nullptr;
   }
 
