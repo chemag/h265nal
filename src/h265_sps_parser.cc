@@ -191,7 +191,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
           &(sps->log2_min_luma_coding_block_size_minus3))) {
     return nullptr;
   }
-  if(sps->log2_min_luma_coding_block_size_minus3 > 3) {
+  if (sps->log2_min_luma_coding_block_size_minus3 > 3) {
     return nullptr;
   }
 
@@ -200,7 +200,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
           &(sps->log2_diff_max_min_luma_coding_block_size))) {
     return nullptr;
   }
-  if(sps->log2_diff_max_min_luma_coding_block_size > 3) {
+  if (sps->log2_diff_max_min_luma_coding_block_size > 3) {
     return nullptr;
   }
 
