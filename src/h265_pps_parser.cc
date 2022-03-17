@@ -321,7 +321,9 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     // pps_range_extension()
     pps->pps_scc_extension =
         H265PpsSccExtensionParser::ParsePpsSccExtension(bit_buffer);
-    return nullptr;
+    if (pps->pps_scc_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (pps->pps_extension_4bits) {
