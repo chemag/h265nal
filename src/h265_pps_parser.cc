@@ -482,7 +482,7 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   fprintf(outfp, "pps_scaling_list_data_present_flag: %i",
           pps_scaling_list_data_present_flag);
 
-  if (pps_scaling_list_data_present_flag) {
+  if (pps_scaling_list_data_present_flag && scaling_list_data) {
     fdump_indent_level(outfp, indent_level);
     scaling_list_data->fdump(outfp, indent_level);
   }
