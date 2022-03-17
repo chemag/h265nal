@@ -37,6 +37,9 @@ std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
 
   // first read the common header
   rtp_fu->header = H265NalUnitHeaderParser::ParseNalUnitHeader(bit_buffer);
+  if (rtp_fu->header == nullptr) {
+    return nullptr;
+  }
 
   // read the fu header
   if (!bit_buffer->ReadBits(&(rtp_fu->s_bit), 1)) {
@@ -57,6 +60,9 @@ std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   // start of a fragmented NAL: keep reading
   rtp_fu->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
       bit_buffer, rtp_fu->fu_type, bitstream_parser_state);
+  if (rtp_fu->nal_unit_payload == nullptr) {
+    return nullptr;
+  }
 
   return rtp_fu;
 }

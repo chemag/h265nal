@@ -186,6 +186,9 @@ H265HrdParametersParser::ParseHrdParameters(
           H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
               bit_buffer, i, CpbCnt,
               hrd_parameters->sub_pic_hrd_params_present_flag);
+      if (sub_layer_hrd_parameters == nullptr) {
+        return nullptr;
+      }
       hrd_parameters->sub_layer_hrd_parameters_vector.push_back(
           std::move(sub_layer_hrd_parameters));
     }
@@ -197,6 +200,9 @@ H265HrdParametersParser::ParseHrdParameters(
           H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
               bit_buffer, i, CpbCnt,
               hrd_parameters->sub_pic_hrd_params_present_flag);
+      if (sub_layer_hrd_parameters == nullptr) {
+        return nullptr;
+      }
       hrd_parameters->sub_layer_hrd_parameters_vector.push_back(
           std::move(sub_layer_hrd_parameters));
     }

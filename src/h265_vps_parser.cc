@@ -75,6 +75,9 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   // profile_tier_level(1, vps_max_sub_layers_minus1)
   vps->profile_tier_level = H265ProfileTierLevelParser::ParseProfileTierLevel(
       bit_buffer, true, vps->vps_max_sub_layers_minus1);
+  if (vps->profile_tier_level == nullptr) {
+    return nullptr;
+  }
 
   // vps_sub_layer_ordering_info_present_flag  u(1)
   if (!bit_buffer->ReadBits(&(vps->vps_sub_layer_ordering_info_present_flag),
@@ -194,6 +197,9 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
       vps->hrd_parameters = H265HrdParametersParser::ParseHrdParameters(
           bit_buffer, vps->cprms_present_flag[i],
           vps->vps_max_sub_layers_minus1);
+      if (vps->hrd_parameters == nullptr) {
+        return nullptr;
+      }
     }
   }
 

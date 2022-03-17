@@ -49,16 +49,25 @@ std::unique_ptr<H265RtpParser::RtpState> H265RtpParser::ParseRtp(
     // rtp_single()
     rtp->rtp_single =
         H265RtpSingleParser::ParseRtpSingle(bit_buffer, bitstream_parser_state);
+    if (rtp->rtp_single == nullptr) {
+      return nullptr;
+    }
 
   } else if (rtp->nal_unit_header->nal_unit_type == AP) {
     // rtp_ap()
     rtp->rtp_ap =
         H265RtpApParser::ParseRtpAp(bit_buffer, bitstream_parser_state);
+    if (rtp->rtp_ap == nullptr) {
+      return nullptr;
+    }
 
   } else if (rtp->nal_unit_header->nal_unit_type == FU) {
     // rtp_fu()
     rtp->rtp_fu =
         H265RtpFuParser::ParseRtpFu(bit_buffer, bitstream_parser_state);
+    if (rtp->rtp_fu == nullptr) {
+      return nullptr;
+    }
   }
 
   return rtp;

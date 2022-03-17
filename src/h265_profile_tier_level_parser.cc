@@ -50,6 +50,9 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   if (profilePresentFlag) {
     profile_tier_level->general =
         H265ProfileInfoParser::ParseProfileInfo(bit_buffer);
+    if (profile_tier_level->general == nullptr) {
+      return nullptr;
+    }
   }
 
   // general_level_idc  u(8)
@@ -85,6 +88,9 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
     if (profile_tier_level->sub_layer_profile_present_flag[i]) {
       profile_tier_level->sub_layer.push_back(
           H265ProfileInfoParser::ParseProfileInfo(bit_buffer));
+      if (profile_tier_level->sub_layer.back() == nullptr) {
+        return nullptr;
+      }
     }
 
     if (profile_tier_level->sub_layer_profile_present_flag[i]) {

@@ -196,6 +196,9 @@ H265VuiParametersParser::ParseVuiParameters(
       // hrd_parameters(1, sps_max_sub_layers_minus1)
       vui->hrd_parameters = H265HrdParametersParser::ParseHrdParameters(
           bit_buffer, 1, vui->sps_max_sub_layers_minus1);
+      if (vui->hrd_parameters == nullptr) {
+        return nullptr;
+      }
     }
   }
 

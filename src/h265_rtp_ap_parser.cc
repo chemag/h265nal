@@ -68,6 +68,9 @@ std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
         H265NalUnitPayloadParser::ParseNalUnitPayload(
             bit_buffer, rtp_ap->nal_unit_headers.back()->nal_unit_type,
             bitstream_parser_state));
+    if (rtp_ap->nal_unit_payloads.back() == nullptr) {
+      return nullptr;
+    }
   }
   return rtp_ap;
 }

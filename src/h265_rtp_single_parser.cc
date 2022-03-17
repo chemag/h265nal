@@ -50,6 +50,9 @@ H265RtpSingleParser::ParseRtpSingle(
   rtp_single->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
       bit_buffer, rtp_single->nal_unit_header->nal_unit_type,
       bitstream_parser_state);
+  if (rtp_single->nal_unit_payload == nullptr) {
+    return nullptr;
+  }
 
   return rtp_single;
 }

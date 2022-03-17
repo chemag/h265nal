@@ -239,6 +239,9 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     // scaling_list_data()
     pps->scaling_list_data =
         H265ScalingListDataParser::ParseScalingListData(bit_buffer);
+    if (pps->scaling_list_data == nullptr) {
+      return nullptr;
+    }
   }
 
   // lists_modification_present_flag  u(1)

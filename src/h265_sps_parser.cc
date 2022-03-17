@@ -64,6 +64,9 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   // profile_tier_level(1, sps_max_sub_layers_minus1)
   sps->profile_tier_level = H265ProfileTierLevelParser::ParseProfileTierLevel(
       bit_buffer, true, sps->sps_max_sub_layers_minus1);
+  if (sps->profile_tier_level == nullptr) {
+    return nullptr;
+  }
 
   // sps_seq_parameter_set_id  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(&(sps->sps_seq_parameter_set_id))) {
@@ -242,6 +245,9 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
       // scaling_list_data()
       sps->scaling_list_data =
           H265ScalingListDataParser::ParseScalingListData(bit_buffer);
+      if (sps->scaling_list_data == nullptr) {
+        return nullptr;
+      }
     }
   }
 
@@ -367,6 +373,9 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     // vui_parameters()
     sps->vui_parameters = H265VuiParametersParser::ParseVuiParameters(
         bit_buffer, sps->sps_max_sub_layers_minus1);
+    if (sps->vui_parameters == nullptr) {
+      return nullptr;
+    }
   }
 
   // sps_extension_present_flag  u(1)
@@ -405,18 +414,27 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     // sps_range_extension()
     sps->sps_range_extension =
         H265SpsRangeExtensionParser::ParseSpsRangeExtension(bit_buffer);
+    if (sps->sps_range_extension == nullptr) {
+      return nullptr;
+    }
   }
   if (sps->sps_multilayer_extension_flag) {
     // sps_multilayer_extension() // specified in Annex F
     sps->sps_multilayer_extension =
         H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
             bit_buffer);
+    if (sps->sps_multilayer_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (sps->sps_3d_extension_flag) {
     // sps_3d_extension() // specified in Annex I
     sps->sps_3d_extension =
         H265Sps3dExtensionParser::ParseSps3dExtension(bit_buffer);
+    if (sps->sps_3d_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (sps->sps_scc_extension_flag) {
@@ -424,6 +442,9 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     sps->sps_scc_extension = H265SpsSccExtensionParser::ParseSpsSccExtension(
         bit_buffer, sps->chroma_format_idc, sps->bit_depth_luma_minus8,
         sps->bit_depth_chroma_minus8);
+    if (sps->sps_scc_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (sps->sps_extension_4bits) {

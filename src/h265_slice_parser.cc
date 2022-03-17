@@ -50,6 +50,9 @@ H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
   slice_segment_layer->slice_segment_header =
       H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           bit_buffer, nal_unit_type, bitstream_parser_state);
+  if (slice_segment_layer->slice_segment_header == nullptr) {
+    return nullptr;
+  }
 
   // slice_segment_data()
   // rbsp_slice_segment_trailing_bits()
@@ -245,6 +248,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
                 bit_buffer, slice_segment_header->num_short_term_ref_pic_sets,
                 slice_segment_header->num_short_term_ref_pic_sets,
                 &st_ref_pic_set, max_num_pics);
+        if (slice_segment_header->st_ref_pic_set == nullptr) {
+          return nullptr;
+        }
 
       } else if (slice_segment_header->num_short_term_ref_pic_sets > 1) {
         // Ceil(Log2(num_short_term_ref_pic_sets));
@@ -462,6 +468,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
             H265PredWeightTableParser::ParsePredWeightTable(
                 bit_buffer, slice_segment_header->ChromaArrayType,
                 slice_segment_header->num_ref_idx_l0_active_minus1);
+        if (slice_segment_header->pred_weight_table == nullptr) {
+          return nullptr;
+        }
       }
 
       // five_minus_max_num_merge_cand  ue(v)
