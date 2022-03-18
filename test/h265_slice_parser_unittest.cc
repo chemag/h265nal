@@ -126,7 +126,7 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlice2) {
 #endif
 }
 
-TEST_F(H265SliceSegmentLayerParserTest, TestSampleSliceBroken) {
+TEST_F(H265SliceSegmentLayerParserTest, TestSampleSlicePpsId15) {
   const uint8_t buffer[] = {
 			0x02, 0x01, 0xd2, 0x78, 0xf7, 0x55, 0xdc, 0xbf,
 			0x2c, 0x44, 0x00, 0x41, 0xa8, 0xd1, 0x66, 0x44,
@@ -163,31 +163,32 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSampleSliceBroken) {
   sps->pic_height_in_luma_samples = 736;
   bitstream_parser_state.sps[0] = sps;
   auto pps = std::make_shared<H265PpsParser::PpsState>();
-  bitstream_parser_state.pps[0] = pps;
+  bitstream_parser_state.pps[15] = pps;
 
   auto slice_segment_layer =
       H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
           buffer, arraysize(buffer), NalUnitType::IDR_W_RADL,
           &bitstream_parser_state);
-  EXPECT_TRUE(slice_segment_layer != nullptr);
+  ASSERT_TRUE(slice_segment_layer != nullptr);
 
   // invalid slice_segment_header
   auto& slice_segment_header = slice_segment_layer->slice_segment_header;
-  EXPECT_TRUE(slice_segment_header == nullptr);
+  ASSERT_TRUE(slice_segment_header != nullptr);
+  EXPECT_EQ(19, slice_segment_header->nal_unit_type);
 }
 
-TEST_F(H265SliceSegmentLayerParserTest, TestSliceContainsShortTermRefPiCSet) {
+TEST_F(H265SliceSegmentLayerParserTest, TestSliceContainsShortTermRefPicSet) {
   const uint8_t vps[] = {
       0x40, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60,
       0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
-      0x00, 0x00, 0x03, 0x00, 0x96
+      0x00, 0x00, 0x03, 0x00, 0x96, 0x70, 0x20, 0x00
   };
   const uint8_t sps[] = {
       0x42, 0x01, 0x01, 0x01, 0x60, 0x00, 0x00, 0x03,
       0x00, 0xb0, 0x00, 0x00, 0x03, 0x00, 0x00, 0x03,
       0x00, 0x96, 0xa0, 0x05, 0x82, 0x00, 0x50, 0x16,
       0x20, 0x5e, 0xe4, 0x59, 0x14, 0xbf, 0xf2, 0xe7,
-      0xf1, 0x3f, 0xa9, 0xb8, 0x10
+      0xf1, 0x3f, 0xa9, 0xb8, 0x10, 0x00, 0x00, 0x00
   };
   const uint8_t pps[] = {
       0x44, 0x01, 0xc0, 0x72, 0xf0, 0x53, 0x24
@@ -196,6 +197,16 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceContainsShortTermRefPiCSet) {
   H265NalUnitParser::ParseNalUnit(vps, arraysize(vps), &bitstream_parser_state);
   H265NalUnitParser::ParseNalUnit(sps, arraysize(sps), &bitstream_parser_state);
   H265NalUnitParser::ParseNalUnit(pps, arraysize(pps), &bitstream_parser_state);
+  // check the parsing went well
+  ASSERT_EQ(1, bitstream_parser_state.vps.size());
+  ASSERT_TRUE(bitstream_parser_state.vps.find(0) !=
+              bitstream_parser_state.vps.end());
+  ASSERT_EQ(1, bitstream_parser_state.sps.size());
+  ASSERT_TRUE(bitstream_parser_state.sps.find(0) !=
+              bitstream_parser_state.sps.end());
+  ASSERT_EQ(1, bitstream_parser_state.pps.size());
+  ASSERT_TRUE(bitstream_parser_state.pps.find(0) !=
+              bitstream_parser_state.pps.end());
 
   const uint8_t slice[] = {
       0x02, 0x01, 0xd0, 0x53, 0x17, 0x62, 0x0a, 0x05,
@@ -209,10 +220,13 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceContainsShortTermRefPiCSet) {
   auto result = H265NalUnitParser::ParseNalUnit(slice, arraysize(slice),
                                                 &bitstream_parser_state);
 
-  EXPECT_TRUE(result->nal_unit_payload->slice_segment_layer != nullptr);
+  ASSERT_TRUE(result != nullptr);
+  ASSERT_TRUE(result->nal_unit_payload != nullptr);
+  ASSERT_TRUE(result->nal_unit_payload->slice_segment_layer != nullptr);
 
   auto& slice_segment_header =
       result->nal_unit_payload->slice_segment_layer->slice_segment_header;
+  ASSERT_TRUE(slice_segment_header != nullptr);
 
   EXPECT_EQ(39, slice_segment_header->num_entry_point_offsets);
 }
