@@ -72,24 +72,29 @@ TEST_F(H265ScalingListDataParserTest, TestSampleScalingListData01) {
   EXPECT_THAT(scaling_list_data->scaling_list_pred_mode_flag[2],
               ::testing::ElementsAreArray({1, 1, 1, 1, 1, 1}));
   EXPECT_THAT(scaling_list_data->scaling_list_pred_mode_flag[3],
-              ::testing::ElementsAreArray({1, 1, 1}));
+              ::testing::ElementsAreArray({1, 0, 0, 1, 0, 0}));
 
   // scaling_list_pred_matrix_id_delta[]
   EXPECT_EQ(4, scaling_list_data->scaling_list_pred_matrix_id_delta.size());
-  for (uint32_t sizeId = 0; sizeId < 4; sizeId += 1) {
-    EXPECT_EQ(
-        0, scaling_list_data->scaling_list_pred_matrix_id_delta[sizeId].size());
-  }
+  EXPECT_THAT(scaling_list_data->scaling_list_pred_matrix_id_delta[0],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
+  EXPECT_THAT(scaling_list_data->scaling_list_pred_matrix_id_delta[1],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
+  EXPECT_THAT(scaling_list_data->scaling_list_pred_matrix_id_delta[2],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
+  EXPECT_THAT(scaling_list_data->scaling_list_pred_matrix_id_delta[3],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
 
   // scaling_list_dc_coef_minus8[]
   EXPECT_EQ(4, scaling_list_data->scaling_list_dc_coef_minus8.size());
   EXPECT_THAT(scaling_list_data->scaling_list_dc_coef_minus8[0],
-              ::testing::ElementsAreArray({1, 1, 1, 1, 1, 1}));
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
   EXPECT_THAT(scaling_list_data->scaling_list_dc_coef_minus8[1],
-              ::testing::ElementsAreArray({1}));
-  for (uint32_t sizeId = 2; sizeId < 4; sizeId += 1) {
-    EXPECT_EQ(0, scaling_list_data->scaling_list_dc_coef_minus8[sizeId].size());
-  }
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
+  EXPECT_THAT(scaling_list_data->scaling_list_dc_coef_minus8[2],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
+  EXPECT_THAT(scaling_list_data->scaling_list_dc_coef_minus8[3],
+              ::testing::ElementsAreArray({0, 0, 0, 0, 0, 0}));
 
   // ScalingList[]
   EXPECT_EQ(4, scaling_list_data->ScalingList.size());
@@ -120,30 +125,38 @@ TEST_F(H265ScalingListDataParserTest, TestSampleScalingListData01) {
   EXPECT_EQ(6, scaling_list_data->ScalingList[2].size());
   for (uint32_t matrixId = 0; matrixId < 6; matrixId += 1) {
     EXPECT_THAT(scaling_list_data->ScalingList[2][matrixId],
-                ::testing::ElementsAreArray({9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9,
-                                             9, 9, 9, 9, 9, 9, 9, 9}));
+                ::testing::ElementsAreArray({8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8,
+                                             8, 8, 8, 8, 8, 8, 8, 8}));
   }
 
   // ScalingList[3]
   EXPECT_EQ(6, scaling_list_data->ScalingList[3].size());
   EXPECT_THAT(scaling_list_data->ScalingList[3][0],
-              ::testing::ElementsAreArray({9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9,
-                                           9, 9, 9, 9, 9, 9, 9, 9}));
+              ::testing::ElementsAreArray({8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8}));
   EXPECT_EQ(0, scaling_list_data->ScalingList[3][1].size());
   EXPECT_EQ(0, scaling_list_data->ScalingList[3][2].size());
-  EXPECT_EQ(0, scaling_list_data->ScalingList[3][3].size());
+  EXPECT_THAT(scaling_list_data->ScalingList[3][3],
+              ::testing::ElementsAreArray({8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8,
+                                           8, 8, 8, 8, 8, 8, 8, 8}));
   EXPECT_EQ(0, scaling_list_data->ScalingList[3][4].size());
   EXPECT_EQ(0, scaling_list_data->ScalingList[3][5].size());
 }

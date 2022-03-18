@@ -33,10 +33,6 @@ H265ScalingListDataParser::ParseScalingListData(const uint8_t* data,
 std::unique_ptr<H265ScalingListDataParser::ScalingListDataState>
 H265ScalingListDataParser::ParseScalingListData(
     rtc::BitBuffer* bit_buffer) noexcept {
-  uint32_t bits_tmp;
-  uint32_t golomb_tmp;
-  int32_t sgolomb_tmp;
-
   // H265 scaling_list_data() NAL Unit.
   // Section 7.3.4 ("Scaling list data syntax") of the H.265
   // standard for a complete description.
@@ -49,6 +45,10 @@ H265ScalingListDataParser::ParseScalingListData(
     scaling_list_data->scaling_list_dc_coef_minus8.emplace_back();
     scaling_list_data->ScalingList.emplace_back();
     for (uint32_t matrixId = 0; matrixId < 6; matrixId += 1) {
+      scaling_list_data->scaling_list_pred_mode_flag[sizeId].emplace_back(0);
+      scaling_list_data->scaling_list_pred_matrix_id_delta[sizeId].emplace_back(
+          0);
+      scaling_list_data->scaling_list_dc_coef_minus8[sizeId].emplace_back(0);
       scaling_list_data->ScalingList[sizeId].emplace_back();
     }
   }
@@ -58,30 +58,30 @@ H265ScalingListDataParser::ParseScalingListData(
     for (uint32_t matrixId = 0; matrixId < 6;
          matrixId += (sizeId == 3) ? 3 : 1) {
       // scaling_list_pred_mode_flag[sizeId][matrixId]  u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(
+              &scaling_list_data->scaling_list_pred_mode_flag[sizeId][matrixId],
+              1)) {
         return nullptr;
       }
-      scaling_list_data->scaling_list_pred_mode_flag[sizeId].push_back(
-          bits_tmp);
 
       if (!scaling_list_data->scaling_list_pred_mode_flag[sizeId][matrixId]) {
         // scaling_list_pred_matrix_id_delta[sizeId][matrixId]  ue(v)
-        if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+        if (!bit_buffer->ReadExponentialGolomb(
+                &scaling_list_data
+                     ->scaling_list_pred_matrix_id_delta[sizeId][matrixId])) {
           return nullptr;
         }
-        scaling_list_data->scaling_list_pred_mode_flag[sizeId].push_back(
-            bits_tmp);
 
       } else {
         uint32_t nextCoef = 8;
         uint32_t coefNum = std::min(64, (1 << (4 + (sizeId << 1))));
         if (sizeId > 1) {
           // scaling_list_dc_coef_minus8[sizeId - 2][matrixId]  se(v)
-          if (!bit_buffer->ReadSignedExponentialGolomb(&sgolomb_tmp)) {
+          if (!bit_buffer->ReadSignedExponentialGolomb(
+                  &scaling_list_data
+                       ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId])) {
             return nullptr;
           }
-          scaling_list_data->scaling_list_dc_coef_minus8[sizeId - 2].push_back(
-              bits_tmp);
           nextCoef = scaling_list_data
                          ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] +
                      8;
