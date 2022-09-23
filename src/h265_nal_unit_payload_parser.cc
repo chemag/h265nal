@@ -184,7 +184,9 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case RADL_R:
     case RASL_N:
     case RASL_R:
-      slice_segment_layer->fdump(outfp, indent_level);
+      if (slice_segment_layer) {
+        slice_segment_layer->fdump(outfp, indent_level);
+      }
       break;
     case RSV_VCL_N10:
     case RSV_VCL_R11:
@@ -200,7 +202,9 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     case IDR_W_RADL:
     case IDR_N_LP:
     case CRA_NUT:
-      slice_segment_layer->fdump(outfp, indent_level);
+      if (slice_segment_layer) {
+        slice_segment_layer->fdump(outfp, indent_level);
+      }
       break;
     case RSV_IRAP_VCL22:
     case RSV_IRAP_VCL23:
