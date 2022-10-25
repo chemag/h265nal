@@ -43,43 +43,41 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
   auto sps_scc_extension = std::make_unique<SpsSccExtensionState>();
 
   // sps_curr_pic_ref_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(sps_scc_extension->sps_curr_pic_ref_enabled_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1,
+                            sps_scc_extension->sps_curr_pic_ref_enabled_flag)) {
     return nullptr;
   }
 
   // palette_mode_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(sps_scc_extension->palette_mode_enabled_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1, sps_scc_extension->palette_mode_enabled_flag)) {
     return nullptr;
   }
 
   if (sps_scc_extension->palette_mode_enabled_flag) {
     // palette_max_size  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(sps_scc_extension->palette_max_size))) {
+            sps_scc_extension->palette_max_size)) {
       return nullptr;
     }
 
     // delta_palette_max_predictor_size  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(sps_scc_extension->delta_palette_max_predictor_size))) {
+            sps_scc_extension->delta_palette_max_predictor_size)) {
       return nullptr;
     }
 
     // sps_palette_predictor_initializers_present_flag  u(1)
     if (!bit_buffer->ReadBits(
-            &(sps_scc_extension
-                  ->sps_palette_predictor_initializers_present_flag),
-            1)) {
+            1, sps_scc_extension
+                   ->sps_palette_predictor_initializers_present_flag)) {
       return nullptr;
     }
 
     if (sps_scc_extension->sps_palette_predictor_initializers_present_flag) {
       // sps_num_palette_predictor_initializers_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(sps_scc_extension
-                    ->sps_num_palette_predictor_initializers_minus1))) {
+              sps_scc_extension
+                  ->sps_num_palette_predictor_initializers_minus1)) {
         return nullptr;
       }
 
@@ -97,7 +95,7 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
           // sps_palette_predictor_initializers[0][*] -> BitDepth_Y
           // sps_palette_predictor_initializers[1,2][*] -> BitDepth_C
           uint32_t bit_depth = (comp == 0) ? BitDepth_Y : BitDepth_C;
-          if (!bit_buffer->ReadBits(&bits_tmp, bit_depth)) {
+          if (!bit_buffer->ReadBits(bit_depth, bits_tmp)) {
             return nullptr;
           }
           sps_scc_extension->sps_palette_predictor_initializers[comp].push_back(
@@ -107,15 +105,15 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
     }
   }
 
-  // motion_vector_resolution_control_idc  u(1)
+  // motion_vector_resolution_control_idc  u(2)
   if (!bit_buffer->ReadBits(
-          &(sps_scc_extension->motion_vector_resolution_control_idc), 2)) {
+          2, sps_scc_extension->motion_vector_resolution_control_idc)) {
     return nullptr;
   }
 
   // intra_boundary_filtering_disabled_flag  u(1)
   if (!bit_buffer->ReadBits(
-          &(sps_scc_extension->intra_boundary_filtering_disabled_flag), 1)) {
+          1, sps_scc_extension->intra_boundary_filtering_disabled_flag)) {
     return nullptr;
   }
 

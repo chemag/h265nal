@@ -41,155 +41,154 @@ H265VuiParametersParser::ParseVuiParameters(
   vui->sps_max_sub_layers_minus1 = sps_max_sub_layers_minus1;
 
   // aspect_ratio_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->aspect_ratio_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->aspect_ratio_info_present_flag)) {
     return nullptr;
   }
 
   if (vui->aspect_ratio_info_present_flag) {
     // aspect_ratio_idc  u(8)
-    if (!bit_buffer->ReadBits(&(vui->aspect_ratio_idc), 8)) {
+    if (!bit_buffer->ReadBits(8, vui->aspect_ratio_idc)) {
       return nullptr;
     }
     if (vui->aspect_ratio_idc == AR_EXTENDED_SAR) {
       // sar_width  u(16)
-      if (!bit_buffer->ReadBits(&(vui->sar_width), 16)) {
+      if (!bit_buffer->ReadBits(16, vui->sar_width)) {
         return nullptr;
       }
       // sar_height  u(16)
-      if (!bit_buffer->ReadBits(&(vui->sar_height), 16)) {
+      if (!bit_buffer->ReadBits(16, vui->sar_height)) {
         return nullptr;
       }
     }
   }
 
   // overscan_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->overscan_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->overscan_info_present_flag)) {
     return nullptr;
   }
 
   if (vui->overscan_info_present_flag) {
     // overscan_appropriate_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->overscan_appropriate_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->overscan_appropriate_flag)) {
       return nullptr;
     }
   }
 
   // video_signal_type_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->video_signal_type_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->video_signal_type_present_flag)) {
     return nullptr;
   }
 
   if (vui->video_signal_type_present_flag) {
     // video_format  u(3)
-    if (!bit_buffer->ReadBits(&(vui->video_format), 3)) {
+    if (!bit_buffer->ReadBits(3, vui->video_format)) {
       return nullptr;
     }
     // video_full_range_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->video_full_range_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->video_full_range_flag)) {
       return nullptr;
     }
     // colour_description_present_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->colour_description_present_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->colour_description_present_flag)) {
       return nullptr;
     }
     if (vui->colour_description_present_flag) {
       // colour_primaries  u(8)
-      if (!bit_buffer->ReadBits(&(vui->colour_primaries), 8)) {
+      if (!bit_buffer->ReadBits(8, vui->colour_primaries)) {
         return nullptr;
       }
       // transfer_characteristics  u(8)
-      if (!bit_buffer->ReadBits(&(vui->transfer_characteristics), 8)) {
+      if (!bit_buffer->ReadBits(8, vui->transfer_characteristics)) {
         return nullptr;
       }
       // matrix_coeffs  u(8)
-      if (!bit_buffer->ReadBits(&(vui->matrix_coeffs), 8)) {
+      if (!bit_buffer->ReadBits(8, vui->matrix_coeffs)) {
         return nullptr;
       }
     }
   }
 
   // chroma_loc_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->chroma_loc_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->chroma_loc_info_present_flag)) {
     return nullptr;
   }
   if (vui->chroma_loc_info_present_flag) {
     // chroma_sample_loc_type_top_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->chroma_sample_loc_type_top_field))) {
+            vui->chroma_sample_loc_type_top_field)) {
       return nullptr;
     }
     // chroma_sample_loc_type_bottom_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->chroma_sample_loc_type_bottom_field))) {
+            vui->chroma_sample_loc_type_bottom_field)) {
       return nullptr;
     }
   }
 
   // neutral_chroma_indication_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->neutral_chroma_indication_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->neutral_chroma_indication_flag)) {
     return nullptr;
   }
 
   // field_seq_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->field_seq_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->field_seq_flag)) {
     return nullptr;
   }
 
   // frame_field_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->frame_field_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->frame_field_info_present_flag)) {
     return nullptr;
   }
 
   // default_display_window_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->default_display_window_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->default_display_window_flag)) {
     return nullptr;
   }
   if (vui->default_display_window_flag) {
     // def_disp_win_left_offset ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_left_offset))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->def_disp_win_left_offset)) {
       return nullptr;
     }
     // def_disp_win_right_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_right_offset))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->def_disp_win_right_offset)) {
       return nullptr;
     }
     // def_disp_win_top_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->def_disp_win_top_offset))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->def_disp_win_top_offset)) {
       return nullptr;
     }
     // def_disp_win_bottom_offset  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->def_disp_win_bottom_offset))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->def_disp_win_bottom_offset)) {
       return nullptr;
     }
   }
 
   // vui_timing_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->vui_timing_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->vui_timing_info_present_flag)) {
     return nullptr;
   }
   if (vui->vui_timing_info_present_flag) {
     // vui_num_units_in_tick  u(32)
-    if (!bit_buffer->ReadBits(&(vui->vui_num_units_in_tick), 32)) {
+    if (!bit_buffer->ReadBits(32, vui->vui_num_units_in_tick)) {
       return nullptr;
     }
     // vui_time_scale  u(32)
-    if (!bit_buffer->ReadBits(&(vui->vui_time_scale), 32)) {
+    if (!bit_buffer->ReadBits(32, vui->vui_time_scale)) {
       return nullptr;
     }
     // vui_poc_proportional_to_timing_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->vui_poc_proportional_to_timing_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->vui_poc_proportional_to_timing_flag)) {
       return nullptr;
     }
     if (vui->vui_poc_proportional_to_timing_flag) {
       // vui_num_ticks_poc_diff_one_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(vui->vui_num_ticks_poc_diff_one_minus1))) {
+              vui->vui_num_ticks_poc_diff_one_minus1)) {
         return nullptr;
       }
     }
     // vui_hrd_parameters_present_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->vui_hrd_parameters_present_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->vui_hrd_parameters_present_flag)) {
       return nullptr;
     }
     if (vui->vui_hrd_parameters_present_flag) {
@@ -203,44 +202,42 @@ H265VuiParametersParser::ParseVuiParameters(
   }
 
   // bitstream_restriction_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vui->bitstream_restriction_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vui->bitstream_restriction_flag)) {
     return nullptr;
   }
   if (vui->bitstream_restriction_flag) {
     // tiles_fixed_structure_flag u(1)
-    if (!bit_buffer->ReadBits(&(vui->tiles_fixed_structure_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->tiles_fixed_structure_flag)) {
       return nullptr;
     }
     // motion_vectors_over_pic_boundaries_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->motion_vectors_over_pic_boundaries_flag),
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              vui->motion_vectors_over_pic_boundaries_flag)) {
       return nullptr;
     }
     // restricted_ref_pic_lists_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vui->restricted_ref_pic_lists_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vui->restricted_ref_pic_lists_flag)) {
       return nullptr;
     }
     // min_spatial_segmentation_idc  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->min_spatial_segmentation_idc))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->min_spatial_segmentation_idc)) {
       return nullptr;
     }
     // max_bytes_per_pic_denom  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->max_bytes_per_pic_denom))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->max_bytes_per_pic_denom)) {
       return nullptr;
     }
     // max_bits_per_min_cu_denom  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vui->max_bits_per_min_cu_denom))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->max_bits_per_min_cu_denom)) {
       return nullptr;
     }
     // log2_max_mv_length_horizontal  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->log2_max_mv_length_horizontal))) {
+            vui->log2_max_mv_length_horizontal)) {
       return nullptr;
     }
     // log2_max_mv_length_vertical  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(
-            &(vui->log2_max_mv_length_vertical))) {
+    if (!bit_buffer->ReadExponentialGolomb(vui->log2_max_mv_length_vertical)) {
       return nullptr;
     }
   }

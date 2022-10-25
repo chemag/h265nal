@@ -237,7 +237,7 @@ bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
   // bit buffer (not read).
   // So we first read (peek) the remaining bits.
   uint32_t remaining_bits;
-  if (!bit_buffer->PeekBits(&remaining_bits, remaining_bitcount)) {
+  if (!bit_buffer->PeekBits(remaining_bitcount, remaining_bits)) {
     // this should not happen: we do not have remaining_bits bits left.
     return false;
   }
@@ -254,7 +254,7 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
   uint32_t bits_tmp;
 
   // rbsp_stop_one_bit  f(1) // equal to 1
-  if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+  if (!bit_buffer->ReadBits(1, bits_tmp)) {
     return false;
   }
   if (bits_tmp != 1) {
@@ -263,7 +263,7 @@ bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
 
   while (!byte_aligned(bit_buffer)) {
     // rbsp_alignment_zero_bit  f(1) // equal to 0
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return false;
     }
     if (bits_tmp != 0) {
@@ -311,7 +311,7 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
   uint64_t sum = 0;
 
   uint32_t val = 0;
-  while (bit_buffer->ReadUInt32(&val)) {
+  while (bit_buffer->ReadUInt32(val)) {
     sum += val;
   }
 
@@ -320,7 +320,7 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
   uint8_t val8 = 0;
   val = 0;
   while (bit_buffer->RemainingBitCount() > 0) {
-    (void)bit_buffer->ReadUInt8(&val8);
+    (void)bit_buffer->ReadUInt8(val8);
     val |= (val8 << (8 * (3 - i)));
     i += 1;
   }

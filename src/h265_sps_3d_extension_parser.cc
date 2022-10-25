@@ -42,13 +42,13 @@ H265Sps3dExtensionParser::ParseSps3dExtension(
 
   for (uint32_t d = 0; d <= 1; d++) {
     // iv_di_mc_enabled_flag[d]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     sps_3d_extension->iv_di_mc_enabled_flag.push_back(bits_tmp);
 
     // iv_mv_scal_enabled_flag[d]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     sps_3d_extension->iv_mv_scal_enabled_flag.push_back(bits_tmp);
@@ -56,71 +56,69 @@ H265Sps3dExtensionParser::ParseSps3dExtension(
     if (d == 0) {
       // log2_ivmc_sub_pb_size_minus3[d]  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(sps_3d_extension->log2_ivmc_sub_pb_size_minus3))) {
+              sps_3d_extension->log2_ivmc_sub_pb_size_minus3)) {
         return nullptr;
       }
 
       // iv_res_pred_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->iv_res_pred_enabled_flag),
-                                1)) {
+      if (!bit_buffer->ReadBits(1,
+                                sps_3d_extension->iv_res_pred_enabled_flag)) {
         return nullptr;
       }
 
       // depth_ref_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->depth_ref_enabled_flag),
-                                1)) {
+      if (!bit_buffer->ReadBits(1, sps_3d_extension->depth_ref_enabled_flag)) {
         return nullptr;
       }
 
       // vsp_mc_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->vsp_mc_enabled_flag), 1)) {
+      if (!bit_buffer->ReadBits(1, sps_3d_extension->vsp_mc_enabled_flag)) {
         return nullptr;
       }
 
       // dbbp_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->dbbp_enabled_flag), 1)) {
+      if (!bit_buffer->ReadBits(1, sps_3d_extension->dbbp_enabled_flag)) {
         return nullptr;
       }
 
     } else {
       // tex_mc_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->tex_mc_enabled_flag), 1)) {
+      if (!bit_buffer->ReadBits(1, sps_3d_extension->tex_mc_enabled_flag)) {
         return nullptr;
       }
 
       // log2_texmc_sub_pb_size_minus3[d]  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(sps_3d_extension->log2_texmc_sub_pb_size_minus3))) {
+              sps_3d_extension->log2_texmc_sub_pb_size_minus3)) {
         return nullptr;
       }
 
       // intra_contour_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->intra_contour_enabled_flag),
-                                1)) {
+      if (!bit_buffer->ReadBits(1,
+                                sps_3d_extension->intra_contour_enabled_flag)) {
         return nullptr;
       }
 
       // intra_dc_only_wedge_enabled_flag[[d]  u(1)
       if (!bit_buffer->ReadBits(
-              &(sps_3d_extension->intra_dc_only_wedge_enabled_flag), 1)) {
+              1, sps_3d_extension->intra_dc_only_wedge_enabled_flag)) {
         return nullptr;
       }
 
       // cqt_cu_part_pred_enabled_flag[d]  u(1)
       if (!bit_buffer->ReadBits(
-              &(sps_3d_extension->cqt_cu_part_pred_enabled_flag), 1)) {
+              1, sps_3d_extension->cqt_cu_part_pred_enabled_flag)) {
         return nullptr;
       }
 
       // inter_dc_only_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->inter_dc_only_enabled_flag),
-                                1)) {
+      if (!bit_buffer->ReadBits(1,
+                                sps_3d_extension->inter_dc_only_enabled_flag)) {
         return nullptr;
       }
 
       // skip_intra_enabled_flag[d]  u(1)
-      if (!bit_buffer->ReadBits(&(sps_3d_extension->skip_intra_enabled_flag),
-                                1)) {
+      if (!bit_buffer->ReadBits(1, sps_3d_extension->skip_intra_enabled_flag)) {
         return nullptr;
       }
     }

@@ -34,7 +34,7 @@ std::unique_ptr<H265AudParser::AudState> H265AudParser::ParseAud(
   auto aud = std::make_unique<AudState>();
 
   // pic_type  u(3)
-  if (!bit_buffer->ReadBits(&(aud->pic_type), 3)) {
+  if (!bit_buffer->ReadBits(3, aud->pic_type)) {
     return nullptr;
   }
 

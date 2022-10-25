@@ -41,7 +41,7 @@ H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
 
   // inter_view_mv_vert_constraint_flag  u(1)
   if (!bit_buffer->ReadBits(
-          &(sps_multilayer_extension->inter_view_mv_vert_constraint_flag), 1)) {
+          1, sps_multilayer_extension->inter_view_mv_vert_constraint_flag)) {
     return nullptr;
   }
 

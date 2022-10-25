@@ -38,37 +38,37 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   auto vps = std::make_shared<VpsState>();
 
   // vps_video_parameter_set_id  u(4)
-  if (!bit_buffer->ReadBits(&(vps->vps_video_parameter_set_id), 4)) {
+  if (!bit_buffer->ReadBits(4, vps->vps_video_parameter_set_id)) {
     return nullptr;
   }
 
   // vps_base_layer_internal_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_base_layer_internal_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_base_layer_internal_flag)) {
     return nullptr;
   }
 
   // vps_base_layer_available_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_base_layer_available_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_base_layer_available_flag)) {
     return nullptr;
   }
 
   // vps_max_layers_minus1  u(6)
-  if (!bit_buffer->ReadBits(&(vps->vps_max_layers_minus1), 6)) {
+  if (!bit_buffer->ReadBits(6, vps->vps_max_layers_minus1)) {
     return nullptr;
   }
 
   // vps_max_sub_layers_minus1  u(3)
-  if (!bit_buffer->ReadBits(&(vps->vps_max_sub_layers_minus1), 3)) {
+  if (!bit_buffer->ReadBits(3, vps->vps_max_sub_layers_minus1)) {
     return nullptr;
   }
 
   // vps_temporal_id_nesting_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_temporal_id_nesting_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_temporal_id_nesting_flag)) {
     return nullptr;
   }
 
   // vps_reserved_0xffff_16bits  u(16)
-  if (!bit_buffer->ReadBits(&(vps->vps_reserved_0xffff_16bits), 16)) {
+  if (!bit_buffer->ReadBits(16, vps->vps_reserved_0xffff_16bits)) {
     return nullptr;
   }
 
@@ -80,8 +80,7 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   // vps_sub_layer_ordering_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_sub_layer_ordering_info_present_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_sub_layer_ordering_info_present_flag)) {
     return nullptr;
   }
 
@@ -90,24 +89,24 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
                          : vps->vps_max_sub_layers_minus1);
        i <= vps->vps_max_sub_layers_minus1; i++) {
     // vps_max_dec_pic_buffering_minus1[i]  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+    if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
       return nullptr;
     }
     vps->vps_max_dec_pic_buffering_minus1.push_back(golomb_tmp);
     // vps_max_num_reorder_pics[i]  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+    if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
       return nullptr;
     }
     vps->vps_max_num_reorder_pics.push_back(golomb_tmp);
     // vps_max_latency_increase_plus1[i]  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+    if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
       return nullptr;
     }
     vps->vps_max_latency_increase_plus1.push_back(golomb_tmp);
   }
 
   // vps_max_layer_id  u(6)
-  if (!bit_buffer->ReadBits(&(vps->vps_max_layer_id), 6)) {
+  if (!bit_buffer->ReadBits(6, vps->vps_max_layer_id)) {
     return nullptr;
   }
   if (vps->vps_max_layer_id > h265limits::VPS_MAX_LAYER_ID_MAX) {
@@ -119,7 +118,7 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   // vps_num_layer_sets_minus1  ue(v)
-  if (!bit_buffer->ReadExponentialGolomb(&(vps->vps_num_layer_sets_minus1))) {
+  if (!bit_buffer->ReadExponentialGolomb(vps->vps_num_layer_sets_minus1)) {
     return nullptr;
   }
   if (vps->vps_num_layer_sets_minus1 >
@@ -136,7 +135,7 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     vps->layer_id_included_flag.emplace_back();
     for (uint32_t j = 0; j <= vps->vps_max_layer_id; j++) {
       // layer_id_included_flag[i][j]  u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       vps->layer_id_included_flag[i - 1].push_back(bits_tmp);
@@ -144,48 +143,48 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   // vps_timing_info_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_timing_info_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_timing_info_present_flag)) {
     return nullptr;
   }
 
   if (vps->vps_timing_info_present_flag) {
     // vps_num_units_in_tick  u(32)
-    if (!bit_buffer->ReadBits(&(vps->vps_num_units_in_tick), 32)) {
+    if (!bit_buffer->ReadBits(32, vps->vps_num_units_in_tick)) {
       return nullptr;
     }
 
     // vps_time_scale  u(32)
-    if (!bit_buffer->ReadBits(&(vps->vps_time_scale), 32)) {
+    if (!bit_buffer->ReadBits(32, vps->vps_time_scale)) {
       return nullptr;
     }
 
     // vps_poc_proportional_to_timing_flag  u(1)
-    if (!bit_buffer->ReadBits(&(vps->vps_poc_proportional_to_timing_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, vps->vps_poc_proportional_to_timing_flag)) {
       return nullptr;
     }
 
     if (vps->vps_poc_proportional_to_timing_flag) {
       // vps_num_ticks_poc_diff_one_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(vps->vps_num_ticks_poc_diff_one_minus1))) {
+              vps->vps_num_ticks_poc_diff_one_minus1)) {
         return nullptr;
       }
     }
     // vps_num_hrd_parameters  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(vps->vps_num_hrd_parameters))) {
+    if (!bit_buffer->ReadExponentialGolomb(vps->vps_num_hrd_parameters)) {
       return nullptr;
     }
 
     for (uint32_t i = 0; i < vps->vps_num_hrd_parameters; i++) {
       // hrd_layer_set_idx[i]  ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       vps->hrd_layer_set_idx.push_back(golomb_tmp);
 
       if (i > 0) {
         // cprms_present_flag[i]  u(1)
-        if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+        if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
           return nullptr;
         }
         vps->cprms_present_flag.push_back(golomb_tmp);
@@ -204,14 +203,14 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   }
 
   // vps_extension_flag  u(1)
-  if (!bit_buffer->ReadBits(&(vps->vps_extension_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, vps->vps_extension_flag)) {
     return nullptr;
   }
 
   if (vps->vps_extension_flag) {
     while (more_rbsp_data(bit_buffer)) {
       // vps_extension_data_flag  u(1)
-      if (!bit_buffer->ReadBits(&(vps->vps_extension_data_flag), 1)) {
+      if (!bit_buffer->ReadBits(1, vps->vps_extension_data_flag)) {
         return nullptr;
       }
     }

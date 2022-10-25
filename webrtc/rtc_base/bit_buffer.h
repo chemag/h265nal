@@ -38,18 +38,20 @@ class BitBuffer {
 
   // Reads byte-sized values from the buffer. Returns false if there isn't
   // enough data left for the specified type.
-  bool ReadUInt8(uint8_t* val);
-  bool ReadUInt16(uint16_t* val);
-  bool ReadUInt32(uint32_t* val);
+  bool ReadUInt8(uint8_t& val);
+  bool ReadUInt16(uint16_t& val);
+  bool ReadUInt32(uint32_t& val);
 
   // Reads bit-sized values from the buffer. Returns false if there isn't enough
   // data left for the specified bit count.
-  bool ReadBits(uint32_t* val, size_t bit_count);
+  bool ReadBits(size_t bit_count, uint32_t& val);
+  bool ReadBits(size_t bit_count, uint64_t& val);
 
   // Peeks bit-sized values from the buffer. Returns false if there isn't enough
   // data left for the specified number of bits. Doesn't move the current
   // offset.
-  bool PeekBits(uint32_t* val, size_t bit_count);
+  bool PeekBits(size_t bit_count, uint32_t& val);
+  bool PeekBits(size_t bit_count, uint64_t& val);
 
   // Reads value in range [0, num_values - 1].
   // This encoding is similar to ReadBits(val, Ceil(Log2(num_values)),
@@ -61,7 +63,10 @@ class BitBuffer {
   // Value v in range [k, num_values - 1] is encoded as (v+k) in n bits.
   // https://aomediacodec.github.io/av1-spec/#nsn
   // Returns false if there isn't enough data left.
-  bool ReadNonSymmetric(uint32_t* val, uint32_t num_values);
+  bool ReadNonSymmetric(uint32_t num_values, uint32_t& val);
+  bool ReadNonSymmetric(uint32_t* val, uint32_t num_values) {
+    return val ? ReadNonSymmetric(num_values, *val) : false;
+  }
 
   // Reads the exponential golomb encoded value at the current offset.
   // Exponential golomb values are encoded as:
@@ -71,11 +76,12 @@ class BitBuffer {
   // and increment the result by 1.
   // Returns false if there isn't enough data left for the specified type, or if
   // the value wouldn't fit in a uint32_t.
-  bool ReadExponentialGolomb(uint32_t* val);
+  bool ReadExponentialGolomb(uint32_t& val);
+
   // Reads signed exponential golomb values at the current offset. Signed
   // exponential golomb values are just the unsigned values mapped to the
   // sequence 0, 1, -1, 2, -2, etc. in order.
-  bool ReadSignedExponentialGolomb(int32_t* val);
+  bool ReadSignedExponentialGolomb(int32_t& val);
 
   // Moves current position |byte_count| bytes forward. Returns false if
   // there aren't enough bytes left in the buffer.

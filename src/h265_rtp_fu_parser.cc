@@ -42,13 +42,13 @@ std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
   }
 
   // read the fu header
-  if (!bit_buffer->ReadBits(&(rtp_fu->s_bit), 1)) {
+  if (!bit_buffer->ReadBits(1, rtp_fu->s_bit)) {
     return nullptr;
   }
-  if (!bit_buffer->ReadBits(&(rtp_fu->e_bit), 1)) {
+  if (!bit_buffer->ReadBits(1, rtp_fu->e_bit)) {
     return nullptr;
   }
-  if (!bit_buffer->ReadBits(&(rtp_fu->fu_type), 6)) {
+  if (!bit_buffer->ReadBits(6, rtp_fu->fu_type)) {
     return nullptr;
   }
 

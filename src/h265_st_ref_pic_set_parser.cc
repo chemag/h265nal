@@ -156,7 +156,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
   if (stRpsIdx != 0) {
     // inter_ref_pic_set_prediction_flag  u(1)
     if (!bit_buffer->ReadBits(
-            &(st_ref_pic_set->inter_ref_pic_set_prediction_flag), 1)) {
+            1, st_ref_pic_set->inter_ref_pic_set_prediction_flag)) {
       return nullptr;
     }
   }
@@ -165,13 +165,13 @@ H265StRefPicSetParser::ParseStRefPicSet(
     if (stRpsIdx == st_ref_pic_set->num_short_term_ref_pic_sets) {
       // delta_idx_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
-              &(st_ref_pic_set->delta_idx_minus1))) {
+              st_ref_pic_set->delta_idx_minus1)) {
         return nullptr;
       }
     }
 
     // delta_rps_sign  u(1)
-    if (!bit_buffer->ReadBits(&(st_ref_pic_set->delta_rps_sign), 1)) {
+    if (!bit_buffer->ReadBits(1, st_ref_pic_set->delta_rps_sign)) {
       return nullptr;
     }
 
@@ -184,7 +184,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
     // abs_delta_rps_minus1  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
-            &(st_ref_pic_set->abs_delta_rps_minus1))) {
+            st_ref_pic_set->abs_delta_rps_minus1)) {
       return nullptr;
     }
 
@@ -205,14 +205,14 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
     for (uint32_t j = 0; j <= NumDeltaPocs_RefRpsIdx; j++) {
       // used_by_curr_pic_flag[j]  u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       st_ref_pic_set->used_by_curr_pic_flag.push_back(bits_tmp);
 
       if (!st_ref_pic_set->used_by_curr_pic_flag.back()) {
         // use_delta_flag[j]  u(1)
-        if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+        if (!bit_buffer->ReadBits(1, bits_tmp)) {
           return nullptr;
         }
       } else {
@@ -226,8 +226,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
   } else {
     // num_negative_pics  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(
-            &(st_ref_pic_set->num_negative_pics))) {
+    if (!bit_buffer->ReadExponentialGolomb(st_ref_pic_set->num_negative_pics)) {
       return nullptr;
     }
     // Section 7.4.8
@@ -241,8 +240,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
     }
 
     // num_positive_pics  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(
-            &(st_ref_pic_set->num_positive_pics))) {
+    if (!bit_buffer->ReadExponentialGolomb(st_ref_pic_set->num_positive_pics)) {
       return nullptr;
     }
     // Section 7.4.8
@@ -259,13 +257,13 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
     for (uint32_t i = 0; i < st_ref_pic_set->num_negative_pics; i++) {
       // delta_poc_s0_minus1[i] ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       st_ref_pic_set->delta_poc_s0_minus1.push_back(golomb_tmp);
 
       // used_by_curr_pic_s0_flag[i] u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       st_ref_pic_set->used_by_curr_pic_s0_flag.push_back(bits_tmp);
@@ -273,13 +271,13 @@ H265StRefPicSetParser::ParseStRefPicSet(
 
     for (uint32_t i = 0; i < st_ref_pic_set->num_positive_pics; i++) {
       // delta_poc_s1_minus1[i] ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       st_ref_pic_set->delta_poc_s1_minus1.push_back(golomb_tmp);
 
       // used_by_curr_pic_s1_flag[i] u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       st_ref_pic_set->used_by_curr_pic_s1_flag.push_back(bits_tmp);

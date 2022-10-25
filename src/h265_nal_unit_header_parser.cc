@@ -49,22 +49,22 @@ H265NalUnitHeaderParser::ParseNalUnitHeader(
   auto nal_unit_header = std::make_unique<NalUnitHeaderState>();
 
   // forbidden_zero_bit  f(1)
-  if (!bit_buffer->ReadBits(&nal_unit_header->forbidden_zero_bit, 1)) {
+  if (!bit_buffer->ReadBits(1, nal_unit_header->forbidden_zero_bit)) {
     return nullptr;
   }
 
   // nal_unit_type  u(6)
-  if (!bit_buffer->ReadBits(&nal_unit_header->nal_unit_type, 6)) {
+  if (!bit_buffer->ReadBits(6, nal_unit_header->nal_unit_type)) {
     return nullptr;
   }
 
   // nuh_layer_id  u(6)
-  if (!bit_buffer->ReadBits(&nal_unit_header->nuh_layer_id, 6)) {
+  if (!bit_buffer->ReadBits(6, nal_unit_header->nuh_layer_id)) {
     return nullptr;
   }
 
   // nuh_temporal_id_plus1  u(3)
-  if (!bit_buffer->ReadBits(&nal_unit_header->nuh_temporal_id_plus1, 3)) {
+  if (!bit_buffer->ReadBits(3, nal_unit_header->nuh_temporal_id_plus1)) {
     return nullptr;
   }
 

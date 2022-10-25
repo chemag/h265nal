@@ -51,26 +51,26 @@ H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
 
   for (uint32_t i = 0; i < CpbCnt; i++) {
     // bit_rate_value_minus1[i]  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+    if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
       return nullptr;
     }
     sub_layer_hrd_parameters->bit_rate_value_minus1.push_back(golomb_tmp);
 
     // cpb_size_value_minus1[i]  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+    if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
       return nullptr;
     }
     sub_layer_hrd_parameters->cpb_size_value_minus1.push_back(golomb_tmp);
 
     if (sub_pic_hrd_params_present_flag) {
       // cpb_size_du_value_minus1[i]  ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       sub_layer_hrd_parameters->cpb_size_du_value_minus1.push_back(golomb_tmp);
 
       // bit_rate_du_value_minus1[i]  ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       sub_layer_hrd_parameters->bit_rate_du_value_minus1.push_back(golomb_tmp);
@@ -80,7 +80,7 @@ H265SubLayerHrdParametersParser::ParseSubLayerHrdParameters(
     }
 
     // cbr_flag[i]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     sub_layer_hrd_parameters->cbr_flag.push_back(bits_tmp);

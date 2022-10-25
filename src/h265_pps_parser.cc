@@ -39,145 +39,144 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   auto pps = std::make_shared<PpsState>();
 
   // pps_pic_parameter_set_id  ue(v)
-  if (!bit_buffer->ReadExponentialGolomb(&(pps->pps_pic_parameter_set_id))) {
+  if (!bit_buffer->ReadExponentialGolomb(pps->pps_pic_parameter_set_id)) {
     return nullptr;
   }
 
   // pps_seq_parameter_set_id  ue(v)
-  if (!bit_buffer->ReadExponentialGolomb(&(pps->pps_seq_parameter_set_id))) {
+  if (!bit_buffer->ReadExponentialGolomb(pps->pps_seq_parameter_set_id)) {
     return nullptr;
   }
 
   // dependent_slice_segments_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->dependent_slice_segments_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->dependent_slice_segments_enabled_flag)) {
     return nullptr;
   }
 
   // output_flag_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->output_flag_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->output_flag_present_flag)) {
     return nullptr;
   }
 
   // num_extra_slice_header_bits  u(3)
-  if (!bit_buffer->ReadBits(&(pps->num_extra_slice_header_bits), 3)) {
+  if (!bit_buffer->ReadBits(3, pps->num_extra_slice_header_bits)) {
     return nullptr;
   }
 
   // sign_data_hiding_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->sign_data_hiding_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->sign_data_hiding_enabled_flag)) {
     return nullptr;
   }
 
   // cabac_init_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->cabac_init_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->cabac_init_present_flag)) {
     return nullptr;
   }
 
   // num_ref_idx_l0_default_active_minus1  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-          &(pps->num_ref_idx_l0_default_active_minus1))) {
+          pps->num_ref_idx_l0_default_active_minus1)) {
     return nullptr;
   }
 
   // num_ref_idx_l1_default_active_minus1  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-          &(pps->num_ref_idx_l1_default_active_minus1))) {
+          pps->num_ref_idx_l1_default_active_minus1)) {
     return nullptr;
   }
 
   // init_qp_minus26  se(v)
-  if (!bit_buffer->ReadSignedExponentialGolomb(&(pps->init_qp_minus26))) {
+  if (!bit_buffer->ReadSignedExponentialGolomb(pps->init_qp_minus26)) {
     return nullptr;
   }
 
   // constrained_intra_pred_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->constrained_intra_pred_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->constrained_intra_pred_flag)) {
     return nullptr;
   }
 
   // transform_skip_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->transform_skip_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->transform_skip_enabled_flag)) {
     return nullptr;
   }
 
   // cu_qp_delta_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->cu_qp_delta_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->cu_qp_delta_enabled_flag)) {
     return nullptr;
   }
 
   if (pps->cu_qp_delta_enabled_flag) {
     // diff_cu_qp_delta_depth  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(pps->diff_cu_qp_delta_depth))) {
+    if (!bit_buffer->ReadExponentialGolomb(pps->diff_cu_qp_delta_depth)) {
       return nullptr;
     }
   }
 
   // pps_cb_qp_offset  se(v)
-  if (!bit_buffer->ReadSignedExponentialGolomb(&(pps->pps_cb_qp_offset))) {
+  if (!bit_buffer->ReadSignedExponentialGolomb(pps->pps_cb_qp_offset)) {
     return nullptr;
   }
 
   // pps_cr_qp_offset  se(v)
-  if (!bit_buffer->ReadSignedExponentialGolomb(&(pps->pps_cr_qp_offset))) {
+  if (!bit_buffer->ReadSignedExponentialGolomb(pps->pps_cr_qp_offset)) {
     return nullptr;
   }
 
   // pps_slice_chroma_qp_offsets_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->pps_slice_chroma_qp_offsets_present_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1, pps->pps_slice_chroma_qp_offsets_present_flag)) {
     return nullptr;
   }
 
   // weighted_pred_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->weighted_pred_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->weighted_pred_flag)) {
     return nullptr;
   }
 
   // weighted_bipred_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->weighted_bipred_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->weighted_bipred_flag)) {
     return nullptr;
   }
 
   // transquant_bypass_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->transquant_bypass_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->transquant_bypass_enabled_flag)) {
     return nullptr;
   }
 
   // tiles_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->tiles_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->tiles_enabled_flag)) {
     return nullptr;
   }
 
   // entropy_coding_sync_enabled_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->entropy_coding_sync_enabled_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->entropy_coding_sync_enabled_flag)) {
     return nullptr;
   }
 
   if (pps->tiles_enabled_flag) {
     // num_tile_columns_minus1  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(pps->num_tile_columns_minus1))) {
+    if (!bit_buffer->ReadExponentialGolomb(pps->num_tile_columns_minus1)) {
       return nullptr;
     }
     // num_tile_rows_minus1  ue(v)
-    if (!bit_buffer->ReadExponentialGolomb(&(pps->num_tile_rows_minus1))) {
+    if (!bit_buffer->ReadExponentialGolomb(pps->num_tile_rows_minus1)) {
       return nullptr;
     }
     // uniform_spacing_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->uniform_spacing_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->uniform_spacing_flag)) {
       return nullptr;
     }
 
     if (!pps->uniform_spacing_flag) {
       for (uint32_t i = 0; i < pps->num_tile_columns_minus1; i++) {
         // column_width_minus1[i]  ue(v)
-        if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+        if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
           return nullptr;
         }
         pps->column_width_minus1.push_back(golomb_tmp);
       }
       for (uint32_t i = 0; i < pps->num_tile_rows_minus1; i++) {
         // row_height_minus1[i]  ue(v)
-        if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+        if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
           return nullptr;
         }
         pps->row_height_minus1.push_back(golomb_tmp);
@@ -185,53 +184,49 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     }
 
     // loop_filter_across_tiles_enabled_flag u(1)
-    if (!bit_buffer->ReadBits(&(pps->loop_filter_across_tiles_enabled_flag),
-                              1)) {
+    if (!bit_buffer->ReadBits(1, pps->loop_filter_across_tiles_enabled_flag)) {
       return nullptr;
     }
   }
 
   // pps_loop_filter_across_slices_enabled_flag u(1)
-  if (!bit_buffer->ReadBits(&(pps->pps_loop_filter_across_slices_enabled_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1,
+                            pps->pps_loop_filter_across_slices_enabled_flag)) {
     return nullptr;
   }
 
   // deblocking_filter_control_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->deblocking_filter_control_present_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1, pps->deblocking_filter_control_present_flag)) {
     return nullptr;
   }
 
   if (pps->deblocking_filter_control_present_flag) {
     // deblocking_filter_override_enabled_flag u(1)
-    if (!bit_buffer->ReadBits(&(pps->deblocking_filter_override_enabled_flag),
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              pps->deblocking_filter_override_enabled_flag)) {
       return nullptr;
     }
 
     // pps_deblocking_filter_disabled_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->pps_deblocking_filter_disabled_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->pps_deblocking_filter_disabled_flag)) {
       return nullptr;
     }
 
     if (!pps->pps_deblocking_filter_disabled_flag) {
       // pps_beta_offset_div2  se(v)
-      if (!bit_buffer->ReadSignedExponentialGolomb(
-              &(pps->pps_beta_offset_div2))) {
+      if (!bit_buffer->ReadSignedExponentialGolomb(pps->pps_beta_offset_div2)) {
         return nullptr;
       }
 
       // pps_tc_offset_div2  se(v)
-      if (!bit_buffer->ReadSignedExponentialGolomb(
-              &(pps->pps_tc_offset_div2))) {
+      if (!bit_buffer->ReadSignedExponentialGolomb(pps->pps_tc_offset_div2)) {
         return nullptr;
       }
     }
   }
 
   // pps_scaling_list_data_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->pps_scaling_list_data_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->pps_scaling_list_data_present_flag)) {
     return nullptr;
   }
 
@@ -245,50 +240,50 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   }
 
   // lists_modification_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->lists_modification_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->lists_modification_present_flag)) {
     return nullptr;
   }
 
   // log2_parallel_merge_level_minus2  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
-          &(pps->log2_parallel_merge_level_minus2))) {
+          pps->log2_parallel_merge_level_minus2)) {
     return nullptr;
   }
 
   // slice_segment_header_extension_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->slice_segment_header_extension_present_flag),
-                            1)) {
+  if (!bit_buffer->ReadBits(1,
+                            pps->slice_segment_header_extension_present_flag)) {
     return nullptr;
   }
 
   // pps_extension_present_flag  u(1)
-  if (!bit_buffer->ReadBits(&(pps->pps_extension_present_flag), 1)) {
+  if (!bit_buffer->ReadBits(1, pps->pps_extension_present_flag)) {
     return nullptr;
   }
 
   if (pps->pps_extension_present_flag) {
     // pps_range_extension_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->pps_range_extension_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->pps_range_extension_flag)) {
       return nullptr;
     }
 
     // pps_multilayer_extension_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->pps_multilayer_extension_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->pps_multilayer_extension_flag)) {
       return nullptr;
     }
 
     // pps_3d_extension_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->pps_3d_extension_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->pps_3d_extension_flag)) {
       return nullptr;
     }
 
     // pps_scc_extension_flag  u(1)
-    if (!bit_buffer->ReadBits(&(pps->pps_scc_extension_flag), 1)) {
+    if (!bit_buffer->ReadBits(1, pps->pps_scc_extension_flag)) {
       return nullptr;
     }
 
     // pps_extension_4bits  u(4)
-    if (!bit_buffer->ReadBits(&(pps->pps_extension_4bits), 4)) {
+    if (!bit_buffer->ReadBits(4, pps->pps_extension_4bits)) {
       return nullptr;
     }
   }
@@ -332,7 +327,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps->pps_extension_4bits) {
     while (more_rbsp_data(bit_buffer)) {
       // pps_extension_data_flag  u(1)
-      if (!bit_buffer->ReadBits(&(pps->pps_extension_data_flag), 1)) {
+      if (!bit_buffer->ReadBits(1, pps->pps_extension_data_flag)) {
         return nullptr;
       }
     }

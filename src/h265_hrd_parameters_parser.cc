@@ -49,13 +49,13 @@ H265HrdParametersParser::ParseHrdParameters(
   if (commonInfPresentFlag) {
     // nal_hrd_parameters_present_flag  u(1)
     if (!bit_buffer->ReadBits(
-            &(hrd_parameters->nal_hrd_parameters_present_flag), 1)) {
+            1, hrd_parameters->nal_hrd_parameters_present_flag)) {
       return nullptr;
     }
 
     // vcl_hrd_parameters_present_flag  u(1)
     if (!bit_buffer->ReadBits(
-            &(hrd_parameters->vcl_hrd_parameters_present_flag), 1)) {
+            1, hrd_parameters->vcl_hrd_parameters_present_flag)) {
       return nullptr;
     }
 
@@ -63,69 +63,68 @@ H265HrdParametersParser::ParseHrdParameters(
         hrd_parameters->vcl_hrd_parameters_present_flag) {
       // sub_pic_hrd_params_present_flag  u(1)
       if (!bit_buffer->ReadBits(
-              &(hrd_parameters->sub_pic_hrd_params_present_flag), 1)) {
+              1, hrd_parameters->sub_pic_hrd_params_present_flag)) {
         return nullptr;
       }
 
       if (hrd_parameters->sub_pic_hrd_params_present_flag) {
         // tick_divisor_minus2  u(8)
-        if (!bit_buffer->ReadBits(&(hrd_parameters->tick_divisor_minus2), 8)) {
+        if (!bit_buffer->ReadBits(8, hrd_parameters->tick_divisor_minus2)) {
           return nullptr;
         }
 
         // du_cpb_removal_delay_increment_length_minus1  u(5)
         if (!bit_buffer->ReadBits(
-                &(hrd_parameters->du_cpb_removal_delay_increment_length_minus1),
-                5)) {
+                5,
+                hrd_parameters->du_cpb_removal_delay_increment_length_minus1)) {
           return nullptr;
         }
 
         // sub_pic_cpb_params_in_pic_timing_sei_flag  u(1)
         if (!bit_buffer->ReadBits(
-                &(hrd_parameters->sub_pic_cpb_params_in_pic_timing_sei_flag),
-                1)) {
+                1, hrd_parameters->sub_pic_cpb_params_in_pic_timing_sei_flag)) {
           return nullptr;
         }
 
         // dpb_output_delay_du_length_minus1  u(5)
         if (!bit_buffer->ReadBits(
-                &(hrd_parameters->dpb_output_delay_du_length_minus1), 5)) {
+                5, hrd_parameters->dpb_output_delay_du_length_minus1)) {
           return nullptr;
         }
       }
 
       // bit_rate_scale  u(4)
-      if (!bit_buffer->ReadBits(&(hrd_parameters->bit_rate_scale), 4)) {
+      if (!bit_buffer->ReadBits(4, hrd_parameters->bit_rate_scale)) {
         return nullptr;
       }
 
       // cpb_size_scale  u(4)
-      if (!bit_buffer->ReadBits(&(hrd_parameters->cpb_size_scale), 4)) {
+      if (!bit_buffer->ReadBits(4, hrd_parameters->cpb_size_scale)) {
         return nullptr;
       }
 
       if (hrd_parameters->sub_pic_hrd_params_present_flag) {
         // cpb_size_du_scale  u(4)
-        if (!bit_buffer->ReadBits(&(hrd_parameters->cpb_size_du_scale), 4)) {
+        if (!bit_buffer->ReadBits(4, hrd_parameters->cpb_size_du_scale)) {
           return nullptr;
         }
       }
 
       // initial_cpb_removal_delay_length_minus1  u(5)
       if (!bit_buffer->ReadBits(
-              &(hrd_parameters->initial_cpb_removal_delay_length_minus1), 5)) {
+              5, hrd_parameters->initial_cpb_removal_delay_length_minus1)) {
         return nullptr;
       }
 
       // au_cpb_removal_delay_length_minus1  u(5)
       if (!bit_buffer->ReadBits(
-              &(hrd_parameters->au_cpb_removal_delay_length_minus1), 5)) {
+              5, hrd_parameters->au_cpb_removal_delay_length_minus1)) {
         return nullptr;
       }
 
       // dpb_output_delay_length_minus1  u(5)
       if (!bit_buffer->ReadBits(
-              &(hrd_parameters->dpb_output_delay_length_minus1), 5)) {
+              5, hrd_parameters->dpb_output_delay_length_minus1)) {
         return nullptr;
       }
     }
@@ -133,14 +132,14 @@ H265HrdParametersParser::ParseHrdParameters(
 
   for (uint32_t i = 0; i <= maxNumSubLayersMinus1; i++) {
     // fixed_pic_rate_general_flag[i]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     hrd_parameters->fixed_pic_rate_general_flag.push_back(bits_tmp);
 
     if (!hrd_parameters->fixed_pic_rate_general_flag[i]) {
       // fixed_pic_rate_within_cvs_flag[i]  u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       hrd_parameters->fixed_pic_rate_within_cvs_flag.push_back(bits_tmp);
@@ -150,7 +149,7 @@ H265HrdParametersParser::ParseHrdParameters(
 
     if (hrd_parameters->fixed_pic_rate_within_cvs_flag[i]) {
       // elemental_duration_in_tc_minus1[i]  ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       hrd_parameters->elemental_duration_in_tc_minus1.push_back(golomb_tmp);
@@ -162,7 +161,7 @@ H265HrdParametersParser::ParseHrdParameters(
       hrd_parameters->elemental_duration_in_tc_minus1.push_back(0);
 
       // low_delay_hrd_flag[i]  u(1)
-      if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
         return nullptr;
       }
       hrd_parameters->low_delay_hrd_flag.push_back(bits_tmp);
@@ -170,7 +169,7 @@ H265HrdParametersParser::ParseHrdParameters(
 
     if (!hrd_parameters->low_delay_hrd_flag[i]) {
       // cpb_cnt_minus1[i]  ue(v)
-      if (!bit_buffer->ReadExponentialGolomb(&golomb_tmp)) {
+      if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
       hrd_parameters->cpb_cnt_minus1.push_back(golomb_tmp);

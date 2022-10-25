@@ -56,19 +56,19 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   }
 
   // general_level_idc  u(8)
-  if (!bit_buffer->ReadBits(&(profile_tier_level->general_level_idc), 8)) {
+  if (!bit_buffer->ReadBits(8, profile_tier_level->general_level_idc)) {
     return nullptr;
   }
 
   for (uint32_t i = 0; i < maxNumSubLayersMinus1; i++) {
     // sub_layer_profile_present_flag[i]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     profile_tier_level->sub_layer_profile_present_flag.push_back(bits_tmp);
 
     // sub_layer_level_present_flag[i]  u(1)
-    if (!bit_buffer->ReadBits(&bits_tmp, 1)) {
+    if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
     }
     profile_tier_level->sub_layer_level_present_flag.push_back(bits_tmp);
@@ -77,7 +77,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
   if (maxNumSubLayersMinus1 > 0) {
     for (uint32_t i = maxNumSubLayersMinus1; i < 8; i++) {
       // reserved_zero_2bits[i]  u(2)
-      if (!bit_buffer->ReadBits(&bits_tmp, 2)) {
+      if (!bit_buffer->ReadBits(2, bits_tmp)) {
         return nullptr;
       }
       profile_tier_level->reserved_zero_2bits.push_back(bits_tmp);
@@ -95,7 +95,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
 
     if (profile_tier_level->sub_layer_profile_present_flag[i]) {
       // sub_layer_level_idc  u(8)
-      if (!bit_buffer->ReadBits(&bits_tmp, 8)) {
+      if (!bit_buffer->ReadBits(8, bits_tmp)) {
         return nullptr;
       }
       profile_tier_level->sub_layer_level_idc.push_back(bits_tmp);
@@ -119,39 +119,38 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
   uint32_t bits_tmp, bits_tmp_hi;
 
   // profile_space  u(2)
-  if (!bit_buffer->ReadBits(&profile_info->profile_space, 2)) {
+  if (!bit_buffer->ReadBits(2, profile_info->profile_space)) {
     return nullptr;
   }
   // tier_flag  u(1)
-  if (!bit_buffer->ReadBits(&profile_info->tier_flag, 1)) {
+  if (!bit_buffer->ReadBits(1, profile_info->tier_flag)) {
     return nullptr;
   }
   // profile_idc  u(5)
-  if (!bit_buffer->ReadBits(&profile_info->profile_idc, 5)) {
+  if (!bit_buffer->ReadBits(5, profile_info->profile_idc)) {
     return nullptr;
   }
   // for (j = 0; j < 32; j++)
   for (uint32_t j = 0; j < 32; j++) {
     // profile_compatibility_flag[j]  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->profile_compatibility_flag[j],
-                              1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->profile_compatibility_flag[j])) {
       return nullptr;
     }
   }
   // progressive_source_flag  u(1)
-  if (!bit_buffer->ReadBits(&profile_info->progressive_source_flag, 1)) {
+  if (!bit_buffer->ReadBits(1, profile_info->progressive_source_flag)) {
     return nullptr;
   }
   // interlaced_source_flag  u(1)
-  if (!bit_buffer->ReadBits(&profile_info->interlaced_source_flag, 1)) {
+  if (!bit_buffer->ReadBits(1, profile_info->interlaced_source_flag)) {
     return nullptr;
   }
   // non_packed_constraint_flag  u(1)
-  if (!bit_buffer->ReadBits(&profile_info->non_packed_constraint_flag, 1)) {
+  if (!bit_buffer->ReadBits(1, profile_info->non_packed_constraint_flag)) {
     return nullptr;
   }
   // frame_only_constraint_flag  u(1)
-  if (!bit_buffer->ReadBits(&profile_info->frame_only_constraint_flag, 1)) {
+  if (!bit_buffer->ReadBits(1, profile_info->frame_only_constraint_flag)) {
     return nullptr;
   }
   if (profile_info->profile_idc == 4 ||
@@ -171,44 +170,42 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
     // The number of bits in this syntax structure is not affected by
     // this condition
     // max_12bit_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_12bit_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->max_12bit_constraint_flag)) {
       return nullptr;
     }
     // max_10bit_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_10bit_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->max_10bit_constraint_flag)) {
       return nullptr;
     }
     // max_8bit_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_8bit_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->max_8bit_constraint_flag)) {
       return nullptr;
     }
     // max_422chroma_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_422chroma_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->max_422chroma_constraint_flag)) {
       return nullptr;
     }
     // max_420chroma_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_420chroma_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->max_420chroma_constraint_flag)) {
       return nullptr;
     }
     // max_monochrome_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->max_monochrome_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              profile_info->max_monochrome_constraint_flag)) {
       return nullptr;
     }
     // intra_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->intra_constraint_flag, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->intra_constraint_flag)) {
       return nullptr;
     }
     // one_picture_only_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->one_picture_only_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              profile_info->one_picture_only_constraint_flag)) {
       return nullptr;
     }
     // lower_bit_rate_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->lower_bit_rate_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              profile_info->lower_bit_rate_constraint_flag)) {
       return nullptr;
     }
     if (profile_info->profile_idc == 5 ||
@@ -218,24 +215,24 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
         profile_info->profile_idc == 10 ||
         profile_info->profile_compatibility_flag[10] == 1) {
       // max_14bit_constraint_flag  u(1)
-      if (!bit_buffer->ReadBits(&profile_info->max_14bit_constraint_flag, 1)) {
+      if (!bit_buffer->ReadBits(1, profile_info->max_14bit_constraint_flag)) {
         return nullptr;
       }
       // reserved_zero_33bits  u(33)
-      if (!bit_buffer->ReadBits(&bits_tmp_hi, 1)) {
+      if (!bit_buffer->ReadBits(1, bits_tmp_hi)) {
         return nullptr;
       }
-      if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+      if (!bit_buffer->ReadBits(32, bits_tmp)) {
         return nullptr;
       }
       profile_info->reserved_zero_33bits =
           ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
     } else {
       // reserved_zero_34bits  u(34)
-      if (!bit_buffer->ReadBits(&bits_tmp_hi, 2)) {
+      if (!bit_buffer->ReadBits(2, bits_tmp_hi)) {
         return nullptr;
       }
-      if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+      if (!bit_buffer->ReadBits(32, bits_tmp)) {
         return nullptr;
       }
       profile_info->reserved_zero_34bits =
@@ -244,29 +241,29 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
   } else if (profile_info->profile_idc == 2 ||
              profile_info->profile_compatibility_flag[2] == 1) {
     // reserved_zero_7bits  u(7)
-    if (!bit_buffer->ReadBits(&profile_info->reserved_zero_7bits, 7)) {
+    if (!bit_buffer->ReadBits(7, profile_info->reserved_zero_7bits)) {
       return nullptr;
     }
     // one_picture_only_constraint_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->one_picture_only_constraint_flag,
-                              1)) {
+    if (!bit_buffer->ReadBits(1,
+                              profile_info->one_picture_only_constraint_flag)) {
       return nullptr;
     }
     // reserved_zero_35bits  u(35)
-    if (!bit_buffer->ReadBits(&bits_tmp_hi, 3)) {
+    if (!bit_buffer->ReadBits(3, bits_tmp_hi)) {
       return nullptr;
     }
-    if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+    if (!bit_buffer->ReadBits(32, bits_tmp)) {
       return nullptr;
     }
     profile_info->reserved_zero_35bits =
         ((uint64_t)bits_tmp_hi << 32) | bits_tmp;
   } else {
     // reserved_zero_43bits  u(43)
-    if (!bit_buffer->ReadBits(&bits_tmp_hi, 11)) {
+    if (!bit_buffer->ReadBits(11, bits_tmp_hi)) {
       return nullptr;
     }
-    if (!bit_buffer->ReadBits(&bits_tmp, 32)) {
+    if (!bit_buffer->ReadBits(32, bits_tmp)) {
       return nullptr;
     }
     profile_info->reserved_zero_43bits =
@@ -283,12 +280,12 @@ H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
       profile_info->profile_compatibility_flag[5] == 1 ||
       profile_info->profile_compatibility_flag[9] == 1) {
     // inbld_flag  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->inbld_flag, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->inbld_flag)) {
       return nullptr;
     }
   } else {
     // reserved_zero_bit  u(1)
-    if (!bit_buffer->ReadBits(&profile_info->reserved_zero_bit, 1)) {
+    if (!bit_buffer->ReadBits(1, profile_info->reserved_zero_bit)) {
       return nullptr;
     }
   }
