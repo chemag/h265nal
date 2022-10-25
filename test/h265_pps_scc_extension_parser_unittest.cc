@@ -38,4 +38,16 @@ TEST_F(H265PpsSccExtensionParserTest, TestSamplePpsSccExtension) {
   EXPECT_EQ(0, pps_scc_extension->pps_palette_predictor_initializers.size());
 }
 
+TEST_F(H265PpsSccExtensionParserTest, TestEnormousLumaBitDepth) {
+  // pps_scc_extension
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0xaa, 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xf2, 0x00, 0x00};
+  // fuzzer::conv: begin
+  auto pps_scc_extension = H265PpsSccExtensionParser::ParsePpsSccExtension(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps_scc_extension == nullptr);
+}
+
 }  // namespace h265nal
