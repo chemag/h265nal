@@ -130,6 +130,18 @@ H265PpsSccExtensionParser::ParsePpsSccExtension(
               (comp == 0)
                   ? (pps_scc_extension->luma_bit_depth_entry_minus8 + 8)
                   : (pps_scc_extension->chroma_bit_depth_entry_minus8 + 8);
+          if (bit_depth == 0) {
+#ifdef FPRINT_ERRORS
+            fprintf(stderr,
+                    "error: invalid luma_bit_depth_entry_minus8: "
+                    "%" PRIu32
+                    " or chroma_bit_depth_entry_minus8: "
+                    "%" PRIu32 "\n",
+                    pps_scc_extension->luma_bit_depth_entry_minus8,
+                    pps_scc_extension->chroma_bit_depth_entry_minus8);
+#endif  // FPRINT_ERRORS
+            return nullptr;
+          }
           if (!bit_buffer->ReadBits(bit_depth, bits_tmp)) {
             return nullptr;
           }
