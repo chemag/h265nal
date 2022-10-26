@@ -41,7 +41,8 @@ TEST_F(H265PpsSccExtensionParserTest, TestSamplePpsSccExtension) {
 TEST_F(H265PpsSccExtensionParserTest, TestEnormousLumaBitDepth) {
   // pps_scc_extension
   // fuzzer::conv: data
-  const uint8_t buffer[] = {0xaa, 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xf2, 0x00, 0x00};
+  const uint8_t buffer[] = {0xa8, 0x00, 0x00, 0x00, 0x03, 0x03, 0xff, 0xff,
+                            0xff, 0xe4, 0x00, 0x00};
   // fuzzer::conv: begin
   auto pps_scc_extension = H265PpsSccExtensionParser::ParsePpsSccExtension(
       buffer, arraysize(buffer));
