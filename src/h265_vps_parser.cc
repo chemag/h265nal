@@ -204,6 +204,18 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
     if (!bit_buffer->ReadExponentialGolomb(vps->vps_num_hrd_parameters)) {
       return nullptr;
     }
+    if (vps->vps_num_hrd_parameters < kVpsNumHdrParameterMin ||
+        vps->vps_num_hrd_parameters > vps->vps_num_layer_sets_minus1 + 1) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid vps_num_hrd_parameters: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vps->vps_num_hrd_parameters, kVpsNumHdrParameterMin,
+              vps->vps_num_layer_sets_minus1 + 1);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     for (uint32_t i = 0; i < vps->vps_num_hrd_parameters; i++) {
       // hrd_layer_set_idx[i]  ue(v)
