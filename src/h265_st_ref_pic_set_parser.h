@@ -21,6 +21,10 @@ class H265StRefPicSetParser {
   // Section 7.4.8: "The value of delta_idx_minus1 shall be in the range
   // of 0 to stRpsIdx - 1, inclusive."
   const static uint32_t kDeltaIdxMinus1Min = 0;
+  // Section 7.4.8: "The value of abs_delta_rps_minus1 shall be in the range
+  // of 0 to 2^15 - 1, inclusive."
+  const static uint32_t kAbsDeltaRpsMinus1Min = 0;
+  const static uint32_t kAbsDeltaRpsMinus1Max = 32767;
 
   // The parsed state of the StRefPicSet.
   struct StRefPicSetState {

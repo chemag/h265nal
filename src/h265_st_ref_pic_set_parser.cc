@@ -192,6 +192,18 @@ H265StRefPicSetParser::ParseStRefPicSet(
             st_ref_pic_set->abs_delta_rps_minus1)) {
       return nullptr;
     }
+    if (st_ref_pic_set->abs_delta_rps_minus1 < kAbsDeltaRpsMinus1Min ||
+        st_ref_pic_set->abs_delta_rps_minus1 > kAbsDeltaRpsMinus1Max) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid abs_delta_rps_minus1: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              st_ref_pic_set->abs_delta_rps_minus1, kAbsDeltaRpsMinus1Min,
+              kAbsDeltaRpsMinus1Max);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     // Equation 7-59
     const uint32_t RefRpsIdx =
