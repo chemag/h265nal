@@ -18,6 +18,10 @@ namespace h265nal {
 // of the 2016-12 standard) from an H265 NALU.
 class H265SpsSccExtensionParser {
  public:
+  // Section A.3.7: "palette_max_size shall be less than or equal to 64"
+  const static uint32_t kPaletteMaxSizeMin = 0;
+  const static uint32_t kPaletteMaxSizeMax = 64;
+
   // The parsed state of the SpsSccExtension.
   struct SpsSccExtensionState {
     SpsSccExtensionState() = default;

@@ -59,6 +59,18 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
             sps_scc_extension->palette_max_size)) {
       return nullptr;
     }
+    if (sps_scc_extension->palette_max_size < kPaletteMaxSizeMin ||
+        sps_scc_extension->palette_max_size > kPaletteMaxSizeMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid palette_max_size: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              sps_scc_extension->palette_max_size, kPaletteMaxSizeMin,
+              kPaletteMaxSizeMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     // delta_palette_max_predictor_size  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
