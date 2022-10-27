@@ -24,6 +24,9 @@ class H265SpsSccExtensionParser {
   // ffmpeg
   const static uint32_t kDeltaPaletteMaxPredictorSizeMin = 0;
   const static uint32_t kDeltaPaletteMaxPredictorSizeMax = 128;
+  // ffmpeg
+  const static uint32_t kSpsNumPalettePredictorInitializersMinus1Min = 0;
+  const static uint32_t kSpsNumPalettePredictorInitializersMinus1Max = 127;
 
   // The parsed state of the SpsSccExtension.
   struct SpsSccExtensionState {

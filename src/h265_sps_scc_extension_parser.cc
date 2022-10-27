@@ -107,6 +107,22 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
                   ->sps_num_palette_predictor_initializers_minus1)) {
         return nullptr;
       }
+      if (sps_scc_extension->sps_num_palette_predictor_initializers_minus1 <
+              kSpsNumPalettePredictorInitializersMinus1Min ||
+          sps_scc_extension->sps_num_palette_predictor_initializers_minus1 >
+              kSpsNumPalettePredictorInitializersMinus1Max) {
+#ifdef FPRINT_ERRORS
+        fprintf(
+            stderr,
+            "invalid sps_num_palette_predictor_initializers_minus1: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps_scc_extension->sps_num_palette_predictor_initializers_minus1,
+            kSpsNumPalettePredictorInitializersMinus1Min,
+            kSpsNumPalettePredictorInitializersMinus1Max);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
 
       uint32_t numComps = (chroma_format_idc == 0) ? 1 : 3;
       uint32_t BitDepth_Y = 8 + bit_depth_luma_minus8;    // Eq 7-4
