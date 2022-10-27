@@ -4,6 +4,8 @@
 
 #include "h265_vps_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -121,6 +123,19 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
   if (!bit_buffer->ReadExponentialGolomb(vps->vps_num_layer_sets_minus1)) {
     return nullptr;
   }
+  if (vps->vps_num_layer_sets_minus1 < kVpsNumLayerSetsMinus1Min ||
+      vps->vps_num_layer_sets_minus1 > kVpsNumLayerSetsMinus1Max) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid vps_num_layer_sets_minus1: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            vps->vps_num_layer_sets_minus1, kVpsNumLayerSetsMinus1Min,
+            kVpsNumLayerSetsMinus1Max);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
+
   if (vps->vps_num_layer_sets_minus1 >
       h265limits::VPS_NUM_LAYER_SETS_MINUS1_MAX) {
 #ifdef FPRINT_ERRORS

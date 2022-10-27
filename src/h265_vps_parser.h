@@ -19,6 +19,11 @@ namespace h265nal {
 // an H265 NALU.
 class H265VpsParser {
  public:
+  // Section 7.4.3.1: "The value of vps_num_layer_sets_minus1 shall be in the
+  // range of 0 to 1023, inclusive."
+  const static uint32_t kVpsNumLayerSetsMinus1Min = 0;
+  const static uint32_t kVpsNumLayerSetsMinus1Max = 1023;
+
   // The parsed state of the VPS. Only some select values are stored.
   // Add more as they are actually needed.
   struct VpsState {
