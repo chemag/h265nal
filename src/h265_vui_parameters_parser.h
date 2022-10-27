@@ -70,6 +70,10 @@ class H265VuiParametersParser {
   // range of 0 to 16, inclusive."
   const static uint32_t kMaxBytesPerPicDenomMin = 0;
   const static uint32_t kMaxBytesPerPicDenomMax = 16;
+  // Section E.3.1: "The value of max_bits_per_min_cu_denom shall be in the
+  // range of 0 to 16, inclusive."
+  const static uint32_t kMaxBitsPerMinCuDenomMin = 0;
+  const static uint32_t kMaxBitsPerMinCuDenomMax = 16;
 
   // The parsed state of the SPS VUI. Only some select values are stored.
   // Add more as they are actually needed.
