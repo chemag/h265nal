@@ -89,6 +89,18 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(sps->chroma_format_idc)) {
     return nullptr;
   }
+  if (sps->chroma_format_idc < kChromaFormatIdcMin ||
+      sps->chroma_format_idc > kChromaFormatIdcMax) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid chroma_format_idc: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps->chroma_format_idc, kChromaFormatIdcMin, kChromaFormatIdcMax);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
+
   if (sps->chroma_format_idc == 3) {
     // separate_colour_plane_flag  u(1)
     if (!bit_buffer->ReadBits(1, sps->separate_colour_plane_flag)) {

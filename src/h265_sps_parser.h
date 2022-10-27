@@ -29,6 +29,10 @@ class H265SpsParser {
   // the range of 0 to 15, inclusive."
   const static uint32_t kSpsSeqParameterSetIdMin = 0;
   const static uint32_t kSpsSeqParameterSetIdMax = 15;
+  // Section 7.4.3.2.1: "The value of chroma_format_idc shall be in
+  // the range of 0 to 3, inclusive."
+  const static uint32_t kChromaFormatIdcMin = 0;
+  const static uint32_t kChromaFormatIdcMax = 3;
 
   // The parsed state of the SPS. Only some select values are stored.
   // Add more as they are actually needed.
