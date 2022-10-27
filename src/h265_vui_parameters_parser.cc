@@ -140,6 +140,21 @@ H265VuiParametersParser::ParseVuiParameters(
             vui->chroma_sample_loc_type_bottom_field)) {
       return nullptr;
     }
+    if (vui->chroma_sample_loc_type_bottom_field <
+            kChromaSampleLocTypeBottomFieldMin ||
+        vui->chroma_sample_loc_type_bottom_field >
+            kChromaSampleLocTypeBottomFieldMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid chroma_sample_loc_type_bottom_field: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->chroma_sample_loc_type_bottom_field,
+              kChromaSampleLocTypeBottomFieldMin,
+              kChromaSampleLocTypeBottomFieldMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
   }
 
   // neutral_chroma_indication_flag  u(1)
