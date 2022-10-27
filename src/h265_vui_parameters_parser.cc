@@ -232,6 +232,18 @@ H265VuiParametersParser::ParseVuiParameters(
     if (!bit_buffer->ReadExponentialGolomb(vui->def_disp_win_bottom_offset)) {
       return nullptr;
     }
+    if (vui->def_disp_win_bottom_offset < kDefDispWinBottomOffsetMin ||
+        vui->def_disp_win_bottom_offset > kDefDispWinBottomOffsetMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid def_disp_win_bottom_offset: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->def_disp_win_bottom_offset, kDefDispWinBottomOffsetMin,
+              kDefDispWinBottomOffsetMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
   }
 
   // vui_timing_info_present_flag  u(1)
