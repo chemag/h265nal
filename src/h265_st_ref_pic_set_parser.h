@@ -30,6 +30,11 @@ class H265StRefPicSetParser {
   // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1],
   // inclusive."
   const static uint32_t kNumNegativePicsMin = 0;
+  // Section 7.4.8: "When nuh_layer_id of the current picture is equal to 0,
+  // the value of num_positive_pics shall be in the range of 0 to
+  // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1] -
+  // num_negative_pics, inclusive."
+  const static uint32_t kNumPositivePicsMin = 0;
 
   // The parsed state of the StRefPicSet.
   struct StRefPicSetState {

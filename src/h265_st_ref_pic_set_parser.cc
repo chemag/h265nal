@@ -263,15 +263,17 @@ H265StRefPicSetParser::ParseStRefPicSet(
     if (!bit_buffer->ReadExponentialGolomb(st_ref_pic_set->num_positive_pics)) {
       return nullptr;
     }
-    // Section 7.4.8
-    // "When nuh_layer_id of the current picture is equal to 0, the value
-    // of num_positive_pics shall be in the range of 0 to
-    // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1] -
-    // num_negative_pics, inclusive."
-
-    if (st_ref_pic_set->num_positive_pics >
-        (max_num_pics - st_ref_pic_set->num_negative_pics)) {
-      // invalid num_positive_pics
+    if (st_ref_pic_set->num_positive_pics < kNumPositivePicsMin ||
+        st_ref_pic_set->num_positive_pics >
+            (max_num_pics - st_ref_pic_set->num_negative_pics)) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid num_positive_pics: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              st_ref_pic_set->num_positive_pics, kNumPositivePicsMin,
+              max_num_pics - st_ref_pic_set->num_negative_pics);
+#endif  // FPRINT_ERRORS
       return nullptr;
     }
 
