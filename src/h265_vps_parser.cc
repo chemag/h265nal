@@ -184,6 +184,21 @@ std::shared_ptr<H265VpsParser::VpsState> H265VpsParser::ParseVps(
               vps->vps_num_ticks_poc_diff_one_minus1)) {
         return nullptr;
       }
+      if (vps->vps_num_ticks_poc_diff_one_minus1 <
+              kVpsNumTicksPocDiffOneMinus1Min ||
+          vps->vps_num_ticks_poc_diff_one_minus1 >
+              kVpsNumTicksPocDiffOneMinus1Max) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "invalid vps_num_ticks_poc_diff_one_minus1: %" PRIu32
+                " not in range "
+                "[%" PRIu32 ", %" PRIu32 "]\n",
+                vps->vps_num_ticks_poc_diff_one_minus1,
+                kVpsNumTicksPocDiffOneMinus1Min,
+                kVpsNumTicksPocDiffOneMinus1Max);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
     }
     // vps_num_hrd_parameters  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(vps->vps_num_hrd_parameters)) {

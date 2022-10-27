@@ -23,6 +23,10 @@ class H265VpsParser {
   // range of 0 to 1023, inclusive."
   const static uint32_t kVpsNumLayerSetsMinus1Min = 0;
   const static uint32_t kVpsNumLayerSetsMinus1Max = 1023;
+  // Section 7.4.3.1: "The value of vps_num_ticks_poc_diff_one_minus1 shall
+  // be in the range of 0 to 2^32 - 2, inclusive."
+  const static uint32_t kVpsNumTicksPocDiffOneMinus1Min = 0;
+  const static uint32_t kVpsNumTicksPocDiffOneMinus1Max = UINT32_MAX - 1;
 
   // The parsed state of the VPS. Only some select values are stored.
   // Add more as they are actually needed.
