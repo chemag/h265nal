@@ -77,6 +77,21 @@ H265SpsSccExtensionParser::ParseSpsSccExtension(
             sps_scc_extension->delta_palette_max_predictor_size)) {
       return nullptr;
     }
+    if (sps_scc_extension->delta_palette_max_predictor_size <
+            kDeltaPaletteMaxPredictorSizeMin ||
+        sps_scc_extension->delta_palette_max_predictor_size >
+            kDeltaPaletteMaxPredictorSizeMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid delta_palette_max_predictor_size: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              sps_scc_extension->delta_palette_max_predictor_size,
+              kDeltaPaletteMaxPredictorSizeMin,
+              kDeltaPaletteMaxPredictorSizeMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     // sps_palette_predictor_initializers_present_flag  u(1)
     if (!bit_buffer->ReadBits(

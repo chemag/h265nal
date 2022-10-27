@@ -21,6 +21,9 @@ class H265SpsSccExtensionParser {
   // Section A.3.7: "palette_max_size shall be less than or equal to 64"
   const static uint32_t kPaletteMaxSizeMin = 0;
   const static uint32_t kPaletteMaxSizeMax = 64;
+  // ffmpeg
+  const static uint32_t kDeltaPaletteMaxPredictorSizeMin = 0;
+  const static uint32_t kDeltaPaletteMaxPredictorSizeMax = 128;
 
   // The parsed state of the SpsSccExtension.
   struct SpsSccExtensionState {
