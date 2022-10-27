@@ -66,6 +66,10 @@ class H265VuiParametersParser {
   // the range of 0 to 4095, inclusive."
   const static uint32_t kMinSpatialSegmentationIdcMin = 0;
   const static uint32_t kMinSpatialSegmentationIdcMax = 4095;
+  // Section E.3.1: "The value of max_bytes_per_pic_denom shall be in the
+  // range of 0 to 16, inclusive."
+  const static uint32_t kMaxBytesPerPicDenomMin = 0;
+  const static uint32_t kMaxBytesPerPicDenomMax = 16;
 
   // The parsed state of the SPS VUI. Only some select values are stored.
   // Add more as they are actually needed.

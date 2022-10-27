@@ -337,6 +337,18 @@ H265VuiParametersParser::ParseVuiParameters(
     if (!bit_buffer->ReadExponentialGolomb(vui->max_bytes_per_pic_denom)) {
       return nullptr;
     }
+    if (vui->max_bytes_per_pic_denom < kMaxBytesPerPicDenomMin ||
+        vui->max_bytes_per_pic_denom > kMaxBytesPerPicDenomMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid max_bytes_per_pic_denom: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->max_bytes_per_pic_denom, kMaxBytesPerPicDenomMin,
+              kMaxBytesPerPicDenomMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     // max_bits_per_min_cu_denom  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(vui->max_bits_per_min_cu_denom)) {
       return nullptr;
