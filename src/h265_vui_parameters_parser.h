@@ -38,6 +38,11 @@ enum AspectRatioType : uint8_t {
 // A class for parsing out a SPS VUI data from an H265 NALU.
 class H265VuiParametersParser {
  public:
+  // Section E.3.1: "The value of chroma_sample_loc_type_top_field [...]
+  // shall be in the range of 0 to 5, inclusive."
+  const static uint32_t kChromaSampleLocTypeTopFieldMin = 0;
+  const static uint32_t kChromaSampleLocTypeTopFieldMax = 5;
+
   // The parsed state of the SPS VUI. Only some select values are stored.
   // Add more as they are actually needed.
   struct VuiParametersState {

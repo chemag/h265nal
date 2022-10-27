@@ -4,6 +4,8 @@
 
 #include "h265_vui_parameters_parser.h"
 
+#define __STDC_FORMAT_MACROS
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -118,6 +120,21 @@ H265VuiParametersParser::ParseVuiParameters(
             vui->chroma_sample_loc_type_top_field)) {
       return nullptr;
     }
+    if (vui->chroma_sample_loc_type_top_field <
+            kChromaSampleLocTypeTopFieldMin ||
+        vui->chroma_sample_loc_type_top_field >
+            kChromaSampleLocTypeTopFieldMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid chroma_sample_loc_type_top_field: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->chroma_sample_loc_type_top_field,
+              kChromaSampleLocTypeTopFieldMin, kChromaSampleLocTypeTopFieldMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
+
     // chroma_sample_loc_type_bottom_field  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(
             vui->chroma_sample_loc_type_bottom_field)) {
