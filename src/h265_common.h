@@ -149,4 +149,8 @@ class NaluChecksum {
   int length;
 };
 
+// some ffmpeg constants
+const uint32_t kMaxWidth = 16888;
+const uint32_t kMaxHeight = 16888;
+
 }  // namespace h265nal
