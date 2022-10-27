@@ -169,16 +169,21 @@ H265StRefPicSetParser::ParseStRefPicSet(
         return nullptr;
       }
     }
-
-    // delta_rps_sign  u(1)
-    if (!bit_buffer->ReadBits(1, st_ref_pic_set->delta_rps_sign)) {
+    if (st_ref_pic_set->delta_idx_minus1 < kDeltaIdxMinus1Min ||
+        st_ref_pic_set->delta_idx_minus1 > (st_ref_pic_set->stRpsIdx - 1)) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid delta_idx_minus1: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              st_ref_pic_set->delta_idx_minus1, kDeltaIdxMinus1Min,
+              st_ref_pic_set->stRpsIdx - 1);
+#endif  // FPRINT_ERRORS
       return nullptr;
     }
 
-    // Section 7.4.8: "The value of delta_idx_minus1 shall be in the range
-    // of 0 to stRpsIdx - 1, inclusive."
-    if (st_ref_pic_set->delta_idx_minus1 > (st_ref_pic_set->stRpsIdx - 1)) {
-      // invalid delta_idx_minus1 value
+    // delta_rps_sign  u(1)
+    if (!bit_buffer->ReadBits(1, st_ref_pic_set->delta_rps_sign)) {
       return nullptr;
     }
 

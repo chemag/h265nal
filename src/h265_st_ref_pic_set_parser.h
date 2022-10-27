@@ -18,6 +18,10 @@ namespace h265nal {
 // standard) from an H265 NALU.
 class H265StRefPicSetParser {
  public:
+  // Section 7.4.8: "The value of delta_idx_minus1 shall be in the range
+  // of 0 to stRpsIdx - 1, inclusive."
+  const static uint32_t kDeltaIdxMinus1Min = 0;
+
   // The parsed state of the StRefPicSet.
   struct StRefPicSetState {
     StRefPicSetState() = default;
