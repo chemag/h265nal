@@ -321,6 +321,18 @@ H265VuiParametersParser::ParseVuiParameters(
     if (!bit_buffer->ReadExponentialGolomb(vui->min_spatial_segmentation_idc)) {
       return nullptr;
     }
+    if (vui->min_spatial_segmentation_idc < kMinSpatialSegmentationIdcMin ||
+        vui->min_spatial_segmentation_idc > kMinSpatialSegmentationIdcMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid min_spatial_segmentation_idc: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->min_spatial_segmentation_idc, kMinSpatialSegmentationIdcMin,
+              kMinSpatialSegmentationIdcMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     // max_bytes_per_pic_denom  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(vui->max_bytes_per_pic_denom)) {
       return nullptr;

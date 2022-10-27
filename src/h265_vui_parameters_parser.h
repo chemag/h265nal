@@ -62,6 +62,10 @@ class H265VuiParametersParser {
   // in the range of 0 to 2^32 - 2, inclusive.
   const static uint32_t kVuiNumTicksPocDiffOneMinus1Min = 0;
   const static uint32_t kVuiNumTicksPocDiffOneMinus1Max = UINT32_MAX - 1;
+  // Section E.3.1: "The value of min_spatial_segmentation_idc shall be in
+  // the range of 0 to 4095, inclusive."
+  const static uint32_t kMinSpatialSegmentationIdcMin = 0;
+  const static uint32_t kMinSpatialSegmentationIdcMax = 4095;
 
   // The parsed state of the SPS VUI. Only some select values are stored.
   // Add more as they are actually needed.
