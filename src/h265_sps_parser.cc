@@ -72,6 +72,18 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(sps->sps_seq_parameter_set_id)) {
     return nullptr;
   }
+  if (sps->sps_seq_parameter_set_id < kSpsSeqParameterSetIdMin ||
+      sps->sps_seq_parameter_set_id > kSpsSeqParameterSetIdMax) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid sps_seq_parameter_set_id: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps->sps_seq_parameter_set_id, kSpsSeqParameterSetIdMin,
+            kSpsSeqParameterSetIdMax);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // chroma_format_idc  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(sps->chroma_format_idc)) {

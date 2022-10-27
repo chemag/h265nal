@@ -25,6 +25,11 @@ namespace h265nal {
 // an H265 NALU.
 class H265SpsParser {
  public:
+  // Section 7.4.3.2.1: "The value of sps_seq_parameter_set_id shall be in
+  // the range of 0 to 15, inclusive."
+  const static uint32_t kSpsSeqParameterSetIdMin = 0;
+  const static uint32_t kSpsSeqParameterSetIdMax = 15;
+
   // The parsed state of the SPS. Only some select values are stored.
   // Add more as they are actually needed.
   struct SpsState {
