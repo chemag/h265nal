@@ -370,6 +370,18 @@ H265VuiParametersParser::ParseVuiParameters(
             vui->log2_max_mv_length_horizontal)) {
       return nullptr;
     }
+    if (vui->log2_max_mv_length_horizontal < kLog2MaxMvLengthHorizontalMin ||
+        vui->log2_max_mv_length_horizontal > kLog2MaxMvLengthHorizontalMax) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid log2_max_mv_length_horizontal: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              vui->log2_max_mv_length_horizontal, kLog2MaxMvLengthHorizontalMin,
+              kLog2MaxMvLengthHorizontalMax);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     // log2_max_mv_length_vertical  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(vui->log2_max_mv_length_vertical)) {
       return nullptr;
