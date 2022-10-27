@@ -49,6 +49,9 @@ class H265VuiParametersParser {
   // from ffmpeg
   const static uint32_t kDefDispWinLeftOffsetMin = 0;
   const static uint32_t kDefDispWinLeftOffsetMax = 16384;
+  // from ffmpeg
+  const static uint32_t kDefDispWinRightOffsetMin = 0;
+  const static uint32_t kDefDispWinRightOffsetMax = 16384;
 
   // The parsed state of the SPS VUI. Only some select values are stored.
   // Add more as they are actually needed.
