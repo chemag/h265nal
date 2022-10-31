@@ -222,6 +222,17 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->conf_win_bottom_offset)) {
       return nullptr;
     }
+    if (sps->conf_win_bottom_offset < 0 ||
+        sps->conf_win_bottom_offset > sps->pic_height_in_luma_samples) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid conf_win_bottom_offset: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              sps->conf_win_bottom_offset, 0, sps->pic_height_in_luma_samples);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
   }
 
   // bit_depth_luma_minus8  ue(v)
