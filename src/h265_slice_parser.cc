@@ -156,6 +156,13 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
     size_t PicSizeInCtbsY = sps->getPicSizeInCtbsY();
     size_t slice_segment_address_len = static_cast<size_t>(
         std::ceil(std::log2(static_cast<float>(PicSizeInCtbsY))));
+    if (slice_segment_address_len == 0) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "invalid slice_segment_address_len: %zu\n",
+              slice_segment_address_len);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     // range: 0 to PicSizeInCtbsY - 1
     // slice_segment_address  u(v)
     if (!bit_buffer->ReadBits(slice_segment_address_len,
