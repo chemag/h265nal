@@ -239,6 +239,18 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(sps->bit_depth_luma_minus8)) {
     return nullptr;
   }
+  if (sps->bit_depth_luma_minus8 < kBitDepthLumaMinus8Min ||
+      sps->bit_depth_luma_minus8 > kBitDepthLumaMinus8Max) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid bit_depth_luma_minus8: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps->bit_depth_luma_minus8, kBitDepthLumaMinus8Min,
+            kBitDepthLumaMinus8Max);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
   // bit_depth_chroma_minus8  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(sps->bit_depth_chroma_minus8)) {
     return nullptr;
