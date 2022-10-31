@@ -33,6 +33,10 @@ class H265SpsParser {
   // the range of 0 to 3, inclusive."
   const static uint32_t kChromaFormatIdcMin = 0;
   const static uint32_t kChromaFormatIdcMax = 3;
+  // Section 7.4.3.2.1: "The value of log2_max_pic_order_cnt_lsb_minus4
+  // shall be in the range of 0 to 12, inclusive."
+  const static uint32_t kLog2MaxPicOrderCntLsbMinus4Min = 0;
+  const static uint32_t kLog2MaxPicOrderCntLsbMinus4Max = 12;
 
   // The parsed state of the SPS. Only some select values are stored.
   // Add more as they are actually needed.

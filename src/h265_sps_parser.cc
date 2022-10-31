@@ -180,6 +180,21 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
           sps->log2_max_pic_order_cnt_lsb_minus4)) {
     return nullptr;
   }
+  if (sps->log2_max_pic_order_cnt_lsb_minus4 <
+          kLog2MaxPicOrderCntLsbMinus4Min ||
+      sps->log2_max_pic_order_cnt_lsb_minus4 >
+          kLog2MaxPicOrderCntLsbMinus4Max) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid log2_max_pic_order_cnt_lsb_minus4: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps->log2_max_pic_order_cnt_lsb_minus4,
+            kLog2MaxPicOrderCntLsbMinus4Min, kLog2MaxPicOrderCntLsbMinus4Max);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
+
   // sps_sub_layer_ordering_info_present_flag  u(1)
   if (!bit_buffer->ReadBits(1, sps->sps_sub_layer_ordering_info_present_flag)) {
     return nullptr;
