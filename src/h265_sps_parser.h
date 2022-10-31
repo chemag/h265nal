@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "h265_common.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_scaling_list_data_parser.h"
 #include "h265_sps_3d_extension_parser.h"
@@ -33,6 +34,10 @@ class H265SpsParser {
   // the range of 0 to 3, inclusive."
   const static uint32_t kChromaFormatIdcMin = 0;
   const static uint32_t kChromaFormatIdcMax = 3;
+  // Section 7.4.3.2.1: "pic_width_in_luma_samples shall not be equal
+  // to 0 and shall be an integer multiple of MinCbSizeY."
+  const static uint32_t kPicWidthInLumaSamplesMin = 1;
+  const static uint32_t kPicWidthInLumaSamplesMax = kMaxWidth;
   // Section 7.4.3.2.1: "The value of log2_max_pic_order_cnt_lsb_minus4
   // shall be in the range of 0 to 12, inclusive."
   const static uint32_t kLog2MaxPicOrderCntLsbMinus4Min = 0;

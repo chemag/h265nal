@@ -112,6 +112,18 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
   if (!bit_buffer->ReadExponentialGolomb(sps->pic_width_in_luma_samples)) {
     return nullptr;
   }
+  if (sps->pic_width_in_luma_samples < kPicWidthInLumaSamplesMin ||
+      sps->pic_width_in_luma_samples > kPicWidthInLumaSamplesMax) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid pic_width_in_luma_samples: %" PRIu32
+            " not in range "
+            "[%" PRIu32 ", %" PRIu32 "]\n",
+            sps->pic_width_in_luma_samples, kPicWidthInLumaSamplesMin,
+            kPicWidthInLumaSamplesMax);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
   // Rec. ITU-T H.265 v5 (02/2018) Page 78
   // "pic_width_in_luma_samples shall not be equal to 0 and shall be an
   // integer multiple of MinCbSizeY."
