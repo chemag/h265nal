@@ -103,7 +103,7 @@ H265PredWeightTableParser::ParsePredWeightTable(
       if (pred_weight_table->chroma_weight_l0_flag[i]) {
         pred_weight_table->delta_chroma_weight_l0.emplace_back();
         pred_weight_table->delta_chroma_offset_l0.emplace_back();
-        for (int j = 0; i < 2; ++j) {
+        for (int j = 0; j < 2; ++j) {
           // delta_chroma_weight_l0[i][j]  se(v)
           if (!bit_buffer->ReadSignedExponentialGolomb(sgolomb_tmp)) {
             return nullptr;
