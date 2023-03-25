@@ -49,7 +49,16 @@ class H265NalUnitParser {
         nal_unit_payload;
   };
 
+  // Parse NAL unit state from the supplied buffer.
+  // Use this function to parse NALUs that have not been escaped
+  // into an RBSP, e.g. with NALUs from an mp4 mdat box.
+  static std::unique_ptr<NalUnitState> ParseNalUnitUnescaped(
+      const uint8_t* data, size_t length,
+      struct H265BitstreamParserState* bitstream_parser_state,
+      bool add_checksum) noexcept;
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
+  // Use this function to parse NALUs that have been escaped
+  // to avoid the start code prefix (0x000001/0x00000001)
   static std::unique_ptr<NalUnitState> ParseNalUnit(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state,

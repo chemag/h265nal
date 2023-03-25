@@ -20,6 +20,17 @@ namespace h265nal {
 // You can find it on this page:
 // http://www.itu.int/rec/T-REC-H.265
 
+// Parse NAL Unit state from the supplied buffer (unescaped version).
+std::unique_ptr<H265NalUnitParser::NalUnitState>
+H265NalUnitParser::ParseNalUnitUnescaped(
+    const uint8_t* data, size_t length,
+    struct H265BitstreamParserState* bitstream_parser_state,
+    bool add_checksum) noexcept {
+  rtc::BitBuffer bit_buffer(data, length);
+
+  return ParseNalUnit(&bit_buffer, bitstream_parser_state, add_checksum);
+}
+
 // Unpack RBSP and parse NAL Unit state from the supplied buffer.
 std::unique_ptr<H265NalUnitParser::NalUnitState>
 H265NalUnitParser::ParseNalUnit(
