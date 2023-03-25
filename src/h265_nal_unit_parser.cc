@@ -62,6 +62,9 @@ H265NalUnitParser::ParseNalUnit(
   nal_unit->nal_unit_payload = H265NalUnitPayloadParser::ParseNalUnitPayload(
       bit_buffer, nal_unit->nal_unit_header->nal_unit_type,
       bitstream_parser_state);
+  if (nal_unit->nal_unit_payload == nullptr) {
+    return nullptr;
+  }
 
   // update the parsed length
   nal_unit->parsed_length = get_current_offset(bit_buffer);
