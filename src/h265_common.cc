@@ -360,4 +360,16 @@ void NaluChecksum::fdump(char *output, int output_len) const {
   }
 }
 
+const char *NaluChecksum::GetPrintableChecksum() const {
+  static char buffer[(kMaxLength * 2) + 1];
+  int i = 0;
+  int oi = 0;
+  while (i < length) {
+    oi +=
+        sprintf(buffer + oi, "%02x", static_cast<unsigned char>(checksum[i++]));
+  }
+  buffer[i] = '\0';
+  return buffer;
+}
+
 }  // namespace h265nal

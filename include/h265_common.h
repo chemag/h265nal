@@ -138,14 +138,17 @@ void fdump_indent_level(FILE *outfp, int indent_level);
 
 class NaluChecksum {
  public:
+  // maximum length (in bytes)
+  const static int kMaxLength = 32;
   static std::shared_ptr<NaluChecksum> GetNaluChecksum(
       rtc::BitBuffer *bit_buffer) noexcept;
   void fdump(char *output, int output_len) const;
   const char *GetChecksum() { return checksum; };
   int GetLength() { return length; };
+  const char *GetPrintableChecksum() const;
 
  private:
-  char checksum[32];
+  char checksum[kMaxLength];
   int length;
 };
 
