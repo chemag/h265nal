@@ -1,5 +1,9 @@
 /*
  *  Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * An Annex-B Parser. It reads a full h265 (HEVC) Annex-B file, and parses
+ * it using a single function (`H265BitstreamParser::ParseBitstream()`).
+ * It then dumps the contents of each NALU read.
  */
 
 #include <getopt.h>
@@ -260,7 +264,7 @@ int main(int argc, char **argv) {
     options->add_length = true;
   }
 
-  // read infile
+  // 1. read infile into buffer
   // TODO(chemag): read the infile incrementally
   FILE *infp = fopen(options->infile, "rb");
   if (infp == nullptr) {
@@ -275,7 +279,7 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> buffer(size);
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
-  // parse bitstream
+  // 2. parse bitstream
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
       h265nal::H265BitstreamParser::ParseBitstream(
           buffer.data(), buffer.size(), options->add_offset,
@@ -299,6 +303,7 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
+  // 3. dump the contents of each NALU
   for (auto &nal_unit : bitstream->nal_units) {
     nal_unit->fdump(outfp, indent_level, options->add_offset,
                     options->add_length, options->add_parsed_length,
@@ -306,7 +311,7 @@ int main(int argc, char **argv) {
     if (options->add_contents) {
       fprintf(outfp, " contents {");
       for (size_t i = 0; i < nal_unit->length; i++) {
-        fprintf(outfp, " 0x%02x,", buffer[nal_unit->offset + i]);
+        fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
         if ((i + 1) % 16 == 0) {
           fprintf(outfp, " ");
         }
