@@ -3,6 +3,8 @@
 # we will use those link directories when building `main`
 #target_link_libraries(main LINK_PUBLIC webrtc)
 
+include_directories(PUBLIC ../include)
+
 include_directories(PUBLIC ../src)
 include_directories(PUBLIC ../webrtc)
 
