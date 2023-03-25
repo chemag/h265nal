@@ -119,11 +119,8 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
   H265BitstreamParserState bitstream_parser_state;
 
-  // create bitstream parser state
-  auto bitstream = std::make_unique<BitstreamState>();
-
   // parse the file
-  bitstream =
+  auto bitstream =
       ParseBitstream(data, length, &bitstream_parser_state, add_checksum);
   if (bitstream == nullptr) {
     // did not work
