@@ -933,4 +933,45 @@ uint32_t H265SpsParser::SpsState::getPicHeightInSamplesC() noexcept {
 }
 #endif
 
+int H265SpsParser::SpsState::getSubWidthC() noexcept {
+  // Table 6-1
+  if (chroma_format_idc == 0 && separate_colour_plane_flag == 0) {
+    // monochrome
+    return 1;
+  } else if (chroma_format_idc == 1 && separate_colour_plane_flag == 0) {
+    // 4:2:0
+    return 2;
+  } else if (chroma_format_idc == 2 && separate_colour_plane_flag == 0) {
+    // 4:2:2
+    return 2;
+  } else if (chroma_format_idc == 3 && separate_colour_plane_flag == 0) {
+    // 4:4:4
+    return 1;
+  } else if (chroma_format_idc == 3 && separate_colour_plane_flag == 1) {
+    // 4:4:0
+    return 1;
+  }
+  return -1;
+}
+
+int H265SpsParser::SpsState::getSubHeightC() noexcept {
+  // Table 6-1
+  if (chroma_format_idc == 0 && separate_colour_plane_flag == 0) {
+    // monochrome
+    return 1;
+  } else if (chroma_format_idc == 1 && separate_colour_plane_flag == 0) {
+    // 4:2:0
+    return 2;
+  } else if (chroma_format_idc == 2 && separate_colour_plane_flag == 0) {
+    // 4:2:2
+    return 1;
+  } else if (chroma_format_idc == 3 && separate_colour_plane_flag == 0) {
+    // 4:4:4
+    return 1;
+  } else if (chroma_format_idc == 3 && separate_colour_plane_flag == 1) {
+    // 4:4:0
+    return 1;
+  }
+  return -1;
+}
 }  // namespace h265nal

@@ -156,6 +156,8 @@ class H265SpsParser {
     uint32_t getPicWidthInSamplesC() noexcept;
     uint32_t getPicHeightInSamplesC() noexcept;
 #endif
+    int getSubWidthC() noexcept;
+    int getSubHeightC() noexcept;
   };
 
   // Unpack RBSP and parse SPS state from the supplied buffer.
