@@ -4,6 +4,7 @@
 
 #include "h265_bitstream_parser.h"
 
+#include <arpa/inet.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -68,6 +69,25 @@ H265BitstreamParser::FindNaluIndices(const uint8_t* data,
   auto it = sequences.rbegin();
   if (it != sequences.rend())
     it->payload_size = length - it->payload_start_offset;
+
+  return sequences;
+}
+
+// NALU search for buffers with explicit nal unit size fields
+std::vector<H265BitstreamParser::NaluIndex>
+H265BitstreamParser::FindNaluIndicesExplicitFraming(const uint8_t* data,
+                                                    size_t length) noexcept {
+  // Assumes 4-byte nal_unit sizes.
+  std::vector<NaluIndex> sequences;
+  const size_t end = length;
+  for (size_t i = 0; i < end;) {
+    // read a nal_unit_size (4 bytes)
+    uint32_t nal_unit_size = ntohl(*(uint32_t*)(data + i));
+    // This is a start sequence
+    NaluIndex index = {i, i + 4, nal_unit_size};
+    sequences.push_back(index);
+    i += (4 + nal_unit_size);
+  }
 
   return sequences;
 }

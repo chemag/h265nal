@@ -64,6 +64,8 @@ class H265BitstreamParser {
   // Returns a vector of the NALU indices in the given buffer.
   static std::vector<NaluIndex> FindNaluIndices(const uint8_t* data,
                                                 size_t length) noexcept;
+  static std::vector<NaluIndex> FindNaluIndicesExplicitFraming(
+      const uint8_t* data, size_t length) noexcept;
 };
 
 }  // namespace h265nal
