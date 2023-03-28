@@ -403,6 +403,13 @@ H265VuiParametersParser::ParseVuiParameters(
   return vui;
 }
 
+float H265VuiParametersParser::VuiParametersState::getFramerate()
+    const noexcept {
+  // Equation D-2
+  float framerate = (float)vui_time_scale / (float)vui_num_units_in_tick;
+  return framerate;
+}
+
 #ifdef FDUMP_DEFINE
 void H265VuiParametersParser::VuiParametersState::fdump(
     FILE* outfp, int indent_level) const {
