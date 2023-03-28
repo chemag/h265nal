@@ -58,8 +58,8 @@ H265RtpSingleParser::ParseRtpSingle(
 }
 
 #ifdef FDUMP_DEFINE
-void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
-                                                int indent_level) const {
+void H265RtpSingleParser::RtpSingleState::fdump(
+    FILE* outfp, int indent_level, ParsingOptions parsing_options) const {
   fprintf(outfp, "rtp_single {");
   indent_level = indent_level_incr(indent_level);
 
@@ -69,7 +69,8 @@ void H265RtpSingleParser::RtpSingleState::fdump(FILE* outfp,
 
   // payload
   fdump_indent_level(outfp, indent_level);
-  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type);
+  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type,
+                          parsing_options);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

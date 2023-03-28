@@ -29,6 +29,7 @@ typedef struct arg_options {
   bool add_length;
   bool add_parsed_length;
   bool add_checksum;
+  bool add_resolution;
   bool add_contents;
   char *infile;
   char *outfile;
@@ -42,6 +43,7 @@ arg_options DEFAULTS{
     .add_length = false,
     .add_parsed_length = false,
     .add_checksum = false,
+    .add_resolution = false,
     .add_contents = false,
     .infile = nullptr,
     .outfile = nullptr,
@@ -73,6 +75,10 @@ void usage(char *name) {
           DEFAULTS.add_checksum ? " [default]" : "");
   fprintf(stderr, "\t--noadd-checksum:\tReset add_checksum flag%s\n",
           !DEFAULTS.add_checksum ? " [default]" : "");
+  fprintf(stderr, "\t--add-resolution:\tSet add_resolution flag%s\n",
+          DEFAULTS.add_resolution ? " [default]" : "");
+  fprintf(stderr, "\t--noadd-resolution:\tReset add_resolution flag%s\n",
+          !DEFAULTS.add_resolution ? " [default]" : "");
   fprintf(stderr, "\t--add-contents:\tSet add_contents flag%s\n",
           DEFAULTS.add_contents ? " [default]" : "");
   fprintf(stderr, "\t--noadd-contents:\tReset add_contents flag%s\n",
@@ -95,6 +101,8 @@ enum {
   NO_ADD_PARSED_LENGTH_FLAG_OPTION,
   ADD_CHECKSUM_FLAG_OPTION,
   NO_ADD_CHECKSUM_FLAG_OPTION,
+  ADD_RESOLUTION_FLAG_OPTION,
+  NO_ADD_RESOLUTION_FLAG_OPTION,
   ADD_CONTENTS_FLAG_OPTION,
   NO_ADD_CONTENTS_FLAG_OPTION,
   VERSION_OPTION,
@@ -128,6 +136,8 @@ arg_options *parse_args(int argc, char **argv) {
        NO_ADD_PARSED_LENGTH_FLAG_OPTION},
       {"add-checksum", no_argument, NULL, ADD_CHECKSUM_FLAG_OPTION},
       {"noadd-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
+      {"add-resolution", no_argument, NULL, ADD_RESOLUTION_FLAG_OPTION},
+      {"noadd-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
       {"noadd-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
@@ -195,6 +205,14 @@ arg_options *parse_args(int argc, char **argv) {
 
       case NO_ADD_CHECKSUM_FLAG_OPTION:
         options.add_checksum = false;
+        break;
+
+      case ADD_RESOLUTION_FLAG_OPTION:
+        options.add_resolution = true;
+        break;
+
+      case NO_ADD_RESOLUTION_FLAG_OPTION:
+        options.add_resolution = false;
         break;
 
       case ADD_CONTENTS_FLAG_OPTION:
@@ -285,6 +303,7 @@ int main(int argc, char **argv) {
   parsing_options.add_length = options->add_length;
   parsing_options.add_parsed_length = options->add_parsed_length;
   parsing_options.add_checksum = options->add_checksum;
+  parsing_options.add_resolution = options->add_resolution;
 
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
       h265nal::H265BitstreamParser::ParseBitstream(buffer.data(), buffer.size(),

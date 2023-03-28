@@ -121,7 +121,8 @@ void H265NalUnitParser::NalUnitState::fdump(
 
   // payload
   fdump_indent_level(outfp, indent_level);
-  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type);
+  nal_unit_payload->fdump(outfp, indent_level, nal_unit_header->nal_unit_type,
+                          parsing_options);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

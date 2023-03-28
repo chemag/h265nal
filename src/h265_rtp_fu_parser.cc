@@ -68,7 +68,8 @@ std::unique_ptr<H265RtpFuParser::RtpFuState> H265RtpFuParser::ParseRtpFu(
 }
 
 #ifdef FDUMP_DEFINE
-void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
+void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level,
+                                        ParsingOptions parsing_options) const {
   fprintf(outfp, "rtp_fu {");
   indent_level = indent_level_incr(indent_level);
 
@@ -87,7 +88,7 @@ void H265RtpFuParser::RtpFuState::fdump(FILE* outfp, int indent_level) const {
   if (s_bit == 1) {
     // start of a fragmented NAL: dump payload
     fdump_indent_level(outfp, indent_level);
-    nal_unit_payload->fdump(outfp, fu_type, indent_level);
+    nal_unit_payload->fdump(outfp, fu_type, indent_level, parsing_options);
   }
 
   indent_level = indent_level_decr(indent_level);

@@ -142,11 +142,13 @@ struct ParsingOptions {
   bool add_length;
   bool add_parsed_length;
   bool add_checksum;
+  bool add_resolution;
   ParsingOptions()
       : add_offset(true),
         add_length(true),
         add_parsed_length(true),
-        add_checksum(true) {}
+        add_checksum(true),
+        add_resolution(true) {}
 };
 
 class NaluChecksum {

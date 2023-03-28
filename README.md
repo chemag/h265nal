@@ -128,10 +128,10 @@ The following code has been copied from `tools/h265nal.cc`:
 std::vector<uint8_t> buffer(size);
 
 // create bitstream parser from the file
+h265nal::ParsingOptions parsing_options;
 std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
       h265nal::H265BitstreamParser::ParseBitstream(
-          buffer.data(), buffer.size(), options->add_offset,
-          options->add_length, options->add_parsed_length);
+          buffer.data(), buffer.size(), parsing_options);
 ```
 
 The `H265BitstreamParser::ParseBitstream()` function receives a generic
@@ -167,6 +167,7 @@ The following code has been copied from `tools/h265nal.nalu.cc`:
   // 4. parse the NALUs one-by-one
   auto bitstream =
       std::make_unique<h265nal::H265BitstreamParser::BitstreamState>();
+  h265nal::ParsingOptions parsing_options;
   for (const auto &nalu_index : nalu_indices) {
     // 4.1. parse 1 NAL unit
     // note: If the NALU comes from an unescaped bitstreams, i.e.,
@@ -174,7 +175,7 @@ The following code has been copied from `tools/h265nal.nalu.cc`:
     // boxes), the right function is `ParseNalUnitUnescaped()`.
     auto nal_unit = h265nal::H265NalUnitParser::ParseNalUnit(
         &data[nalu_index.payload_start_offset], nalu_index.payload_size,
-        &bitstream_parser_state, true /* add_checksum */);
+        &bitstream_parser_state, parsing_options);
     ...
   }
 ```

@@ -591,7 +591,8 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
 }
 
 #ifdef FDUMP_DEFINE
-void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
+void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level,
+                                    ParsingOptions parsing_options) const {
   fprintf(outfp, "sps {");
   indent_level = indent_level_incr(indent_level);
 
@@ -841,6 +842,17 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
     // sps_scc_extension()
     fdump_indent_level(outfp, indent_level);
     sps_scc_extension->fdump(outfp, indent_level);
+  }
+
+  if (parsing_options.add_resolution) {
+    // add video resolution
+    int width = -1;
+    int height = -1;
+    getResolution(&width, &height);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "width: %i", width);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "height: %i", height);
   }
 
   indent_level = indent_level_decr(indent_level);

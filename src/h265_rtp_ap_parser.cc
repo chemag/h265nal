@@ -76,7 +76,8 @@ std::unique_ptr<H265RtpApParser::RtpApState> H265RtpApParser::ParseRtpAp(
 }
 
 #ifdef FDUMP_DEFINE
-void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
+void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level,
+                                        ParsingOptions parsing_options) const {
   fprintf(outfp, "rtp_ap {");
   indent_level = indent_level_incr(indent_level);
 
@@ -92,7 +93,7 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level) const {
 
     fdump_indent_level(outfp, indent_level);
     nal_unit_payloads[i]->fdump(outfp, nal_unit_headers[i]->nal_unit_type,
-                                indent_level);
+                                indent_level, parsing_options);
   }
 
   indent_level = indent_level_decr(indent_level);
