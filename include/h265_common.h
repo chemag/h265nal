@@ -136,6 +136,19 @@ int indent_level_decr(int indent_level);
 void fdump_indent_level(FILE *outfp, int indent_level);
 #endif  // FDUMP_DEFINE
 
+// Generic Parsing Options
+struct ParsingOptions {
+  bool add_offset;
+  bool add_length;
+  bool add_parsed_length;
+  bool add_checksum;
+  ParsingOptions()
+      : add_offset(true),
+        add_length(true),
+        add_parsed_length(true),
+        add_checksum(true) {}
+};
+
 class NaluChecksum {
  public:
   // maximum length (in bytes)

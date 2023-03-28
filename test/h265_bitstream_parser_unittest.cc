@@ -60,9 +60,11 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   // init the BitstreamParserState
   H265BitstreamParserState bitstream_parser_state;
 
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = true;
   auto bitstream = H265BitstreamParser::ParseBitstream(
       buffer, arraysize(buffer), &bitstream_parser_state,
-      /* add_checksum */ true);
+      parsing_options);
   // fuzzer::conv: end
 
   EXPECT_TRUE(bitstream != nullptr);
@@ -133,13 +135,10 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
 
 TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   // init the BitstreamParserState
-  bool add_offset = true;
-  bool add_length = true;
-  bool add_parsed_length = true;
-  bool add_checksum = true;
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = true;
   auto bitstream = H265BitstreamParser::ParseBitstream(
-      buffer, arraysize(buffer), add_offset, add_length, add_parsed_length,
-      add_checksum);
+      buffer, arraysize(buffer), parsing_options);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there are 4 NAL units
@@ -293,9 +292,11 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   H265BitstreamParserState bitstream_parser_state;
 
   // 0. parse buffer0
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = true;
   auto bitstream = H265BitstreamParser::ParseBitstream(
       buffer0, arraysize(buffer0), &bitstream_parser_state,
-      /* add_checksum */ true);
+      parsing_options);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there are 4 NAL units
@@ -364,7 +365,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   // 1. parse buffer1
   bitstream = H265BitstreamParser::ParseBitstream(buffer1, arraysize(buffer1),
                                                   &bitstream_parser_state,
-                                                  /* add_checksum */ true);
+                                                  parsing_options);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there is 1 NAL units
@@ -388,7 +389,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   // 2. parse buffer2
   bitstream = H265BitstreamParser::ParseBitstream(buffer2, arraysize(buffer2),
                                                   &bitstream_parser_state,
-                                                  /* add_checksum */ true);
+                                                  parsing_options);
   EXPECT_TRUE(bitstream != nullptr);
 
   // check there is 1 NAL units

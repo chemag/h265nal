@@ -30,8 +30,8 @@ class H265NalUnitParser {
     NalUnitState& operator=(NalUnitState&&) = delete;
 
 #ifdef FDUMP_DEFINE
-    void fdump(FILE* outfp, int indent_level, bool add_offset, bool add_length,
-               bool add_parsed_length, bool add_checksum) const;
+    void fdump(FILE* outfp, int indent_level,
+               ParsingOptions parsing_options) const;
 #endif  // FDUMP_DEFINE
 
     // NAL Unit offset in the full blob
@@ -55,29 +55,31 @@ class H265NalUnitParser {
   static std::unique_ptr<NalUnitState> ParseNalUnitUnescaped(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state,
-      bool add_checksum) noexcept;
+      ParsingOptions parsing_options) noexcept;
   // Unpack RBSP and parse NAL unit state from the supplied buffer.
   // Use this function to parse NALUs that have been escaped
   // to avoid the start code prefix (0x000001/0x00000001)
   static std::unique_ptr<NalUnitState> ParseNalUnit(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state,
-      bool add_checksum) noexcept;
+      ParsingOptions parsing_options) noexcept;
   static std::unique_ptr<NalUnitState> ParseNalUnit(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state,
-      bool add_checksum) noexcept;
+      ParsingOptions parsing_options) noexcept;
   static std::unique_ptr<NalUnitState> ParseNalUnit(
       const uint8_t* data, size_t length,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept {
-    return ParseNalUnit(data, length, bitstream_parser_state,
-                        /*add_checksum*/ false);
+    ParsingOptions parsing_options;
+    parsing_options.add_checksum = false;
+    return ParseNalUnit(data, length, bitstream_parser_state, parsing_options);
   }
   static std::unique_ptr<NalUnitState> ParseNalUnit(
       rtc::BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept {
-    return ParseNalUnit(bit_buffer, bitstream_parser_state,
-                        /*add_checksum*/ false);
+    ParsingOptions parsing_options;
+    parsing_options.add_checksum = false;
+    return ParseNalUnit(bit_buffer, bitstream_parser_state, parsing_options);
   }
 };
 

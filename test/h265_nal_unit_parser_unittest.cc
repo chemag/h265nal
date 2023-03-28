@@ -28,9 +28,11 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
                             0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
   // fuzzer::conv: begin
   H265BitstreamParserState bitstream_parser_state;
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = true;
   auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
                                                   &bitstream_parser_state,
-                                                  /* add checksum */ true);
+                                                  parsing_options);
   // fuzzer::conv: end
 
   EXPECT_TRUE(nal_unit != nullptr);
@@ -125,9 +127,11 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
 TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
   const uint8_t buffer[] = {};
   H265BitstreamParserState bitstream_parser_state;
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = false;
   auto nal_unit =
       H265NalUnitParser::ParseNalUnit(buffer, 0, &bitstream_parser_state,
-                                      /* add_checksum */ false);
+                                      parsing_options);
   EXPECT_TRUE(nal_unit == nullptr);
 }
 
