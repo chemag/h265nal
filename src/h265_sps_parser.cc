@@ -849,7 +849,8 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level) const {
 }
 #endif  // FDUMP_DEFINE
 
-bool H265SpsParser::SpsState::getMaxNumPics(uint32_t* max_num_pics) noexcept {
+bool H265SpsParser::SpsState::getMaxNumPics(
+    uint32_t* max_num_pics) const noexcept {
   if (sps_max_sub_layers_minus1 >= sps_max_dec_pic_buffering_minus1.size()) {
     // Section 7.4.8: "num_negative_pics specifies the number of entries
     // in the stRpsIdx-th candidate short-term RPS that have picture order
@@ -864,76 +865,76 @@ bool H265SpsParser::SpsState::getMaxNumPics(uint32_t* max_num_pics) noexcept {
   return true;
 }
 
-uint32_t H265SpsParser::SpsState::getMinCbLog2SizeY() noexcept {
+uint32_t H265SpsParser::SpsState::getMinCbLog2SizeY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-10)
   return log2_min_luma_coding_block_size_minus3 + 3;
 }
 
-uint32_t H265SpsParser::SpsState::getCtbLog2SizeY() noexcept {
+uint32_t H265SpsParser::SpsState::getCtbLog2SizeY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-11)
   return getMinCbLog2SizeY() + log2_diff_max_min_luma_coding_block_size;
 }
 
-uint32_t H265SpsParser::SpsState::getMinCbSizeY() noexcept {
+uint32_t H265SpsParser::SpsState::getMinCbSizeY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-12)
   return 1 << getMinCbLog2SizeY();
 }
 
-uint32_t H265SpsParser::SpsState::getCtbSizeY() noexcept {
+uint32_t H265SpsParser::SpsState::getCtbSizeY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-13)
   return 1 << getCtbLog2SizeY();
 }
 
-uint32_t H265SpsParser::SpsState::getPicWidthInMinCbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicWidthInMinCbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-14)
   return pic_width_in_luma_samples / getMinCbSizeY();
 }
 
-uint32_t H265SpsParser::SpsState::getPicWidthInCtbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicWidthInCtbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 79, Equation (7-15)
   return static_cast<uint32_t>(
       std::ceil(1.0 * pic_width_in_luma_samples / getCtbSizeY()));
 }
 
-uint32_t H265SpsParser::SpsState::getPicHeightInMinCbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicHeightInMinCbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-16)
   return pic_height_in_luma_samples / getMinCbSizeY();
 }
 
-uint32_t H265SpsParser::SpsState::getPicHeightInCtbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicHeightInCtbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-17)
   return static_cast<uint32_t>(
       std::ceil(1.0 * pic_height_in_luma_samples / getCtbSizeY()));
 }
 
-uint32_t H265SpsParser::SpsState::getPicSizeInMinCbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicSizeInMinCbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-18)
   return getPicWidthInMinCbsY() * getPicHeightInMinCbsY();
 }
 
-uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicSizeInCtbsY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-19)
   return getPicWidthInCtbsY() * getPicHeightInCtbsY();
 }
 
-uint32_t H265SpsParser::SpsState::getPicSizeInSamplesY() noexcept {
+uint32_t H265SpsParser::SpsState::getPicSizeInSamplesY() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-20)
   return pic_width_in_luma_samples * pic_height_in_luma_samples;
 }
 
 #if 0
-uint32_t H265SpsParser::SpsState::getPicWidthInSamplesC() noexcept {
+uint32_t H265SpsParser::SpsState::getPicWidthInSamplesC() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-21)
   return pic_width_in_luma_samples / getSubWidthC();
 }
 
-uint32_t H265SpsParser::SpsState::getPicHeightInSamplesC() noexcept {
+uint32_t H265SpsParser::SpsState::getPicHeightInSamplesC() const noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 80, Equation (7-22)
   return pic_height_in_luma_samples / getSubHeightC();
 }
 #endif
 
-int H265SpsParser::SpsState::getSubWidthC() noexcept {
+int H265SpsParser::SpsState::getSubWidthC() const noexcept {
   // Table 6-1
   if (chroma_format_idc == 0 && separate_colour_plane_flag == 0) {
     // monochrome
@@ -954,7 +955,7 @@ int H265SpsParser::SpsState::getSubWidthC() noexcept {
   return -1;
 }
 
-int H265SpsParser::SpsState::getSubHeightC() noexcept {
+int H265SpsParser::SpsState::getSubHeightC() const noexcept {
   // Table 6-1
   if (chroma_format_idc == 0 && separate_colour_plane_flag == 0) {
     // monochrome
@@ -975,7 +976,8 @@ int H265SpsParser::SpsState::getSubHeightC() noexcept {
   return -1;
 }
 
-int H265SpsParser::SpsState::getResolution(int* width, int* height) noexcept {
+int H265SpsParser::SpsState::getResolution(int* width,
+                                           int* height) const noexcept {
   if (width == nullptr || height == nullptr) {
     return -1;
   }

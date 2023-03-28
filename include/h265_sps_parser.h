@@ -140,25 +140,25 @@ class H265SpsParser {
     uint32_t sps_extension_data_flag = 0;
 
     // derived values
-    bool getMaxNumPics(uint32_t* max_num_pics) noexcept;
-    uint32_t getMinCbLog2SizeY() noexcept;
-    uint32_t getCtbLog2SizeY() noexcept;
-    uint32_t getMinCbSizeY() noexcept;
-    uint32_t getCtbSizeY() noexcept;
-    uint32_t getPicWidthInMinCbsY() noexcept;
-    uint32_t getPicWidthInCtbsY() noexcept;
-    uint32_t getPicHeightInMinCbsY() noexcept;
-    uint32_t getPicHeightInCtbsY() noexcept;
-    uint32_t getPicSizeInMinCbsY() noexcept;
-    uint32_t getPicSizeInCtbsY() noexcept;
-    uint32_t getPicSizeInSamplesY() noexcept;
+    bool getMaxNumPics(uint32_t* max_num_pics) const noexcept;
+    uint32_t getMinCbLog2SizeY() const noexcept;
+    uint32_t getCtbLog2SizeY() const noexcept;
+    uint32_t getMinCbSizeY() const noexcept;
+    uint32_t getCtbSizeY() const noexcept;
+    uint32_t getPicWidthInMinCbsY() const noexcept;
+    uint32_t getPicWidthInCtbsY() const noexcept;
+    uint32_t getPicHeightInMinCbsY() const noexcept;
+    uint32_t getPicHeightInCtbsY() const noexcept;
+    uint32_t getPicSizeInMinCbsY() const noexcept;
+    uint32_t getPicSizeInCtbsY() const noexcept;
+    uint32_t getPicSizeInSamplesY() const noexcept;
 #if 0
-    uint32_t getPicWidthInSamplesC() noexcept;
-    uint32_t getPicHeightInSamplesC() noexcept;
+    uint32_t getPicWidthInSamplesC() const noexcept;
+    uint32_t getPicHeightInSamplesC() const noexcept;
 #endif
-    int getSubWidthC() noexcept;
-    int getSubHeightC() noexcept;
-    int getResolution(int* width, int* height) noexcept;
+    int getSubWidthC() const noexcept;
+    int getSubHeightC() const noexcept;
+    int getResolution(int* width, int* height) const noexcept;
   };
 
   // Unpack RBSP and parse SPS state from the supplied buffer.
