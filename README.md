@@ -280,21 +280,15 @@ h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
 1. install gtests (see [here](https://stackoverflow.com/questions/15852631/how-to-install-gtest-on-mac-os-x-with-homebrew))
 
 ```
-$ git clone https://github.com/google/googletest
-$ cd googletest
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-$ sudo make install
+$ brew install googletest
 ```
 
 2. install llvm (see [here](https://stackoverflow.com/questions/53111082/how-to-install-clang-tidy-on-macos))
 
 ```
 $ brew install llvm
+$ brew install clang-format
 $ ln -s "$(brew --prefix llvm)/bin/clang-format" "/usr/local/bin/clang-format"
 $ ln -s "$(brew --prefix llvm)/bin/clang-tidy" "/usr/local/bin/clang-tidy"
 $ ln -s "$(brew --prefix llvm)/bin/clang-apply-replacements" "/usr/local/bin/clang-apply-replacements"
 ```
-
