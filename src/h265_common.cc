@@ -38,6 +38,7 @@ bool IsSliceSegment(uint32_t nal_unit_type) {
     case CRA_NUT:
       // slice_segment_layer_rbsp()
       return true;
+    default:
       break;
   }
   return false;
