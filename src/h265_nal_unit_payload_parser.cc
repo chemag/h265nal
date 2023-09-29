@@ -142,7 +142,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       break;
     case PREFIX_SEI_NUT:
     case SUFFIX_SEI_NUT:
-      nal_unit_payload->sei = H265SeiParser::ParseSei(bit_buffer);
+      nal_unit_payload->sei = H265SeiMessageParser::ParseSei(bit_buffer);
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:
