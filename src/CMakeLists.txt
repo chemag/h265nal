@@ -38,6 +38,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_pps_scc_extension_parser.cc
       h265_pps_parser.cc
       h265_aud_parser.cc
+      h265_sei_parser.cc
       h265_slice_parser.cc
       h265_bitstream_parser_state.cc
       h265_bitstream_parser.cc
@@ -65,6 +66,7 @@ else()
       h265_pps_scc_extension_parser.cc
       h265_pps_parser.cc
       h265_aud_parser.cc
+      h265_sei_parser.cc
       h265_rtp_ap_parser.cc
       h265_rtp_fu_parser.cc
       h265_rtp_single_parser.cc
