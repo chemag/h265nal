@@ -11,6 +11,7 @@
 #include "h265_aud_parser.h"
 #include "h265_common.h"
 #include "h265_pps_parser.h"
+#include "h265_sei_parser.h"
 #include "h265_slice_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_vps_parser.h"
@@ -43,6 +44,7 @@ class H265NalUnitPayloadParser {
     std::unique_ptr<struct H265AudParser::AudState> aud;
     std::unique_ptr<struct H265SliceSegmentLayerParser::SliceSegmentLayerState>
         slice_segment_layer;
+    std::unique_ptr<struct H265SeiMessageParser::SeiMessageState> sei;
   };
 
   // Unpack RBSP and parse NAL unit payload state from the supplied buffer.

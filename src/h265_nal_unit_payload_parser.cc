@@ -141,13 +141,8 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
       // TODO(chemag): add support for filler_data()
       break;
     case PREFIX_SEI_NUT:
-      // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information()
-      // (sei)
-      break;
     case SUFFIX_SEI_NUT:
-      // TODO(chemag): add support for supplemental_enhancement_information()
-      // (sei) sei_rbsp()
+      nal_unit_payload->sei = H265SeiMessageParser::ParseSei(bit_buffer);
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:
@@ -252,14 +247,10 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       // TODO(chemag): add support for filler_data()
       break;
     case PREFIX_SEI_NUT:
-      // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information()
-      // (sei)
-      break;
     case SUFFIX_SEI_NUT:
-      // sei_rbsp()
-      // TODO(chemag): add support for supplemental_enhancement_information()
-      // (sei)
+      if (sei) {
+        sei->fdump(outfp, indent_level);
+      }
       break;
     case RSV_NVCL41:
     case RSV_NVCL42:
