@@ -40,7 +40,9 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
   // ff_byte/last_payload_type_byte  f(8)
   ff_byte = 0xff;
   while (ff_byte == 0xff) {
-    bit_buffer->ReadBits(8, ff_byte);
+    if (!bit_buffer->ReadBits(8, ff_byte)) {
+      return nullptr;
+    }
     payload_type += ff_byte;
   }
   sei_message_state->payload_type = static_cast<SeiType>(payload_type);
@@ -48,7 +50,9 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
   // ff_byte/last_payload_size_byte  f(8)
   ff_byte = 0xff;
   while (ff_byte == 0xff) {
-    bit_buffer->ReadBits(8, ff_byte);
+    if (!bit_buffer->ReadBits(8, ff_byte)) {
+      return nullptr;
+    }
     payload_size += ff_byte;
   }
   sei_message_state->payload_size = payload_size;
@@ -87,7 +91,9 @@ H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
       std::make_unique<H265SeiUserDataRegisteredItuTT35State>();
 
   // itu_t_t35_country_code  b(8)
-  bit_buffer->ReadUInt8(payload_state->itu_t_t35_country_code);
+  if (!bit_buffer->ReadUInt8(payload_state->itu_t_t35_country_code)) {
+    return nullptr;
+  }
   remaining_payload_size--;
 
   if (payload_state->itu_t_t35_country_code == 0xff) {
@@ -96,14 +102,18 @@ H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
     }
 
     // itu_t_t35_country_code_extension_byte  b(8)
-    bit_buffer->ReadUInt8(payload_state->itu_t_t35_country_code_extension_byte);
+    if (!bit_buffer->ReadUInt8(payload_state->itu_t_t35_country_code_extension_byte)) {
+      return nullptr;
+    }
     remaining_payload_size--;
   }
 
   payload_state->payload.resize(remaining_payload_size);
   for (size_t i = 0; i < payload_state->payload.size(); ++i) {
     // itu_t_t35_payload_byte  b(8)
-    bit_buffer->ReadUInt8(payload_state->payload[i]);
+    if (!bit_buffer->ReadUInt8(payload_state->payload[i])) {
+      return nullptr;
+    }
   }
   return payload_state;
 }
@@ -120,7 +130,9 @@ H265SeiUnknownParser::parse_payload(rtc::BitBuffer* bit_buffer,
   auto payload_state = std::make_unique<H265SeiUnknownState>();
   payload_state->payload.resize(remaining_payload_size);
   for (size_t i = 0; i < payload_state->payload.size(); ++i) {
-    bit_buffer->ReadUInt8(payload_state->payload[i]);
+    if (!bit_buffer->ReadUInt8(payload_state->payload[i])) {
+      return nullptr;
+    }
   }
   return payload_state;
 }
