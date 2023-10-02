@@ -97,7 +97,6 @@ class H265SeiPayloadParser {
   H265SeiPayloadParser& operator=(H265SeiPayloadParser&&) = delete;
 
   struct H265SeiPayloadState {
-   public:
     H265SeiPayloadState() = default;
     virtual ~H265SeiPayloadState() = default;
     // disable copy ctor, move ctor, and copy&move assignments
@@ -106,7 +105,6 @@ class H265SeiPayloadParser {
     H265SeiPayloadState& operator=(const H265SeiPayloadState&) = delete;
     H265SeiPayloadState& operator=(H265SeiPayloadState&&) = delete;
     virtual void serialize(std::vector<uint8_t>& bytes) const = 0;
-
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const = 0;
 #endif  // FDUMP_DEFINE
@@ -131,11 +129,9 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
     H265SeiUserDataRegisteredItuTT35State& operator=(
         H265SeiUserDataRegisteredItuTT35State&&) = delete;
     virtual void serialize(std::vector<uint8_t>& bytes) const;
-
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
-
     uint8_t itu_t_t35_country_code = 0;
     uint8_t itu_t_t35_country_code_extension_byte = 0;
     std::vector<uint8_t> payload;
@@ -144,25 +140,23 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
       rtc::BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
-class H265SeiNotImplementedParser : public H265SeiPayloadParser {
+class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
-  struct H265SeiNotImplementedState
+  struct H265SeiUnknownState
       : public H265SeiPayloadParser::H265SeiPayloadState {
-    H265SeiNotImplementedState() = default;
-    virtual ~H265SeiNotImplementedState() = default;
+    H265SeiUnknownState() = default;
+    virtual ~H265SeiUnknownState() = default;
     // disable copy ctor, move ctor, and copy&move assignments
-    H265SeiNotImplementedState(const H265SeiNotImplementedState&) = delete;
-    H265SeiNotImplementedState(H265SeiNotImplementedState&&) = delete;
-    H265SeiNotImplementedState& operator=(const H265SeiNotImplementedState&) =
+    H265SeiUnknownState(const H265SeiUnknownState&) = delete;
+    H265SeiUnknownState(H265SeiUnknownState&&) = delete;
+    H265SeiUnknownState& operator=(const H265SeiUnknownState&) =
         delete;
-    H265SeiNotImplementedState& operator=(H265SeiNotImplementedState&&) =
+    H265SeiUnknownState& operator=(H265SeiUnknownState&&) =
         delete;
     virtual void serialize(std::vector<uint8_t>& bytes) const;
-
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
-
     std::vector<uint8_t> payload;
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(

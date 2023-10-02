@@ -48,9 +48,7 @@ TEST_F(H265SeiParserTest, TestUserDataRegisteredItuTT35Sei) {
   EXPECT_EQ(memcmp(buffer, serialized_bytes.data(), serialized_bytes.size()), 0);
 }
 
-// The data in this test is no kind of valid sei, it is just used to test that we
-// create the "Unimplemented" sei state with the raw payload bytes
-TEST_F(H265SeiParserTest, TestSeiNotImplementedSei) {
+TEST_F(H265SeiParserTest, TestUnknownSei) {
 
   std::vector<uint8_t> buffer;
   buffer.push_back(0x03); // a currently unimplemented sei type
@@ -65,7 +63,7 @@ TEST_F(H265SeiParserTest, TestSeiNotImplementedSei) {
   EXPECT_TRUE(sei_message != nullptr);
   EXPECT_EQ(sei_message->payload_type, h265nal::SeiType::filler_payload);
   EXPECT_EQ(sei_message->payload_size, 256);
-  auto unimplemented_state = dynamic_cast<H265SeiNotImplementedParser::H265SeiNotImplementedState*>(sei_message->payload_state.get());
+  auto unimplemented_state = dynamic_cast<H265SeiUnknownParser::H265SeeUnknownState*>(sei_message->payload_state.get());
   EXPECT_TRUE(unimplemented_state != nullptr);
   EXPECT_EQ(unimplemented_state->payload.size(), 256);
   std::vector<uint8_t> serialized_bytes;
