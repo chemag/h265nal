@@ -68,6 +68,9 @@ target_link_libraries(h265_pps_parser_fuzzer PUBLIC h265nal)
 add_executable(h265_aud_parser_fuzzer h265_aud_parser_fuzzer.cc)
 target_link_libraries(h265_aud_parser_fuzzer PUBLIC h265nal)
 
+add_executable(h265_sei_parser_fuzzer h265_sei_parser_fuzzer.cc)
+target_link_libraries(h265_sei_parser_fuzzer PUBLIC h265nal)
+
 if(H265NAL_SMALL_FOOTPRINT)
   message(STATUS "fuzz: small footprint selected")
 
