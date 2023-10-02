@@ -63,7 +63,7 @@ TEST_F(H265SeiParserTest, TestUnknownSei) {
   EXPECT_TRUE(sei_message != nullptr);
   EXPECT_EQ(sei_message->payload_type, h265nal::SeiType::filler_payload);
   EXPECT_EQ(sei_message->payload_size, 256);
-  auto unimplemented_state = dynamic_cast<H265SeiUnknownParser::H265SeeUnknownState*>(sei_message->payload_state.get());
+  auto unimplemented_state = dynamic_cast<H265SeiUnknownParser::H265SeiUnknownState*>(sei_message->payload_state.get());
   EXPECT_TRUE(unimplemented_state != nullptr);
   EXPECT_EQ(unimplemented_state->payload.size(), 256);
   std::vector<uint8_t> serialized_bytes;
