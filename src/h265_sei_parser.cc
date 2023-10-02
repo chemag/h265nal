@@ -34,19 +34,20 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
 
   uint32_t payload_type = 0;
   uint32_t payload_size = 0;
-  uint32_t ff_byte = 0xff;
+  uint8_t ff_byte = 0xff;
   auto sei_message_state = std::make_unique<SeiMessageState>();
 
   while (ff_byte == 0xff) {
-    bit_buffer->ReadBits(8, ff_byte);  // f(8)
+    bit_buffer->ReadUInt8(ff_byte);  // f(8)
     payload_type += ff_byte;
   }
 
   ff_byte = 0xff;
   while (ff_byte == 0xff) {
-    bit_buffer->ReadBits(8, ff_byte);  // f(8)
+    bit_buffer->ReadUInt8(ff_byte);  // f(8)
     payload_size += ff_byte;
   }
+
   sei_message_state->payload_type = static_cast<SeiType>(payload_type);
   sei_message_state->payload_size = payload_size;
 
@@ -64,6 +65,27 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
   sei_message_state->payload_state =
       payload_parser->parse_payload(bit_buffer, payload_size);
   return sei_message_state;
+}
+
+void H265SeiMessageParser::SeiMessageState::serialize(
+    std::vector<uint8_t>& bytes) const {
+  uint32_t remaining_type = static_cast<uint8_t>(payload_type);
+  while (remaining_type > 0xff) {
+    bytes.push_back(0xff);
+    remaining_type -= 0xff;
+  }
+  bytes.push_back(static_cast<uint8_t>(remaining_type));
+
+  uint32_t remaining_size = payload_size;
+  while (remaining_size > 0xff) {
+    bytes.push_back(0xff);
+    remaining_size -= 0xff;
+  }
+  bytes.push_back(static_cast<uint8_t>(remaining_size));
+
+  if (payload_state) {
+    payload_state->serialize(bytes);
+  }
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
@@ -91,6 +113,18 @@ H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
   return payload_state;
 }
 
+void H265SeiUserDataRegisteredItuTT35Parser::
+    H265SeiUserDataRegisteredItuTT35State::serialize(
+        std::vector<uint8_t>& bytes) const {
+  if (itu_t_t35_country_code == 0xff) {
+    bytes.push_back(itu_t_t35_country_code);
+    bytes.push_back(itu_t_t35_country_code_extension_byte);
+  } else {
+    bytes.push_back(itu_t_t35_country_code);
+  }
+  bytes.insert(bytes.end(), payload.begin(), payload.end());
+}
+
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiNotImplementedParser::parse_payload(rtc::BitBuffer* bit_buffer,
                                            uint32_t payload_size) {
@@ -106,6 +140,11 @@ H265SeiNotImplementedParser::parse_payload(rtc::BitBuffer* bit_buffer,
     bit_buffer->ReadUInt8(payload_state->payload[i]);
   }
   return payload_state;
+}
+
+void H265SeiNotImplementedParser::H265SeiNotImplementedState::serialize(
+    std::vector<uint8_t>& bytes) const {
+  bytes.insert(bytes.end(), payload.begin(), payload.end());
 }
 
 #ifdef FDUMP_DEFINE

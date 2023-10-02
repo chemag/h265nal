@@ -97,6 +97,7 @@ class H265SeiPayloadParser {
   H265SeiPayloadParser& operator=(H265SeiPayloadParser&&) = delete;
 
   struct H265SeiPayloadState {
+   public:
     H265SeiPayloadState() = default;
     virtual ~H265SeiPayloadState() = default;
     // disable copy ctor, move ctor, and copy&move assignments
@@ -104,6 +105,8 @@ class H265SeiPayloadParser {
     H265SeiPayloadState(H265SeiPayloadState&&) = delete;
     H265SeiPayloadState& operator=(const H265SeiPayloadState&) = delete;
     H265SeiPayloadState& operator=(H265SeiPayloadState&&) = delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const = 0;
+
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const = 0;
 #endif  // FDUMP_DEFINE
@@ -127,10 +130,12 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
         const H265SeiUserDataRegisteredItuTT35State&) = delete;
     H265SeiUserDataRegisteredItuTT35State& operator=(
         H265SeiUserDataRegisteredItuTT35State&&) = delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
+
     uint8_t itu_t_t35_country_code = 0;
     uint8_t itu_t_t35_country_code_extension_byte = 0;
     std::vector<uint8_t> payload;
@@ -152,10 +157,12 @@ class H265SeiNotImplementedParser : public H265SeiPayloadParser {
         delete;
     H265SeiNotImplementedState& operator=(H265SeiNotImplementedState&&) =
         delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
+
     std::vector<uint8_t> payload;
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
@@ -173,6 +180,7 @@ class H265SeiMessageParser {
     SeiMessageState(SeiMessageState&&) = delete;
     SeiMessageState& operator=(const SeiMessageState&) = delete;
     SeiMessageState& operator=(SeiMessageState&&) = delete;
+    void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
