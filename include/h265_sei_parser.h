@@ -139,18 +139,18 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
       rtc::BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
-class H265SeiNotImplementedParser : public H265SeiPayloadParser {
+class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
-  struct H265SeiNotImplementedState
+  struct H265SeiUnknownState
       : public H265SeiPayloadParser::H265SeiPayloadState {
-    H265SeiNotImplementedState() = default;
-    virtual ~H265SeiNotImplementedState() = default;
+    H265SeiUnknownState() = default;
+    virtual ~H265SeiUnknownState() = default;
     // disable copy ctor, move ctor, and copy&move assignments
-    H265SeiNotImplementedState(const H265SeiNotImplementedState&) = delete;
-    H265SeiNotImplementedState(H265SeiNotImplementedState&&) = delete;
-    H265SeiNotImplementedState& operator=(const H265SeiNotImplementedState&) =
+    H265SeiUnknownState(const H265SeiUnknownState&) = delete;
+    H265SeiUnknownState(H265SeiUnknownState&&) = delete;
+    H265SeiUnknownState& operator=(const H265SeiUnknownState&) =
         delete;
-    H265SeiNotImplementedState& operator=(H265SeiNotImplementedState&&) =
+    H265SeiUnknownState& operator=(H265SeiUnknownState&&) =
         delete;
 
 #ifdef FDUMP_DEFINE
