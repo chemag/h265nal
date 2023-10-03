@@ -148,10 +148,8 @@ class H265SeiUnknownParser : public H265SeiPayloadParser {
     // disable copy ctor, move ctor, and copy&move assignments
     H265SeiUnknownState(const H265SeiUnknownState&) = delete;
     H265SeiUnknownState(H265SeiUnknownState&&) = delete;
-    H265SeiUnknownState& operator=(const H265SeiUnknownState&) =
-        delete;
-    H265SeiUnknownState& operator=(H265SeiUnknownState&&) =
-        delete;
+    H265SeiUnknownState& operator=(const H265SeiUnknownState&) = delete;
+    H265SeiUnknownState& operator=(H265SeiUnknownState&&) = delete;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
