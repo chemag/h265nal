@@ -104,6 +104,8 @@ class H265SeiPayloadParser {
     H265SeiPayloadState(H265SeiPayloadState&&) = delete;
     H265SeiPayloadState& operator=(const H265SeiPayloadState&) = delete;
     H265SeiPayloadState& operator=(H265SeiPayloadState&&) = delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const = 0;
+
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const = 0;
 #endif  // FDUMP_DEFINE
@@ -127,6 +129,7 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
         const H265SeiUserDataRegisteredItuTT35State&) = delete;
     H265SeiUserDataRegisteredItuTT35State& operator=(
         H265SeiUserDataRegisteredItuTT35State&&) = delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
@@ -150,6 +153,7 @@ class H265SeiUnknownParser : public H265SeiPayloadParser {
     H265SeiUnknownState(H265SeiUnknownState&&) = delete;
     H265SeiUnknownState& operator=(const H265SeiUnknownState&) = delete;
     H265SeiUnknownState& operator=(H265SeiUnknownState&&) = delete;
+    virtual void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;
@@ -171,6 +175,7 @@ class H265SeiMessageParser {
     SeiMessageState(SeiMessageState&&) = delete;
     SeiMessageState& operator=(const SeiMessageState&) = delete;
     SeiMessageState& operator=(SeiMessageState&&) = delete;
+    void serialize(std::vector<uint8_t>& bytes) const;
 
 #ifdef FDUMP_DEFINE
     virtual void fdump(FILE* outfp, int indent_level) const;

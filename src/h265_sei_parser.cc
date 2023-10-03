@@ -77,6 +77,27 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
   return sei_message_state;
 }
 
+void H265SeiMessageParser::SeiMessageState::serialize(
+    std::vector<uint8_t>& bytes) const {
+  uint32_t remaining_type = static_cast<uint8_t>(payload_type);
+  while (remaining_type > 0xff) {
+    bytes.push_back(0xff);
+    remaining_type -= 0xff;
+  }
+  bytes.push_back(static_cast<uint8_t>(remaining_type));
+
+  uint32_t remaining_size = payload_size;
+  while (remaining_size > 0xff) {
+    bytes.push_back(0xff);
+    remaining_size -= 0xff;
+  }
+  bytes.push_back(static_cast<uint8_t>(remaining_size));
+
+  if (payload_state) {
+    payload_state->serialize(bytes);
+  }
+}
+
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
     rtc::BitBuffer* bit_buffer, uint32_t payload_size) {
@@ -119,6 +140,18 @@ H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
   return payload_state;
 }
 
+void H265SeiUserDataRegisteredItuTT35Parser::
+    H265SeiUserDataRegisteredItuTT35State::serialize(
+        std::vector<uint8_t>& bytes) const {
+  if (itu_t_t35_country_code == 0xff) {
+    bytes.push_back(itu_t_t35_country_code);
+    bytes.push_back(itu_t_t35_country_code_extension_byte);
+  } else {
+    bytes.push_back(itu_t_t35_country_code);
+  }
+  bytes.insert(bytes.end(), payload.begin(), payload.end());
+}
+
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(rtc::BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
@@ -136,6 +169,11 @@ H265SeiUnknownParser::parse_payload(rtc::BitBuffer* bit_buffer,
     }
   }
   return payload_state;
+}
+
+void H265SeiUnknownParser::H265SeiUnknownState::serialize(
+    std::vector<uint8_t>& bytes) const {
+  bytes.insert(bytes.end(), payload.begin(), payload.end());
 }
 
 #ifdef FDUMP_DEFINE
