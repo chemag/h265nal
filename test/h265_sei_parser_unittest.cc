@@ -43,6 +43,9 @@ TEST_F(H265SeiParserTest, TestUserDataRegisteredItuTT35Sei) {
   EXPECT_TRUE(user_data_sei != nullptr);
   EXPECT_EQ(user_data_sei->itu_t_t35_country_code, 181);
   EXPECT_EQ(user_data_sei->itu_t_t35_country_code_extension_byte, 0);
+  std::vector<uint8_t> serialized_bytes;
+  sei_message->serialize(serialized_bytes);
+  EXPECT_EQ(memcmp(buffer, serialized_bytes.data(), serialized_bytes.size()), 0);
 }
 
 TEST_F(H265SeiParserTest, TestUnknownSei) {
@@ -63,6 +66,9 @@ TEST_F(H265SeiParserTest, TestUnknownSei) {
   auto unimplemented_state = dynamic_cast<H265SeiUnknownParser::H265SeiUnknownState*>(sei_message->payload_state.get());
   EXPECT_TRUE(unimplemented_state != nullptr);
   EXPECT_EQ(unimplemented_state->payload.size(), 256);
+  std::vector<uint8_t> serialized_bytes;
+  sei_message->serialize(serialized_bytes);
+  EXPECT_EQ(memcmp(buffer.data(), serialized_bytes.data(), serialized_bytes.size()), 0);
 }
 
 }  // namespace h265nal
