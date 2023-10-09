@@ -139,6 +139,33 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
       rtc::BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiUserDataUnregisteredParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiUserDataUnregisteredState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiUserDataUnregisteredState() = default;
+    virtual ~H265SeiUserDataUnregisteredState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiUserDataUnregisteredState(const H265SeiUserDataUnregisteredState&) =
+        delete;
+    H265SeiUserDataUnregisteredState(H265SeiUserDataUnregisteredState&&) =
+        delete;
+    H265SeiUserDataUnregisteredState& operator=(
+        const H265SeiUserDataUnregisteredState&) = delete;
+    H265SeiUserDataUnregisteredState& operator=(
+        H265SeiUserDataUnregisteredState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    uint64_t uuid_iso_iec_11578_1 = 0;
+    uint64_t uuid_iso_iec_11578_2 = 0;
+    std::vector<uint8_t> payload;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      rtc::BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState

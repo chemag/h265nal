@@ -4,6 +4,7 @@
 
 #include "h265_sei_parser.h"
 
+#include <inttypes.h>
 #include <stdio.h>
 
 #include <cstdint>
@@ -67,6 +68,9 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
       payload_parser =
           std::make_unique<H265SeiUserDataRegisteredItuTT35Parser>();
       break;
+    case SeiType::user_data_unregistered:
+      payload_parser = std::make_unique<H265SeiUserDataUnregisteredParser>();
+      break;
     default:
       payload_parser = std::make_unique<H265SeiUnknownParser>();
       break;
@@ -80,7 +84,7 @@ H265SeiMessageParser::ParseSei(rtc::BitBuffer* bit_buffer) noexcept {
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
     rtc::BitBuffer* bit_buffer, uint32_t payload_size) {
-  // H265 SEI user data ITU T-35 (access_unit_delimiter_rbsp()) parser.
+  // H265 SEI user data ITU T-35 (user_data_registered_itu_t_t35()) parser.
   // Section D.2.6 ("User data registered by Recommendation ITU-T T.35
   // SEI message syntax") of the H.265 standard for a complete description.
   uint32_t remaining_payload_size = payload_size;
@@ -112,6 +116,53 @@ H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
   payload_state->payload.resize(remaining_payload_size);
   for (size_t i = 0; i < payload_state->payload.size(); ++i) {
     // itu_t_t35_payload_byte  b(8)
+    if (!bit_buffer->ReadUInt8(payload_state->payload[i])) {
+      return nullptr;
+    }
+  }
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiUserDataUnregisteredParser::parse_payload(rtc::BitBuffer* bit_buffer,
+                                                 uint32_t payload_size) {
+  uint32_t bits_tmp;
+
+  // H265 SEI user data unregistered (user_data_unregistered()) parser.
+  // Section D.2.7 ("User data unregisterd SEI message syntax") of
+  // the H.265 standard for a complete description.
+  uint32_t remaining_payload_size = payload_size;
+  if (remaining_payload_size == 0) {
+    return nullptr;
+  }
+  auto payload_state = std::make_unique<H265SeiUserDataUnregisteredState>();
+
+  // uuid_iso_iec_11578  u(128)
+  payload_state->uuid_iso_iec_11578_1 = 0;
+  if (!bit_buffer->ReadBits(32, bits_tmp)) {
+    return nullptr;
+  }
+  payload_state->uuid_iso_iec_11578_1 |= (uint64_t)bits_tmp << 32;
+  if (!bit_buffer->ReadBits(32, bits_tmp)) {
+    return nullptr;
+  }
+  payload_state->uuid_iso_iec_11578_1 |= (uint64_t)bits_tmp << 0;
+
+  payload_state->uuid_iso_iec_11578_2 = 0;
+  if (!bit_buffer->ReadBits(32, bits_tmp)) {
+    return nullptr;
+  }
+  payload_state->uuid_iso_iec_11578_2 |= (uint64_t)bits_tmp << 32;
+  if (!bit_buffer->ReadBits(32, bits_tmp)) {
+    return nullptr;
+  }
+  payload_state->uuid_iso_iec_11578_2 |= (uint64_t)bits_tmp << 0;
+
+  remaining_payload_size -= 16;
+
+  payload_state->payload.resize(remaining_payload_size);
+  for (size_t i = 0; i < payload_state->payload.size(); ++i) {
+    // user_data_payload_byte  b(8)
     if (!bit_buffer->ReadUInt8(payload_state->payload[i])) {
       return nullptr;
     }
@@ -171,6 +222,35 @@ void H265SeiUserDataRegisteredItuTT35Parser::
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "itu_t_t35_country_code_extension_byte: %i",
           itu_t_t35_country_code_extension_byte);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "payload_size: %zu", payload.size());
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "payload {");
+  for (const uint8_t& v : payload) {
+    fprintf(outfp, " %u", v);
+  }
+  fprintf(outfp, " }");
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiUserDataUnregisteredParser::H265SeiUserDataUnregisteredState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "user_data_unregistered {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  // this is an UUID: 4-2-2-2-6 structure
+  fprintf(outfp,
+          "uuid_iso_iec_11578: %08" PRIx64 "-%04" PRIx64 "-%04" PRIx64
+          "-%04" PRIx64 "-%012" PRIx64,
+          uuid_iso_iec_11578_1 >> 32, (uuid_iso_iec_11578_1 >> 8) & 0xffff,
+          (uuid_iso_iec_11578_1 >> 0) & 0xffff, uuid_iso_iec_11578_2 >> 48,
+          uuid_iso_iec_11578_2 & 0x0000ffffffffffff);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "payload_size: %zu", payload.size());
