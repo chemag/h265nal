@@ -132,7 +132,7 @@ H265SeiUserDataUnregisteredParser::parse_payload(rtc::BitBuffer* bit_buffer,
   // Section D.2.7 ("User data unregisterd SEI message syntax") of
   // the H.265 standard for a complete description.
   uint32_t remaining_payload_size = payload_size;
-  if (remaining_payload_size == 0) {
+  if (remaining_payload_size < 16) {
     return nullptr;
   }
   auto payload_state = std::make_unique<H265SeiUserDataUnregisteredState>();
