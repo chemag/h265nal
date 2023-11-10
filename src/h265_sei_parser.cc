@@ -248,7 +248,7 @@ void H265SeiUserDataUnregisteredParser::H265SeiUserDataUnregisteredState::fdump(
   fprintf(outfp,
           "uuid_iso_iec_11578: %08" PRIx64 "-%04" PRIx64 "-%04" PRIx64
           "-%04" PRIx64 "-%012" PRIx64,
-          uuid_iso_iec_11578_1 >> 32, (uuid_iso_iec_11578_1 >> 8) & 0xffff,
+          uuid_iso_iec_11578_1 >> 32, (uuid_iso_iec_11578_1 >> 16) & 0xffff,
           (uuid_iso_iec_11578_1 >> 0) & 0xffff, uuid_iso_iec_11578_2 >> 48,
           uuid_iso_iec_11578_2 & 0x0000ffffffffffff);
 
