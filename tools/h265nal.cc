@@ -257,16 +257,19 @@ arg_options *parse_args(int argc, char **argv) {
 int main(int argc, char **argv) {
   arg_options *options;
 
-#ifdef SMALL_FOOTPRINT
-  printf("h265nal: small footprint version\n");
-#else
-  printf("h265nal: original version\n");
-#endif
   // parse args
   options = parse_args(argc, argv);
   if (options == nullptr) {
     usage(argv[0]);
     exit(-1);
+  }
+
+  if (options->debug > 1) {
+#ifdef SMALL_FOOTPRINT
+    printf("h265nal: small footprint version\n");
+#else
+    printf("h265nal: original version\n");
+#endif
   }
 
   // print args
