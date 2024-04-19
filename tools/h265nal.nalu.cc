@@ -32,19 +32,21 @@ typedef struct arg_options {
   bool add_length;
   bool add_parsed_length;
   bool add_checksum;
+  bool add_resolution;
   bool add_contents;
   char *infile;
   char *outfile;
 } arg_options;
 
 // default option values
-arg_options DEFAULTS{
+arg_options DEFAULT_OPTIONS{
     .debug = 0,
     .as_one_line = true,
     .add_offset = false,
     .add_length = false,
     .add_parsed_length = false,
     .add_checksum = false,
+    .add_resolution = false,
     .add_contents = false,
     .infile = nullptr,
     .outfile = nullptr,
@@ -54,32 +56,38 @@ void usage(char *name) {
   fprintf(stderr, "usage: %s [options]\n", name);
   fprintf(stderr, "where options are:\n");
   fprintf(stderr, "\t-d:\t\tIncrease debug verbosity [default: %i]\n",
-          DEFAULTS.debug);
+          DEFAULT_OPTIONS.debug);
   fprintf(stderr, "\t-q:\t\tZero debug verbosity\n");
+  fprintf(stderr, "\t-i <infile>:\t\tH265 file to parse [default: stdin]\n");
+  fprintf(stderr, "\t-o <output>:\t\tH265 parsing output [default: stdout]\n");
   fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag%s\n",
-          DEFAULTS.as_one_line ? " [default]" : "");
-  fprintf(stderr, "\t--noas-one-line:\tReset as_one_line flag%s\n",
-          !DEFAULTS.as_one_line ? " [default]" : "");
+          DEFAULT_OPTIONS.as_one_line ? " [default]" : "");
+  fprintf(stderr, "\t--no-as-one-line:\tReset as_one_line flag%s\n",
+          !DEFAULT_OPTIONS.as_one_line ? " [default]" : "");
   fprintf(stderr, "\t--add-offset:\tSet add_offset flag%s\n",
-          DEFAULTS.add_offset ? " [default]" : "");
-  fprintf(stderr, "\t--noadd-offset:\tReset add_offset flag%s\n",
-          !DEFAULTS.add_offset ? " [default]" : "");
+          DEFAULT_OPTIONS.add_offset ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-offset:\tReset add_offset flag%s\n",
+          !DEFAULT_OPTIONS.add_offset ? " [default]" : "");
   fprintf(stderr, "\t--add-length:\tSet add_length flag%s\n",
-          DEFAULTS.add_length ? " [default]" : "");
-  fprintf(stderr, "\t--noadd-length:\tReset add_length flag%s\n",
-          !DEFAULTS.add_length ? " [default]" : "");
+          DEFAULT_OPTIONS.add_length ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-length:\tReset add_length flag%s\n",
+          !DEFAULT_OPTIONS.add_length ? " [default]" : "");
   fprintf(stderr, "\t--add-parsed-length:\tSet add_parsed_length flag%s\n",
-          DEFAULTS.add_parsed_length ? " [default]" : "");
-  fprintf(stderr, "\t--noadd-parsed-length:\tReset add_parsed_length flag%s\n",
-          !DEFAULTS.add_parsed_length ? " [default]" : "");
+          DEFAULT_OPTIONS.add_parsed_length ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-parsed-length:\tReset add_parsed_length flag%s\n",
+          !DEFAULT_OPTIONS.add_parsed_length ? " [default]" : "");
   fprintf(stderr, "\t--add-checksum:\tSet add_checksum flag%s\n",
-          DEFAULTS.add_checksum ? " [default]" : "");
-  fprintf(stderr, "\t--noadd-checksum:\tReset add_checksum flag%s\n",
-          !DEFAULTS.add_checksum ? " [default]" : "");
+          DEFAULT_OPTIONS.add_checksum ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-checksum:\tReset add_checksum flag%s\n",
+          !DEFAULT_OPTIONS.add_checksum ? " [default]" : "");
+  fprintf(stderr, "\t--add-resolution:\tSet add_resolution flag%s\n",
+          DEFAULT_OPTIONS.add_resolution ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-resolution:\tReset add_resolution flag%s\n",
+          !DEFAULT_OPTIONS.add_resolution ? " [default]" : "");
   fprintf(stderr, "\t--add-contents:\tSet add_contents flag%s\n",
-          DEFAULTS.add_contents ? " [default]" : "");
-  fprintf(stderr, "\t--noadd-contents:\tReset add_contents flag%s\n",
-          !DEFAULTS.add_contents ? " [default]" : "");
+          DEFAULT_OPTIONS.add_contents ? " [default]" : "");
+  fprintf(stderr, "\t--no-add-contents:\tReset add_contents flag%s\n",
+          !DEFAULT_OPTIONS.add_contents ? " [default]" : "");
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -98,6 +106,8 @@ enum {
   NO_ADD_PARSED_LENGTH_FLAG_OPTION,
   ADD_CHECKSUM_FLAG_OPTION,
   NO_ADD_CHECKSUM_FLAG_OPTION,
+  ADD_RESOLUTION_FLAG_OPTION,
+  NO_ADD_RESOLUTION_FLAG_OPTION,
   ADD_CONTENTS_FLAG_OPTION,
   NO_ADD_CONTENTS_FLAG_OPTION,
   VERSION_OPTION,
@@ -109,7 +119,7 @@ arg_options *parse_args(int argc, char **argv) {
   static arg_options options;
 
   // set default options
-  options = DEFAULTS;
+  options = DEFAULT_OPTIONS;
 
   // getopt_long stores the option index here
   int optindex = 0;
@@ -118,27 +128,31 @@ arg_options *parse_args(int argc, char **argv) {
   static struct option longopts[] = {
       // matching options to short options
       {"debug", no_argument, NULL, 'd'},
+      {"infile", required_argument, NULL, 'i'},
+      {"outfile", required_argument, NULL, 'o'},
       // options without a short option
       {"quiet", no_argument, NULL, QUIET_OPTION},
       {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
-      {"noas-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
+      {"no-as-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
       {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
-      {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
+      {"no-add-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
       {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
-      {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
+      {"no-add-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
       {"add-parsed-length", no_argument, NULL, ADD_PARSED_LENGTH_FLAG_OPTION},
-      {"noadd-parsed-length", no_argument, NULL,
+      {"no-add-parsed-length", no_argument, NULL,
        NO_ADD_PARSED_LENGTH_FLAG_OPTION},
       {"add-checksum", no_argument, NULL, ADD_CHECKSUM_FLAG_OPTION},
-      {"noadd-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
+      {"no-add-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
+      {"add-resolution", no_argument, NULL, ADD_RESOLUTION_FLAG_OPTION},
+      {"no-add-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
-      {"noadd-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
+      {"no-add-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
 
   // parse arguments
-  while ((c = getopt_long(argc, argv, "dh", longopts, &optindex)) != -1) {
+  while ((c = getopt_long(argc, argv, "di:o:h", longopts, &optindex)) != -1) {
     switch (c) {
       case 0:
         // long options that define flag
@@ -158,6 +172,14 @@ arg_options *parse_args(int argc, char **argv) {
 
       case QUIET_OPTION:
         options.debug = 0;
+        break;
+
+      case 'i':
+        options.infile = optarg;
+        break;
+
+      case 'o':
+        options.outfile = optarg;
         break;
 
       case AS_ONE_LINE_FLAG_OPTION:
@@ -200,6 +222,14 @@ arg_options *parse_args(int argc, char **argv) {
         options.add_checksum = false;
         break;
 
+      case ADD_RESOLUTION_FLAG_OPTION:
+        options.add_resolution = true;
+        break;
+
+      case NO_ADD_RESOLUTION_FLAG_OPTION:
+        options.add_resolution = false;
+        break;
+
       case ADD_CONTENTS_FLAG_OPTION:
         options.add_contents = true;
         break;
@@ -223,33 +253,25 @@ arg_options *parse_args(int argc, char **argv) {
     }
   }
 
-  // require 2 extra parameters
-  if ((argc - optind != 1) && (argc - optind != 2)) {
-    fprintf(stderr, "need infile (outfile is optional)\n");
-    usage(argv[0]);
-    return nullptr;
-  }
-
-  options.infile = argv[optind];
-  if (argc - optind == 2) {
-    options.outfile = argv[optind + 1];
-  }
   return &options;
 }
 
 int main(int argc, char **argv) {
   arg_options *options;
 
-#ifdef SMALL_FOOTPRINT
-  printf("h265nal: small footprint version\n");
-#else
-  printf("h265nal: original version\n");
-#endif
   // parse args
   options = parse_args(argc, argv);
   if (options == nullptr) {
     usage(argv[0]);
     exit(-1);
+  }
+
+  if (options->debug > 1) {
+#ifdef SMALL_FOOTPRINT
+    printf("h265nal: small footprint version\n");
+#else
+    printf("h265nal: original version\n");
+#endif
   }
 
   // print args
@@ -269,7 +291,13 @@ int main(int argc, char **argv) {
 
   // 1. read infile into buffer
   // TODO(chemag): read the infile incrementally
-  FILE *infp = fopen(options->infile, "rb");
+  FILE *infp = nullptr;
+  if ((options->infile == nullptr) ||
+      (strlen(options->infile) == 1 && options->infile[0] == '-')) {
+    infp = stdin;
+  } else {
+    infp = fopen(options->infile, "rb");
+  }
   if (infp == nullptr) {
     // did not work
     fprintf(stderr, "Could not open input file: \"%s\"\n", options->infile);
@@ -299,6 +327,7 @@ int main(int argc, char **argv) {
   parsing_options.add_length = options->add_length;
   parsing_options.add_parsed_length = options->add_parsed_length;
   parsing_options.add_checksum = options->add_checksum;
+  parsing_options.add_resolution = options->add_resolution;
 
   // 4. parse the NALUs one-by-one
   auto bitstream =
