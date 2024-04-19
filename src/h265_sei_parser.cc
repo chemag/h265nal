@@ -197,7 +197,7 @@ void H265SeiMessageParser::SeiMessageState::fdump(FILE* outfp,
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "payload_type: %i", payload_type);
+  fprintf(outfp, "payload_type: %i", static_cast<int>(payload_type));
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "payload_size: %u", payload_size);
