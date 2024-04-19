@@ -125,29 +125,31 @@ arg_options *parse_args(int argc, char **argv) {
   static struct option longopts[] = {
       // matching options to short options
       {"debug", no_argument, NULL, 'd'},
+      {"infile", required_argument, NULL, 'i'},
+      {"outfile", required_argument, NULL, 'o'},
       // options without a short option
       {"quiet", no_argument, NULL, QUIET_OPTION},
       {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
-      {"noas-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
+      {"no-as-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
       {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
-      {"noadd-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
+      {"no-add-offset", no_argument, NULL, NO_ADD_OFFSET_FLAG_OPTION},
       {"add-length", no_argument, NULL, ADD_LENGTH_FLAG_OPTION},
-      {"noadd-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
+      {"no-add-length", no_argument, NULL, NO_ADD_LENGTH_FLAG_OPTION},
       {"add-parsed-length", no_argument, NULL, ADD_PARSED_LENGTH_FLAG_OPTION},
-      {"noadd-parsed-length", no_argument, NULL,
+      {"no-add-parsed-length", no_argument, NULL,
        NO_ADD_PARSED_LENGTH_FLAG_OPTION},
       {"add-checksum", no_argument, NULL, ADD_CHECKSUM_FLAG_OPTION},
-      {"noadd-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
+      {"no-add-checksum", no_argument, NULL, NO_ADD_CHECKSUM_FLAG_OPTION},
       {"add-resolution", no_argument, NULL, ADD_RESOLUTION_FLAG_OPTION},
-      {"noadd-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
+      {"no-add-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
-      {"noadd-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
+      {"no-add-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
 
   // parse arguments
-  while ((c = getopt_long(argc, argv, "dh", longopts, &optindex)) != -1) {
+  while ((c = getopt_long(argc, argv, "di:o:h", longopts, &optindex)) != -1) {
     switch (c) {
       case 0:
         // long options that define flag
@@ -167,6 +169,14 @@ arg_options *parse_args(int argc, char **argv) {
 
       case QUIET_OPTION:
         options.debug = 0;
+        break;
+
+      case 'i':
+        options.infile = optarg;
+        break;
+
+      case 'o':
+        options.outfile = optarg;
         break;
 
       case AS_ONE_LINE_FLAG_OPTION:
@@ -240,17 +250,6 @@ arg_options *parse_args(int argc, char **argv) {
     }
   }
 
-  // require 2 extra parameters
-  if ((argc - optind != 1) && (argc - optind != 2)) {
-    fprintf(stderr, "need infile (outfile is optional)\n");
-    usage(argv[0]);
-    return nullptr;
-  }
-
-  options.infile = argv[optind];
-  if (argc - optind == 2) {
-    options.outfile = argv[optind + 1];
-  }
   return &options;
 }
 
@@ -289,7 +288,13 @@ int main(int argc, char **argv) {
 
   // 1. read infile into buffer
   // TODO(chemag): read the infile incrementally
-  FILE *infp = fopen(options->infile, "rb");
+  FILE *infp = nullptr;
+  if ((options->infile == nullptr) ||
+      (strlen(options->infile) == 1 && options->infile[0] == '-')) {
+    infp = stdin;
+  } else {
+    infp = fopen(options->infile, "rb");
+  }
   if (infp == nullptr) {
     // did not work
     fprintf(stderr, "Could not open input file: \"%s\"\n", options->infile);
