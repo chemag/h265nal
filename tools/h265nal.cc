@@ -307,7 +307,7 @@ int main(int argc, char **argv) {
   std::vector<uint8_t> buffer(size);
   fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
 
-  // 2. parse bitstream
+  // 2. prepare bitstream parsing
   h265nal::ParsingOptions parsing_options;
   parsing_options.add_offset = options->add_offset;
   parsing_options.add_length = options->add_length;
@@ -315,6 +315,7 @@ int main(int argc, char **argv) {
   parsing_options.add_checksum = options->add_checksum;
   parsing_options.add_resolution = options->add_resolution;
 
+  // 3. parse bitstream
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
       h265nal::H265BitstreamParser::ParseBitstream(buffer.data(), buffer.size(),
                                                    parsing_options);
@@ -336,7 +337,7 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
-  // 3. dump the contents of each NALU
+  // 4. dump the contents of each NALU
   for (auto &nal_unit : bitstream->nal_units) {
     nal_unit->fdump(outfp, indent_level, parsing_options);
     if (options->add_contents) {
