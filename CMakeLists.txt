@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD 14)
 # set up clang-tidy
 set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-format-style='google'")
 if(WIN32)
-  # Designated initializers throughout project requires C++20 on windows 
+  # Designated initializers throughout project requires C++20 on windows
   set(CMAKE_CXX_STANDARD 20)
   if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++20")
