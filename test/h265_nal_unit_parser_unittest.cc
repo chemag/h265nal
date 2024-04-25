@@ -125,7 +125,7 @@ TEST_F(H265NalUnitParserTest, TestSampleNalUnit) {
 }
 
 TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
-  const uint8_t buffer[] = {};
+  const uint8_t buffer[] = {0};
   H265BitstreamParserState bitstream_parser_state;
   ParsingOptions parsing_options;
   parsing_options.add_checksum = false;

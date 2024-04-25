@@ -4,7 +4,11 @@
 
 #include "h265_bitstream_parser.h"
 
+#if defined WIN32 || defined _WIN32 || defined __CYGWIN__
+#include <winsock.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include <stdio.h>
 
 #include <cstdint>

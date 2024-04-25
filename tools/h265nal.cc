@@ -6,7 +6,11 @@
  * It then dumps the contents of each NALU read.
  */
 
+#if defined WIN32 || defined _WIN32 || defined __CYGWIN__
+#include "ya_getopt.h"
+#else
 #include <getopt.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 
