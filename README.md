@@ -91,7 +91,7 @@ nal_unit { nal_unit_header { forbidden_zero_bit: 0 nal_unit_type: 0 nuh_layer_id
 Parse all the NAL units of an Annex B (`.265` extension) file.
 
 ```
-$ ./tools/h265nal file.265 --noas-one-line --add-length --add-offset
+$ ./tools/h265nal -i file.265 --no-as-one-line --add-length --add-offset
 nal_unit {
   offset: 0x00000004
   length: 23
