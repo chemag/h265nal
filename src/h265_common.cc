@@ -4,7 +4,7 @@
 
 #include "h265_common.h"
 
-#ifdef WIN32
+#if defined WIN32 || defined _WIN32 || defined __CYGWIN__
 #include <winsock2.h>
 #else
 #include <arpa/inet.h>

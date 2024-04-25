@@ -1,0 +1,3 @@
+[submodule "ya_getopt"]
+	path = ya_getopt
+	url = https://github.com/kubo/ya_getopt
