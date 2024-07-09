@@ -250,6 +250,7 @@ arg_options *parse_args(int argc, char **argv) {
       case HELP_OPTION:
       case 'h':
         usage(argv[0]);
+        break;
 
       default:
         printf("Unsupported option: %c\n", c);
