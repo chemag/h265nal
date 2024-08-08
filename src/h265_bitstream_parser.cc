@@ -111,6 +111,12 @@ H265BitstreamParser::ParseBitstream(
 
   // (1) split the input string into a vector of NAL units
   std::vector<NaluIndex> nalu_indices = FindNaluIndices(data, length);
+  if (nalu_indices.size() == 0) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "error: no NAL units found on bitstream (zero NALU indices)\n");
+#endif  // FPRINT_ERRORS
+  }
 
   // process each of the NAL units
   for (const NaluIndex& nalu_index : nalu_indices) {
