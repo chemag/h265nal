@@ -130,6 +130,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   if (bitstream_parser_state->pps.find(pps_id) ==
       bitstream_parser_state->pps.end()) {
     // non-existent PPS id
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "non-existent PPS id: %u\n", pps_id);
+#endif  // FPRINT_ERRORS
     return nullptr;
   }
   auto& pps = bitstream_parser_state->pps[pps_id];
@@ -139,6 +142,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   if (bitstream_parser_state->sps.find(sps_id) ==
       bitstream_parser_state->sps.end()) {
     // non-existent SPS id
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "non-existent SPS id: %u\n", sps_id);
+#endif  // FPRINT_ERRORS
     return nullptr;
   }
   auto& sps = bitstream_parser_state->sps[sps_id];
