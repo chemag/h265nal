@@ -154,6 +154,23 @@ bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type) {
   return false;
 }
 
+// NALU packing uses a mechanism to identify the start of a new NALU
+// based on a 3-byte start code sequence. The idea is that every NALU
+// starts with the binary string "\x00\x00\x01" ("start code prefix").
+// In order to avoid the start code prefix to appear by chance in the
+// middle of a NALU, the NALU is checked, and every appearance of a
+// start code prefix is replaced by a 4-byte escaped version. The
+// escaped version consists of adding a "\x03" byte as the third
+// byte of the string. This means that the "\x00\x00\x01" string,
+// when it is not a start code prefix, is replaced with the
+// "\x00\x00\x03\x01" string. Note that we also need to escape the
+// "\x00\x00\x03" string (using "\x00\x00\x03\x03" instead). For
+// completeness, "\x00\x00\x00" and "\x00\x00\x02" are also escaped.
+//
+// UnescapeRbsp() takes a escaped string (where any 3-byte string
+// where the first 2x bytes are "\x00" and the third byte is "\x00",
+// "\x01", "\x02", or "\x03" have been escaped (and extra "\x03"
+// has been inserted as third byte), and returns the unescaped one.
 std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
   std::vector<uint8_t> out;
   out.reserve(length);
