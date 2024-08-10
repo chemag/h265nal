@@ -45,6 +45,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_nal_unit_header_parser.cc
       h265_nal_unit_payload_parser.cc
       h265_nal_unit_parser.cc
+      h265_configuration_box_parser.cc
 )
 else()
   add_library(h265nal
@@ -77,6 +78,7 @@ else()
       h265_nal_unit_header_parser.cc
       h265_nal_unit_payload_parser.cc
       h265_nal_unit_parser.cc
+      h265_configuration_box_parser.cc
 )
 endif()
 
