@@ -192,6 +192,17 @@ bool BitBuffer::ReadBits(size_t bit_count, uint64_t& val) {
   return PeekBits(bit_count, val) && ConsumeBits(bit_count);
 }
 
+bool BitBuffer::ReadBytes(size_t byte_count, uint8_t *buffer) {
+  // There is probably a more efficient way to read a buffer than
+  // byte-by-byte.
+  for (int i = 0; i < byte_count; ++i) {
+    if (! ReadUInt8(buffer[i])) {
+      return false;
+    }
+  }
+  return true;
+}
+
 bool BitBuffer::ConsumeBytes(size_t byte_count) {
   return ConsumeBits(byte_count * 8);
 }

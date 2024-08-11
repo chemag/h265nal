@@ -47,6 +47,11 @@ class BitBuffer {
   bool ReadBits(size_t bit_count, uint32_t& val);
   bool ReadBits(size_t bit_count, uint64_t& val);
 
+  // Reads byte-sized values from the buffer. Returns false if there isn't enough
+  // data left for the specified bit count. Caller must make sure buffer has
+  // enough space for the copy.
+  bool ReadBytes(size_t byte_count, uint8_t *buffer);
+
   // Peeks bit-sized values from the buffer. Returns false if there isn't enough
   // data left for the specified number of bits. Doesn't move the current
   // offset.
