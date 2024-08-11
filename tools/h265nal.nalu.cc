@@ -25,6 +25,7 @@
 #include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
+#include "h265_configuration_box_parser.h"
 #include "rtc_base/bit_buffer.h"
 
 extern int optind;
@@ -38,6 +39,7 @@ typedef struct arg_options {
   bool add_checksum;
   bool add_resolution;
   bool add_contents;
+  char *hvcc_file;
   char *infile;
   char *outfile;
 } arg_options;
@@ -63,6 +65,9 @@ void usage(char *name) {
           DEFAULT_OPTIONS.debug);
   fprintf(stderr, "\t-q:\t\tZero debug verbosity\n");
   fprintf(stderr, "\t-i <infile>:\t\tH265 file to parse [default: stdin]\n");
+  fprintf(stderr,
+          "\t--hvcc-file <infile>:\t\tXXX file to parse bitstream state from "
+          "[default: none]\n");
   fprintf(stderr, "\t-o <output>:\t\tH265 parsing output [default: stdout]\n");
   fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag%s\n",
           DEFAULT_OPTIONS.as_one_line ? " [default]" : "");
@@ -114,6 +119,7 @@ enum {
   NO_ADD_RESOLUTION_FLAG_OPTION,
   ADD_CONTENTS_FLAG_OPTION,
   NO_ADD_CONTENTS_FLAG_OPTION,
+  HVCC_FILE_OPTION,
   VERSION_OPTION,
   HELP_OPTION
 };
@@ -151,6 +157,7 @@ arg_options *parse_args(int argc, char **argv) {
       {"no-add-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
       {"no-add-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
+      {"hvcc-file", required_argument, NULL, HVCC_FILE_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
@@ -242,6 +249,10 @@ arg_options *parse_args(int argc, char **argv) {
         options.add_contents = false;
         break;
 
+      case HVCC_FILE_OPTION:
+        options.hvcc_file = optarg;
+        break;
+
       case VERSION_OPTION:
         printf("version: %s\n", PROJECT_VER);
         exit(0);
@@ -327,6 +338,38 @@ int main(int argc, char **argv) {
 
   // use bitstream parser state to keep the SPS/PPS/SubsetSPS NALUs
   h265nal::H265BitstreamParserState bitstream_parser_state;
+  if (options->hvcc_file != nullptr) {
+    // 1. read hvcc_file into buffer
+    // TODO(chemag): read the hvcc file incrementally
+    FILE *hvcc_infp = nullptr;
+    hvcc_infp = fopen(options->hvcc_file, "rb");
+    if (hvcc_infp == nullptr) {
+      // did not work
+      fprintf(stderr, "Could not open hvcc file: \"%s\"\n", options->hvcc_file);
+      return -1;
+    }
+    fseek(hvcc_infp, 0, SEEK_END);
+    int64_t hvcc_size = ftell(hvcc_infp);
+    fseek(hvcc_infp, 0, SEEK_SET);
+    // read file into buffer
+    std::vector<uint8_t> hvcc_buffer(hvcc_size);
+    fread(reinterpret_cast<char *>(hvcc_buffer.data()), 1, hvcc_size,
+          hvcc_infp);
+    uint8_t *hvcc_data = hvcc_buffer.data();
+    size_t hvcc_length = hvcc_buffer.size();
+
+    // 3. parse the hvcC structure
+    auto configuration_box =
+        h265nal::H265ConfigurationBoxParser::ParseConfigurationBox(
+            hvcc_data, hvcc_length, &bitstream_parser_state, parsing_options);
+    if (configuration_box == nullptr) {
+      // cannot parse the NalUnit
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "error: cannot parse buffer into H265ConfigurationBox\n");
+#endif  // FPRINT_ERRORS
+      return -1;
+    }
+  }
 
   // 3. parse the NAL unit
   // note: If the NALU comes from an unescaped bitstreams, i.e.,
