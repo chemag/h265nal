@@ -27,7 +27,8 @@ all: \
     h265_rtp_fu_parser_fuzzer.cc \
     h265_slice_parser_fuzzer.cc \
     h265_bitstream_parser_fuzzer.cc \
-    h265_nal_unit_parser_fuzzer.cc
+    h265_nal_unit_parser_fuzzer.cc \
+    h265_configuration_box_parser_fuzzer.cc
 	@echo "run: RUNS=1000000 make -j -Oline fuzz"
 
 
@@ -106,6 +107,9 @@ h265_bitstream_parser_fuzzer.cc: ../test/h265_bitstream_parser_unittest.cc
 h265_nal_unit_parser_fuzzer.cc: ../test/h265_nal_unit_parser_unittest.cc
 	./converter.py ../test/h265_nal_unit_parser_unittest.cc ./
 
+h265_configuration_box_parser_fuzzer.cc: ../test/h265_configuration_box_parser_unittest.cc
+	./converter.py ../test/h265_configuration_box_parser_unittest.cc ./
+
 
 RUNS?=1000000
 
@@ -134,7 +138,8 @@ fuzz: \
     h265_rtp_fu_parser_fuzzer \
     h265_slice_parser_fuzzer \
     h265_bitstream_parser_fuzzer \
-    h265_nal_unit_parser_fuzzer
+    h265_nal_unit_parser_fuzzer \
+    h265_configuration_box_parser_fuzzer
 
 h265_utils_fuzzer:
 	-../build/fuzz/h265_utils_fuzzer -artifact_prefix=corpus/h265_utils_fuzzer/ corpus/h265_utils_fuzzer/ -runs=$(RUNS)
@@ -210,4 +215,7 @@ h265_bitstream_parser_fuzzer:
 
 h265_nal_unit_parser_fuzzer:
 	-../build/fuzz/h265_nal_unit_parser_fuzzer -artifact_prefix=corpus/h265_nal_unit_parser_fuzzer/ corpus/h265_nal_unit_parser_fuzzer/ -runs=$(RUNS)
+
+h265_configuration_box_parser_fuzzer:
+	-../build/fuzz/h265_configuration_box_parser_fuzzer -artifact_prefix=corpus/h265_configuration_box_parser_fuzzer/ corpus/h265_configuration_box_parser_fuzzer/ -runs=$(RUNS)
 
