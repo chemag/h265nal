@@ -264,131 +264,106 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
 #ifdef FDUMP_DEFINE
 void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
     FILE* outfp, int indent_level, ParsingOptions parsing_options) const {
-#if 0
   fprintf(outfp, "configuration_box {");
   indent_level = indent_level_incr(indent_level);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_video_parameter_set_id: %i", configuration_box_video_parameter_set_id);
+  fprintf(outfp, "configurationVersion: %i", configurationVersion);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_base_layer_internal_flag: %i",
-          configuration_box_base_layer_internal_flag);
+  fprintf(outfp, "general_profile_space: %i", general_profile_space);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_base_layer_available_flag: %i",
-          configuration_box_base_layer_available_flag);
+  fprintf(outfp, "general_tier_flag: %i", general_tier_flag);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_layers_minus1: %i", configuration_box_max_layers_minus1);
+  fprintf(outfp, "general_profile_idc: %i", general_profile_idc);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_sub_layers_minus1: %i", configuration_box_max_sub_layers_minus1);
+  fprintf(outfp, "general_profile_compatibility_flags: %i",
+          general_profile_compatibility_flags);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_temporal_id_nesting_flag: %i",
-          configuration_box_temporal_id_nesting_flag);
+  fprintf(outfp, "general_constraint_indicator_flags: %lu",
+          general_constraint_indicator_flags);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_reserved_0xffff_16bits: 0x%04x",
-          configuration_box_reserved_0xffff_16bits);
+  fprintf(outfp, "general_level_idc: %i", general_level_idc);
 
   fdump_indent_level(outfp, indent_level);
-  profile_tier_level->fdump(outfp, indent_level);
+  fprintf(outfp, "reserved1: %i", reserved1);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_sub_layer_ordering_info_present_flag: %i",
-          configuration_box_sub_layer_ordering_info_present_flag);
+  fprintf(outfp, "min_spatial_segmentation_idc: %i",
+          min_spatial_segmentation_idc);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_dec_pic_buffering_minus1 {");
-  for (const uint32_t& v : configuration_box_max_dec_pic_buffering_minus1) {
-    fprintf(outfp, " %i", v);
-  }
-  fprintf(outfp, " }");
+  fprintf(outfp, "reserved2: %i", reserved2);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_num_reorder_pics {");
-  for (const uint32_t& v : configuration_box_max_num_reorder_pics) {
-    fprintf(outfp, " %i", v);
-  }
-  fprintf(outfp, " }");
+  fprintf(outfp, "parallelismType: %i", parallelismType);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_latency_increase_plus1 {");
-  for (const uint32_t& v : configuration_box_max_latency_increase_plus1) {
-    fprintf(outfp, " %i", v);
-  }
-  fprintf(outfp, " }");
+  fprintf(outfp, "reserved3: %i", reserved3);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_max_layer_id: %i", configuration_box_max_layer_id);
+  fprintf(outfp, "chromaFormat: %i", chromaFormat);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_num_layer_sets_minus1: %i", configuration_box_num_layer_sets_minus1);
+  fprintf(outfp, "reserved4: %i", reserved4);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "layer_id_included_flag {");
-  for (const std::vector<uint32_t>& vv : layer_id_included_flag) {
-    fprintf(outfp, " {");
-    for (const uint32_t& v : vv) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
-  }
-  fprintf(outfp, " }");
+  fprintf(outfp, "bitDepthLumaMinus8: %i", bitDepthLumaMinus8);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_timing_info_present_flag: %i",
-          configuration_box_timing_info_present_flag);
+  fprintf(outfp, "reserved5: %i", reserved5);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_num_units_in_tick: %i", configuration_box_num_units_in_tick);
+  fprintf(outfp, "bitDepthChromaMinus8: %i", bitDepthChromaMinus8);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_time_scale: %i", configuration_box_time_scale);
+  fprintf(outfp, "avgFrameRate: %i", avgFrameRate);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_poc_proportional_to_timing_flag: %i",
-          configuration_box_poc_proportional_to_timing_flag);
+  fprintf(outfp, "constantFrameRate: %i", constantFrameRate);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_num_ticks_poc_diff_one_minus1: %i",
-          configuration_box_num_ticks_poc_diff_one_minus1);
+  fprintf(outfp, "numTemporalLayers: %i", numTemporalLayers);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_num_hrd_parameters: %i", configuration_box_num_hrd_parameters);
+  fprintf(outfp, "temporalIdNested: %i", temporalIdNested);
 
-  if (configuration_box_num_hrd_parameters > 0) {
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "lengthSizeMinusOne: %i", lengthSizeMinusOne);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "numOfArrays: %i", numOfArrays);
+
+  for (int j = 0; j < numOfArrays; j++) {
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "hrd_layer_set_idx {");
-    for (const uint32_t& v : hrd_layer_set_idx) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
+    fprintf(outfp, "array_completeness[%i]: %i", j, array_completeness[j]);
 
     fdump_indent_level(outfp, indent_level);
-    fprintf(outfp, "cprms_present_flag {");
-    for (const uint32_t& v : cprms_present_flag) {
-      fprintf(outfp, " %i", v);
-    }
-    fprintf(outfp, " }");
+    fprintf(outfp, "reserved6[%i]: %i", j, reserved6[j]);
 
-    // hrd_parameters(cprms_present_flag[i], configuration_box_max_sub_layers_minus1)
     fdump_indent_level(outfp, indent_level);
-    hrd_parameters->fdump(outfp, indent_level);
+    fprintf(outfp, "NAL_unit_type[%i]: %i", j, NAL_unit_type[j]);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "numNalus[%i]: %i", j, numNalus[j]);
+
+    for (int i = 0; i < numNalus[j]; i++) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "nalUnitLength[%i][%i]: %i", j, i, nalUnitLength[j][i]);
+
+      fdump_indent_level(outfp, indent_level);
+      nalUnit[j][i]->fdump(outfp, indent_level, parsing_options);
+    }
   }
-
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_extension_flag: %i", configuration_box_extension_flag);
-
-  fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "configuration_box_extension_data_flag: %i", configuration_box_extension_data_flag);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "}");
-#endif
 }
 #endif  // FDUMP_DEFINE
 
