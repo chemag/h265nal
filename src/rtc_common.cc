@@ -8,7 +8,9 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#include "rtc_base/bit_buffer.h"
+// Originally bit_buffer.cc
+
+#include "rtc_common.h"
 
 #include <algorithm>
 #include <limits>
@@ -22,7 +24,6 @@
 #define RTC_DCHECK_LE(v1, v2) RTC_DCHECK(v1 <= v2)
 #define RTC_DCHECK_LT(v1, v2) RTC_DCHECK(v1 < v2)
 #define RTC_DCHECK_GT(v1, v2) RTC_DCHECK(v1 > v2)
-
 
 namespace {
 
@@ -42,17 +43,13 @@ uint8_t HighestBits(uint8_t byte, size_t bit_count) {
 }
 
 // Returns the highest byte of |val| in a uint8_t.
-uint8_t HighestByte(uint64_t val) {
-  return static_cast<uint8_t>(val >> 56);
-}
+uint8_t HighestByte(uint64_t val) { return static_cast<uint8_t>(val >> 56); }
 
 // Returns the result of writing partial data from |source|, of
 // |source_bit_count| size in the highest bits, to |target| at
 // |target_bit_offset| from the highest bit.
-uint8_t WritePartialByte(uint8_t source,
-                         size_t source_bit_count,
-                         uint8_t target,
-                         size_t target_bit_offset) {
+uint8_t WritePartialByte(uint8_t source, size_t source_bit_count,
+                         uint8_t target, size_t target_bit_offset) {
   RTC_DCHECK(target_bit_offset < 8);
   RTC_DCHECK(source_bit_count < 9);
   RTC_DCHECK(source_bit_count <= (8 - target_bit_offset));
@@ -79,8 +76,6 @@ size_t CountBits(uint64_t val) {
 }
 
 }  // namespace
-
-namespace rtc {
 
 BitBuffer::BitBuffer(const uint8_t* bytes, size_t byte_count)
     : bytes_(bytes), byte_count_(byte_count), byte_offset_(), bit_offset_() {
@@ -192,11 +187,11 @@ bool BitBuffer::ReadBits(size_t bit_count, uint64_t& val) {
   return PeekBits(bit_count, val) && ConsumeBits(bit_count);
 }
 
-bool BitBuffer::ReadBytes(size_t byte_count, uint8_t *buffer) {
+bool BitBuffer::ReadBytes(size_t byte_count, uint8_t* buffer) {
   // There is probably a more efficient way to read a buffer than
   // byte-by-byte.
   for (int i = 0; i < byte_count; ++i) {
-    if (! ReadUInt8(buffer[i])) {
+    if (!ReadUInt8(buffer[i])) {
       return false;
     }
   }
@@ -408,5 +403,3 @@ bool BitBufferWriter::WriteSignedExponentialGolomb(int32_t val) {
     return WriteExponentialGolomb(signed_val * 2);
   }
 }
-
-}  // namespace rtc

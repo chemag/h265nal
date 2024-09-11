@@ -8,8 +8,7 @@
 
 #include "h265_rtp_fu_parser.h"
 #include "h265_common.h"
-#include "rtc_base/arraysize.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 
 // libfuzzer infra to test the fuzz target

@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -59,7 +59,7 @@ class H265PredWeightTableParser {
       const uint8_t* data, size_t length, uint32_t ChromaArrayType,
       uint32_t num_ref_idx_l0_active_minus1) noexcept;
   static std::unique_ptr<PredWeightTableState> ParsePredWeightTable(
-      rtc::BitBuffer* bit_buffer, uint32_t ChromaArrayType,
+      BitBuffer* bit_buffer, uint32_t ChromaArrayType,
       uint32_t num_ref_idx_l0_active_minus1) noexcept;
 };
 

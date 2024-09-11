@@ -23,7 +23,7 @@ std::unique_ptr<H265NalUnitHeaderParser::NalUnitHeaderState>
 H265NalUnitHeaderParser::ParseNalUnitHeader(const uint8_t* data,
                                             size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
   return ParseNalUnitHeader(&bit_buffer);
 }
@@ -31,7 +31,7 @@ H265NalUnitHeaderParser::ParseNalUnitHeader(const uint8_t* data,
 bool H265NalUnitHeaderParser::GetNalUnitType(const uint8_t* data,
                                              const size_t length,
                                              NalUnitType& naluType) noexcept {
-  rtc::BitBuffer bitBuffer(data, length);
+  BitBuffer bitBuffer(data, length);
   auto naluHeader = ParseNalUnitHeader(&bitBuffer);
   if (!naluHeader) {
     return false;
@@ -42,7 +42,7 @@ bool H265NalUnitHeaderParser::GetNalUnitType(const uint8_t* data,
 
 std::unique_ptr<H265NalUnitHeaderParser::NalUnitHeaderState>
 H265NalUnitHeaderParser::ParseNalUnitHeader(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   // H265 NAL Unit Header (nal_unit_header()) parser.
   // Section 7.3.1.2 ("NAL unit header syntax") of the H.265
   // standard for a complete description.

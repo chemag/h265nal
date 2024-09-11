@@ -25,13 +25,13 @@ std::unique_ptr<H265SpsRangeExtensionParser::SpsRangeExtensionState>
 H265SpsRangeExtensionParser::ParseSpsRangeExtension(const uint8_t* data,
                                                     size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSpsRangeExtension(&bit_buffer);
 }
 
 std::unique_ptr<H265SpsRangeExtensionParser::SpsRangeExtensionState>
 H265SpsRangeExtensionParser::ParseSpsRangeExtension(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   // H265 sps_range_extension() NAL Unit.
   // Section 7.3.2.2.2 ("Sequence parameter set range extension syntax") of
   // the H.265 standard for a complete description.

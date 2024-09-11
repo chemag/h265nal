@@ -14,7 +14,7 @@
 #include "h265_pred_weight_table_parser.h"
 #include "h265_sps_parser.h"
 #include "h265_st_ref_pic_set_parser.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -136,7 +136,7 @@ class H265SliceSegmentHeaderParser {
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static std::unique_ptr<SliceSegmentHeaderState> ParseSliceSegmentHeader(
-      rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
+      BitBuffer* bit_buffer, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 
@@ -175,7 +175,7 @@ class H265SliceSegmentLayerParser {
       const uint8_t* data, size_t length, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
   static std::unique_ptr<SliceSegmentLayerState> ParseSliceSegmentLayer(
-      rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
+      BitBuffer* bit_buffer, uint32_t nal_unit_type,
       struct H265BitstreamParserState* bitstream_parser_state) noexcept;
 };
 

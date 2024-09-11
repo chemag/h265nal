@@ -25,14 +25,14 @@ H265HrdParametersParser::ParseHrdParameters(
     const uint8_t* data, size_t length, uint32_t commonInfPresentFlag,
     uint32_t maxNumSubLayersMinus1) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseHrdParameters(&bit_buffer, commonInfPresentFlag,
                             maxNumSubLayersMinus1);
 }
 
 std::unique_ptr<H265HrdParametersParser::HrdParametersState>
 H265HrdParametersParser::ParseHrdParameters(
-    rtc::BitBuffer* bit_buffer, uint32_t commonInfPresentFlag,
+    BitBuffer* bit_buffer, uint32_t commonInfPresentFlag,
     uint32_t maxNumSubLayersMinus1) noexcept {
   uint32_t bits_tmp;
   uint32_t golomb_tmp;

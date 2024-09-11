@@ -1,12 +1,7 @@
-# link executable to webrtc library
-# Since the webrtc library has public include directories
-# we will use those link directories when building `main`
-#target_link_libraries(main LINK_PUBLIC webrtc)
 
 include_directories(PUBLIC ../include)
 
 include_directories(PUBLIC ../src)
-include_directories(PUBLIC ../webrtc)
 
 # MacOS requirements
 include_directories(PUBLIC /usr/local/include)
@@ -14,8 +9,6 @@ link_directories(/usr/local/lib)
 
 add_compile_options(-fsanitize=address,fuzzer,undefined)
 add_link_options(-fsanitize=address,fuzzer,undefined)
-
-#target_include_directories(h265_profile_tier_level_parser_fuzzer PUBLIC /usr/local/include ${CMAKE_CURRENT_SOURCE_DIR} webrtc)
 
 function(add_fuzzer TARGET SOURCE)
   if(NOT WIN32)

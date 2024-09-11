@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "h265_nal_unit_parser.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -73,7 +73,7 @@ class H265ConfigurationBoxParser {
       struct H265BitstreamParserState* bitstream_parser_state,
       ParsingOptions parsing_options) noexcept;
   static std::shared_ptr<ConfigurationBoxState> ParseConfigurationBox(
-      rtc::BitBuffer* bit_buffer,
+      BitBuffer* bit_buffer,
       struct H265BitstreamParserState* bitstream_parser_state,
       ParsingOptions parsing_options) noexcept;
 };

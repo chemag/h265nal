@@ -9,8 +9,7 @@
 
 #include "h265_common.h"
 #include "h265_sps_parser.h"
-#include "rtc_base/arraysize.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 

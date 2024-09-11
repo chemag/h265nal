@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -51,7 +51,7 @@ class H265SubLayerHrdParametersParser {
       const uint8_t* data, size_t length, uint32_t subLayerId, uint32_t CpbCnt,
       uint32_t sub_pic_hrd_params_present_flag) noexcept;
   static std::unique_ptr<SubLayerHrdParametersState> ParseSubLayerHrdParameters(
-      rtc::BitBuffer* bit_buffer, uint32_t subLayerId, uint32_t CpbCnt,
+      BitBuffer* bit_buffer, uint32_t subLayerId, uint32_t CpbCnt,
       uint32_t sub_pic_hrd_params_present_flag) noexcept;
 };
 

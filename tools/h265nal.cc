@@ -22,7 +22,7 @@
 #include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 extern int optind;
 

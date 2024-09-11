@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "h265_hrd_parameters_parser.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -153,7 +153,7 @@ class H265VuiParametersParser {
       const uint8_t* data, size_t length,
       uint32_t sps_max_sub_layers_minus1) noexcept;
   static std::unique_ptr<VuiParametersState> ParseVuiParameters(
-      rtc::BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept;
+      BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept;
 };
 
 }  // namespace h265nal

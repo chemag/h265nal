@@ -1,11 +1,6 @@
 # add executable
 #add_executable(main main.cc)
 
-# link executable to webrtc library
-# Since the webrtc library has public include directories
-# we will use those link directories when building `main`
-#target_link_libraries(main LINK_PUBLIC webrtc)
-
 option(H265NAL_SMALL_FOOTPRINT, "xmall footprint build")
 
 if(H265NAL_SMALL_FOOTPRINT)
@@ -20,6 +15,7 @@ endif()
 
 if(H265NAL_SMALL_FOOTPRINT)
   add_library(h265nal
+      rtc_common.cc
       h265_common.cc
       h265_utils.cc
       h265_profile_tier_level_parser.cc
@@ -49,6 +45,7 @@ if(H265NAL_SMALL_FOOTPRINT)
 )
 else()
   add_library(h265nal
+      rtc_common.cc
       h265_common.cc
       h265_utils.cc
       h265_profile_tier_level_parser.cc
@@ -83,8 +80,6 @@ else()
 endif()
 
 target_include_directories(h265nal PUBLIC ../include)
-target_include_directories(h265nal PUBLIC ../webrtc)
-target_link_libraries(h265nal PUBLIC webrtc)
 if (WIN32)
   target_link_libraries(h265nal PUBLIC wsock32 ws2_32)
 endif()

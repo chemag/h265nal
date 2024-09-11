@@ -9,7 +9,7 @@
 #include <memory>
 
 #include "h265_common.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -40,7 +40,7 @@ class H265NalUnitHeaderParser {
   static std::unique_ptr<NalUnitHeaderState> ParseNalUnitHeader(
       const uint8_t* data, size_t length) noexcept;
   static std::unique_ptr<NalUnitHeaderState> ParseNalUnitHeader(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      BitBuffer* bit_buffer) noexcept;
   // Parses nalu type from the given buffer
   static bool GetNalUnitType(const uint8_t* data, const size_t length,
                              NalUnitType& naluType) noexcept;

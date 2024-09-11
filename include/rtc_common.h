@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015 The WebRTC Project Authors. All rights reserved.
+ *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
  *
  *  Use of this source code is governed by a BSD-style license
  *  that can be found in the LICENSE file in the root of the source
@@ -8,15 +8,53 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef RTC_BASE_BIT_BUFFER_H_
-#define RTC_BASE_BIT_BUFFER_H_
+#ifndef RTC_COMMON_H_
+#define RTC_COMMON_H_
 
 #include <stddef.h>  // For size_t.
 #include <stdint.h>  // For integer types.
 
-#include "rtc_base/constructor_magic.h"
+// (1) arraysize.h
 
-namespace rtc {
+// This file defines the arraysize() macro and is derived from Chromium's
+// base/macros.h.
+
+// The arraysize(arr) macro returns the # of elements in an array arr.
+// The expression is a compile-time constant, and therefore can be
+// used in defining new arrays, for example.  If you use arraysize on
+// a pointer by mistake, you will get a compile-time error.
+
+// This template function declaration is used in defining arraysize.
+// Note that the function doesn't need an implementation, as we only
+// use its type.
+template <typename T, size_t N>
+char (&ArraySizeHelper(T (&array)[N]))[N];
+
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+
+// (2) constructor_magic.h
+
+// Put this in the declarations for a class to be unassignable.
+#define RTC_DISALLOW_ASSIGN(TypeName) \
+  TypeName& operator=(const TypeName&) = delete
+
+// A macro to disallow the copy constructor and operator= functions. This should
+// be used in the declarations for a class.
+#define RTC_DISALLOW_COPY_AND_ASSIGN(TypeName) \
+  TypeName(const TypeName&) = delete;          \
+  RTC_DISALLOW_ASSIGN(TypeName)
+
+// A macro to disallow all the implicit constructors, namely the default
+// constructor, copy constructor and operator= functions.
+//
+// This should be used in the declarations for a class that wants to prevent
+// anyone from instantiating it. This is especially useful for classes
+// containing only static methods.
+#define RTC_DISALLOW_IMPLICIT_CONSTRUCTORS(TypeName) \
+  TypeName() = delete;                               \
+  RTC_DISALLOW_COPY_AND_ASSIGN(TypeName)
+
+// (3) bit_buffer.h
 
 // A class, similar to ByteBuffer, that can parse bit-sized data out of a set of
 // bytes. Has a similar API to ByteBuffer, plus methods for reading bit-sized
@@ -47,10 +85,10 @@ class BitBuffer {
   bool ReadBits(size_t bit_count, uint32_t& val);
   bool ReadBits(size_t bit_count, uint64_t& val);
 
-  // Reads byte-sized values from the buffer. Returns false if there isn't enough
-  // data left for the specified bit count. Caller must make sure buffer has
-  // enough space for the copy.
-  bool ReadBytes(size_t byte_count, uint8_t *buffer);
+  // Reads byte-sized values from the buffer. Returns false if there isn't
+  // enough data left for the specified bit count. Caller must make sure buffer
+  // has enough space for the copy.
+  bool ReadBytes(size_t byte_count, uint8_t* buffer);
 
   // Peeks bit-sized values from the buffer. Returns false if there isn't enough
   // data left for the specified number of bits. Doesn't move the current
@@ -152,6 +190,4 @@ class BitBufferWriter : public BitBuffer {
   RTC_DISALLOW_COPY_AND_ASSIGN(BitBufferWriter);
 };
 
-}  // namespace rtc
-
-#endif  // RTC_BASE_BIT_BUFFER_H_
+#endif  // RTC_COMMON_H_

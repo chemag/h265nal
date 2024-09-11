@@ -11,7 +11,7 @@
 
 #include "h265_hrd_parameters_parser.h"
 #include "h265_profile_tier_level_parser.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -80,7 +80,7 @@ class H265VpsParser {
   static std::shared_ptr<VpsState> ParseVps(const uint8_t* data,
                                             size_t length) noexcept;
   static std::shared_ptr<VpsState> ParseVps(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

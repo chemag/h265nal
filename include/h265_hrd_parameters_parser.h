@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "h265_sub_layer_hrd_parameters_parser.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -65,7 +65,7 @@ class H265HrdParametersParser {
       const uint8_t* data, size_t length, uint32_t commonInfPresentFlag,
       uint32_t maxNumSubLayersMinus1) noexcept;
   static std::unique_ptr<HrdParametersState> ParseHrdParameters(
-      rtc::BitBuffer* bit_buffer, uint32_t commonInfPresentFlag,
+      BitBuffer* bit_buffer, uint32_t commonInfPresentFlag,
       uint32_t maxNumSubLayersMinus1) noexcept;
 };
 

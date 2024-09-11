@@ -196,7 +196,7 @@ std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
 }
 
 // Syntax functions and descriptors) (Section 7.2)
-bool byte_aligned(rtc::BitBuffer *bit_buffer) {
+bool byte_aligned(BitBuffer *bit_buffer) {
   // If the current position in the bitstream is on a byte boundary, i.e.,
   // the next bit in the bitstream is the first bit in a byte, the return
   // value of byte_aligned() is equal to TRUE.
@@ -207,14 +207,14 @@ bool byte_aligned(rtc::BitBuffer *bit_buffer) {
   return (out_bit_offset == 0);
 }
 
-int get_current_offset(rtc::BitBuffer *bit_buffer) {
+int get_current_offset(BitBuffer *bit_buffer) {
   size_t out_byte_offset, out_bit_offset;
   bit_buffer->GetCurrentOffset(&out_byte_offset, &out_bit_offset);
 
   return out_byte_offset + ((out_bit_offset == 0) ? 0 : 1);
 }
 
-bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
+bool more_rbsp_data(BitBuffer *bit_buffer) {
   // > If there is no more data in the raw byte sequence payload (RBSP), the
   // > return value of more_rbsp_data() is equal to FALSE.
   uint64_t remaining_bitcount = bit_buffer->RemainingBitCount();
@@ -268,7 +268,7 @@ bool more_rbsp_data(rtc::BitBuffer *bit_buffer) {
   return !is_rbsp_trailing_bits;
 }
 
-bool rbsp_trailing_bits(rtc::BitBuffer *bit_buffer) {
+bool rbsp_trailing_bits(BitBuffer *bit_buffer) {
   uint32_t bits_tmp;
 
   // rbsp_stop_one_bit  f(1) // equal to 1
@@ -312,7 +312,7 @@ void fdump_indent_level(FILE *outfp, int indent_level) {
 #endif  // FDUMP_DEFINE
 
 std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
-    rtc::BitBuffer *bit_buffer) noexcept {
+    BitBuffer *bit_buffer) noexcept {
   // save the bit buffer current state
   size_t byte_offset = 0;
   size_t bit_offset = 0;

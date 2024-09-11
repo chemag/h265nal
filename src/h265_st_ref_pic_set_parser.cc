@@ -29,7 +29,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
         st_ref_pic_set_state_vector,
     uint32_t max_num_pics) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseStRefPicSet(&bit_buffer, stRpsIdx, num_short_term_ref_pic_sets,
                           st_ref_pic_set_state_vector, max_num_pics);
 }
@@ -126,7 +126,7 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
 
 std::unique_ptr<H265StRefPicSetParser::StRefPicSetState>
 H265StRefPicSetParser::ParseStRefPicSet(
-    rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
+    BitBuffer* bit_buffer, uint32_t stRpsIdx,
     uint32_t num_short_term_ref_pic_sets,
     const std::vector<std::unique_ptr<struct StRefPicSetState>>*
         st_ref_pic_set_state_vector,

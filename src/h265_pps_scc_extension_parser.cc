@@ -25,13 +25,13 @@ std::unique_ptr<H265PpsSccExtensionParser::PpsSccExtensionState>
 H265PpsSccExtensionParser::ParsePpsSccExtension(const uint8_t* data,
                                                 size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParsePpsSccExtension(&bit_buffer);
 }
 
 std::unique_ptr<H265PpsSccExtensionParser::PpsSccExtensionState>
 H265PpsSccExtensionParser::ParsePpsSccExtension(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   uint32_t bits_tmp;
 
   // H265 pps_scc_extension() NAL Unit.

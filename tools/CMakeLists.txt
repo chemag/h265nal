@@ -1,11 +1,6 @@
 # add executable
 #add_executable(main main.cc)
 
-# link executable to webrtc library
-# Since the webrtc library has public include directories
-# we will use those link directories when building `main`
-#target_link_libraries(main LINK_PUBLIC webrtc)
-
 option(H265NAL_SMALL_FOOTPRINT, "small footprint build")
 
 if(H265NAL_SMALL_FOOTPRINT)

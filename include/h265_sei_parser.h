@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -109,7 +109,7 @@ class H265SeiPayloadParser {
 #endif  // FDUMP_DEFINE
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
-      rtc::BitBuffer* bit_buffer, uint32_t payload_size) = 0;
+      BitBuffer* bit_buffer, uint32_t payload_size) = 0;
 };
 
 class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
@@ -136,7 +136,7 @@ class H265SeiUserDataRegisteredItuTT35Parser : public H265SeiPayloadParser {
     std::vector<uint8_t> payload;
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
-      rtc::BitBuffer* bit_buffer, uint32_t payload_size);
+      BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
 class H265SeiUserDataUnregisteredParser : public H265SeiPayloadParser {
@@ -163,7 +163,7 @@ class H265SeiUserDataUnregisteredParser : public H265SeiPayloadParser {
     std::vector<uint8_t> payload;
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
-      rtc::BitBuffer* bit_buffer, uint32_t payload_size);
+      BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
 class H265SeiUnknownParser : public H265SeiPayloadParser {
@@ -184,7 +184,7 @@ class H265SeiUnknownParser : public H265SeiPayloadParser {
     std::vector<uint8_t> payload;
   };
   virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
-      rtc::BitBuffer* bit_buffer, uint32_t payload_size);
+      BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
 class H265SeiMessageParser {
@@ -209,7 +209,7 @@ class H265SeiMessageParser {
   };
 
   static std::unique_ptr<H265SeiMessageParser::SeiMessageState> ParseSei(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      BitBuffer* bit_buffer) noexcept;
   static std::unique_ptr<H265SeiMessageParser::SeiMessageState> ParseSei(
       const uint8_t* data, size_t length) noexcept;
 };

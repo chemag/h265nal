@@ -10,7 +10,7 @@
 #include <memory>
 #include <vector>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -65,7 +65,7 @@ class H265ProfileInfoParser {
   static std::unique_ptr<ProfileInfoState> ParseProfileInfo(
       const uint8_t* data, size_t length) noexcept;
   static std::unique_ptr<ProfileInfoState> ParseProfileInfo(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      BitBuffer* bit_buffer) noexcept;
 };
 
 // A class for parsing out a video sequence parameter set (profile_tier_level)
@@ -108,7 +108,7 @@ class H265ProfileTierLevelParser {
       const uint8_t* data, size_t length, const bool profilePresentFlag,
       const unsigned int maxNumSubLayersMinus1) noexcept;
   static std::unique_ptr<ProfileTierLevelState> ParseProfileTierLevel(
-      rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
+      BitBuffer* bit_buffer, const bool profilePresentFlag,
       const unsigned int maxNumSubLayersMinus1) noexcept;
 };
 

@@ -247,10 +247,12 @@ switch (rtp->nal_unit_header.nal_unit_type) {
 # 5. Requirements
 Requires gtests, gmock.
 
-The [`webrtc`](webrtc) directory contains an RBSP parser copied from webrtc.
-
 
 # 6. Other
+
+The `rtc_common.h|cc` code contains an RBSP parser copied from an old
+version of webrtc.
+
 The [fuzz](fuzz/README.md) directory contains information on fuzzing the
 parser.
 

@@ -7,8 +7,7 @@
 // Do not edit directly.
 
 #include "h265_profile_tier_level_parser.h"
-#include "rtc_base/arraysize.h"
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 
 // libfuzzer infra to test the fuzz target

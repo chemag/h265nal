@@ -28,7 +28,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     struct H265BitstreamParserState* bitstream_parser_state,
     ParsingOptions parsing_options) noexcept {
   // hvcC boxes are already unescaped
-  rtc::BitBuffer bit_buffer(data, length);
+  BitBuffer bit_buffer(data, length);
 
   return ParseConfigurationBox(&bit_buffer, bitstream_parser_state,
                                parsing_options);
@@ -36,7 +36,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
 
 std::shared_ptr<H265ConfigurationBoxParser::ConfigurationBoxState>
 H265ConfigurationBoxParser::ParseConfigurationBox(
-    rtc::BitBuffer* bit_buffer,
+    BitBuffer* bit_buffer,
     struct H265BitstreamParserState* bitstream_parser_state,
     ParsingOptions parsing_options) noexcept {
   uint32_t bits_tmp;

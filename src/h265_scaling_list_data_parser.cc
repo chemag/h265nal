@@ -26,13 +26,13 @@ std::unique_ptr<H265ScalingListDataParser::ScalingListDataState>
 H265ScalingListDataParser::ParseScalingListData(const uint8_t* data,
                                                 size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseScalingListData(&bit_buffer);
 }
 
 std::unique_ptr<H265ScalingListDataParser::ScalingListDataState>
 H265ScalingListDataParser::ParseScalingListData(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   // H265 scaling_list_data() NAL Unit.
   // Section 7.3.4 ("Scaling list data syntax") of the H.265
   // standard for a complete description.

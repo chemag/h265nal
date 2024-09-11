@@ -29,7 +29,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
     const uint8_t* data, size_t length, uint32_t nal_unit_type,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
   return ParseNalUnitPayload(&bit_buffer, nal_unit_type,
                              bitstream_parser_state);
@@ -37,7 +37,7 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
 
 std::unique_ptr<H265NalUnitPayloadParser::NalUnitPayloadState>
 H265NalUnitPayloadParser::ParseNalUnitPayload(
-    rtc::BitBuffer* bit_buffer, uint32_t nal_unit_type,
+    BitBuffer* bit_buffer, uint32_t nal_unit_type,
     struct H265BitstreamParserState* bitstream_parser_state) noexcept {
   // H265 NAL Unit Payload (nal_unit()) parser.
   // Section 7.3.1.1 ("General NAL unit header syntax") of the H.265

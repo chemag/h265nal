@@ -25,12 +25,12 @@ namespace h265nal {
 std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParsePps(&bit_buffer);
 }
 
 std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   uint32_t golomb_tmp;
 
   // H265 PPS NAL Unit (pic_parameter_set_rbsp()) parser.

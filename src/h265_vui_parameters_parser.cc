@@ -27,13 +27,13 @@ H265VuiParametersParser::ParseVuiParameters(
     const uint8_t* data, size_t length,
     uint32_t sps_max_sub_layers_minus1) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseVuiParameters(&bit_buffer, sps_max_sub_layers_minus1);
 }
 
 std::unique_ptr<H265VuiParametersParser::VuiParametersState>
 H265VuiParametersParser::ParseVuiParameters(
-    rtc::BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept {
+    BitBuffer* bit_buffer, uint32_t sps_max_sub_layers_minus1) noexcept {
   // H265 vui_parameters() parser.
   // Section E.2.1 ("VUI parameters syntax") of the H.265 standard for
   // a complete description.

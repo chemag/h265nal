@@ -9,7 +9,7 @@
 #include <memory>
 #include <vector>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -83,7 +83,7 @@ class H265StRefPicSetParser {
           st_ref_pic_set_state_vector,
       uint32_t max_num_pics) noexcept;
   static std::unique_ptr<StRefPicSetState> ParseStRefPicSet(
-      rtc::BitBuffer* bit_buffer, uint32_t stRpsIdx,
+      BitBuffer* bit_buffer, uint32_t stRpsIdx,
       uint32_t num_short_term_ref_pic_sets,
       const std::vector<std::unique_ptr<struct StRefPicSetState>>*
           st_ref_pic_set_state_vector,

@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "rtc_base/bit_buffer.h"
+#include "rtc_common.h"
 
 namespace h265nal {
 
@@ -37,7 +37,7 @@ class H265AudParser {
   static std::unique_ptr<AudState> ParseAud(const uint8_t* data,
                                             size_t length) noexcept;
   static std::unique_ptr<AudState> ParseAud(
-      rtc::BitBuffer* bit_buffer) noexcept;
+      BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

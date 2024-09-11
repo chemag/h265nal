@@ -26,13 +26,13 @@ std::unique_ptr<H265SpsMultilayerExtensionParser::SpsMultilayerExtensionState>
 H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
     const uint8_t* data, size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseSpsMultilayerExtension(&bit_buffer);
 }
 
 std::unique_ptr<H265SpsMultilayerExtensionParser::SpsMultilayerExtensionState>
 H265SpsMultilayerExtensionParser::ParseSpsMultilayerExtension(
-    rtc::BitBuffer* bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   // H265 sps_multilayer_extension() NAL Unit.
   // Section F.7.3.2.2.4 ("Sequence parameter set multilayer extension syntax")
   // of the H.265 standard for a complete description.

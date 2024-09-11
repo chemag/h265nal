@@ -26,7 +26,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
     const uint8_t* data, size_t length, const bool profilePresentFlag,
     const unsigned int maxNumSubLayersMinus1) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
 
   return ParseProfileTierLevel(&bit_buffer, profilePresentFlag,
                                maxNumSubLayersMinus1);
@@ -34,7 +34,7 @@ H265ProfileTierLevelParser::ParseProfileTierLevel(
 
 std::unique_ptr<H265ProfileTierLevelParser::ProfileTierLevelState>
 H265ProfileTierLevelParser::ParseProfileTierLevel(
-    rtc::BitBuffer* bit_buffer, const bool profilePresentFlag,
+    BitBuffer* bit_buffer, const bool profilePresentFlag,
     const unsigned int maxNumSubLayersMinus1) noexcept {
   uint32_t bits_tmp;
 
@@ -109,12 +109,12 @@ std::unique_ptr<H265ProfileInfoParser::ProfileInfoState>
 H265ProfileInfoParser::ParseProfileInfo(const uint8_t* data,
                                         size_t length) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
-  rtc::BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
+  BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
   return ParseProfileInfo(&bit_buffer);
 }
 
 std::unique_ptr<H265ProfileInfoParser::ProfileInfoState>
-H265ProfileInfoParser::ParseProfileInfo(rtc::BitBuffer* bit_buffer) noexcept {
+H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
   auto profile_info = std::make_unique<ProfileInfoState>();
   uint32_t bits_tmp, bits_tmp_hi;
 
