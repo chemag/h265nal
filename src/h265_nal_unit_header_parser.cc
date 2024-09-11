@@ -41,8 +41,7 @@ bool H265NalUnitHeaderParser::GetNalUnitType(const uint8_t* data,
 }
 
 std::unique_ptr<H265NalUnitHeaderParser::NalUnitHeaderState>
-H265NalUnitHeaderParser::ParseNalUnitHeader(
-    BitBuffer* bit_buffer) noexcept {
+H265NalUnitHeaderParser::ParseNalUnitHeader(BitBuffer* bit_buffer) noexcept {
   // H265 NAL Unit Header (nal_unit_header()) parser.
   // Section 7.3.1.2 ("NAL unit header syntax") of the H.265
   // standard for a complete description.

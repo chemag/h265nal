@@ -82,8 +82,8 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
-H265SeiUserDataRegisteredItuTT35Parser::parse_payload(
-    BitBuffer* bit_buffer, uint32_t payload_size) {
+H265SeiUserDataRegisteredItuTT35Parser::parse_payload(BitBuffer* bit_buffer,
+                                                      uint32_t payload_size) {
   // H265 SEI user data ITU T-35 (user_data_registered_itu_t_t35()) parser.
   // Section D.2.6 ("User data registered by Recommendation ITU-T T.35
   // SEI message syntax") of the H.265 standard for a complete description.

@@ -165,8 +165,7 @@ class H265SpsParser {
   // Unpack RBSP and parse SPS state from the supplied buffer.
   static std::shared_ptr<SpsState> ParseSps(const uint8_t* data,
                                             size_t length) noexcept;
-  static std::shared_ptr<SpsState> ParseSps(
-      BitBuffer* bit_buffer) noexcept;
+  static std::shared_ptr<SpsState> ParseSps(BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

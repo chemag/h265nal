@@ -36,8 +36,7 @@ class H265AudParser {
   // Unpack RBSP and parse AUD state from the supplied buffer.
   static std::unique_ptr<AudState> ParseAud(const uint8_t* data,
                                             size_t length) noexcept;
-  static std::unique_ptr<AudState> ParseAud(
-      BitBuffer* bit_buffer) noexcept;
+  static std::unique_ptr<AudState> ParseAud(BitBuffer* bit_buffer) noexcept;
 };
 
 }  // namespace h265nal

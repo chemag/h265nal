@@ -31,8 +31,7 @@ H265Sps3dExtensionParser::ParseSps3dExtension(const uint8_t* data,
 }
 
 std::unique_ptr<H265Sps3dExtensionParser::Sps3dExtensionState>
-H265Sps3dExtensionParser::ParseSps3dExtension(
-    BitBuffer* bit_buffer) noexcept {
+H265Sps3dExtensionParser::ParseSps3dExtension(BitBuffer* bit_buffer) noexcept {
   uint32_t bits_tmp;
 
   // H265 sps_3d_extension() NAL Unit.
