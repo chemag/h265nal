@@ -18,14 +18,14 @@
 // this is simpler than dealing with checks.*
 #include "assert.h"
 
+namespace h265nal {
+
 #define RTC_DCHECK(cond) assert(cond)
 #define RTC_CHECK(cond) assert(cond)
 
 #define RTC_DCHECK_LE(v1, v2) RTC_DCHECK(v1 <= v2)
 #define RTC_DCHECK_LT(v1, v2) RTC_DCHECK(v1 < v2)
 #define RTC_DCHECK_GT(v1, v2) RTC_DCHECK(v1 > v2)
-
-namespace {
 
 // Returns the lowest (right-most) |bit_count| bits in |byte|.
 uint8_t LowestBits(uint8_t byte, size_t bit_count) {
@@ -74,8 +74,6 @@ size_t CountBits(uint64_t val) {
   }
   return bit_count;
 }
-
-}  // namespace
 
 BitBuffer::BitBuffer(const uint8_t* bytes, size_t byte_count)
     : bytes_(bytes), byte_count_(byte_count), byte_offset_(), bit_offset_() {
@@ -403,3 +401,5 @@ bool BitBufferWriter::WriteSignedExponentialGolomb(int32_t val) {
     return WriteExponentialGolomb(signed_val * 2);
   }
 }
+
+}  // namespace h265nal

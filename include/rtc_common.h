@@ -14,6 +14,8 @@
 #include <stddef.h>  // For size_t.
 #include <stdint.h>  // For integer types.
 
+namespace h265nal {
+
 // (1) arraysize.h
 
 // This file defines the arraysize() macro and is derived from Chromium's
@@ -189,5 +191,7 @@ class BitBufferWriter : public BitBuffer {
 
   RTC_DISALLOW_COPY_AND_ASSIGN(BitBufferWriter);
 };
+
+}  // namespace h265nal
 
 #endif  // RTC_COMMON_H_
