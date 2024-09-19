@@ -38,7 +38,7 @@ class H265ConfigurationBoxParser {
     uint32_t general_profile_space = 0;
     uint32_t general_tier_flag = 0;
     uint32_t general_profile_idc = 0;
-    uint32_t general_profile_compatibility_flags = 0;
+    std::array<uint32_t, 32> general_profile_compatibility_flags;
     uint64_t general_constraint_indicator_flags = 0;
     uint32_t general_level_idc = 0;
     uint32_t reserved1 = 0;

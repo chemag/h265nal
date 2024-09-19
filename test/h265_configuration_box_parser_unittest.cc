@@ -94,7 +94,11 @@ TEST_F(H265ConfigurationBoxParserTest, TestSampleConfigurationBox) {
   EXPECT_EQ(0, configuration_box->general_profile_space);
   EXPECT_EQ(0, configuration_box->general_tier_flag);
   EXPECT_EQ(1, configuration_box->general_profile_idc);
-  EXPECT_EQ(0x60000000, configuration_box->general_profile_compatibility_flags);
+  EXPECT_THAT(configuration_box->general_profile_compatibility_flags,
+              ::testing::ElementsAreArray({0, 1, 1, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0,
+                                           0, 0, 0, 0, 0, 0, 0, 0}));
   EXPECT_EQ(0x800000000000,
             configuration_box->general_constraint_indicator_flags);
 

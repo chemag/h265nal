@@ -73,9 +73,11 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
   }
 
   // unsigned int(32) general_profile_compatibility_flags;
-  if (!bit_buffer->ReadBits(
-          32, configuration_box->general_profile_compatibility_flags)) {
-    return nullptr;
+  for (uint32_t j = 0; j < 32; j++) {
+    if (!bit_buffer->ReadBits(
+            1, configuration_box->general_profile_compatibility_flags[j])) {
+      return nullptr;
+    }
   }
 
   // unsigned int(48) general_constraint_indicator_flags;
@@ -280,8 +282,11 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
   fprintf(outfp, "general_profile_idc: %i", general_profile_idc);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "general_profile_compatibility_flags: %i",
-          general_profile_compatibility_flags);
+  fprintf(outfp, "general_profile_compatibility_flags {");
+  for (const uint32_t& v : general_profile_compatibility_flags) {
+    fprintf(outfp, " %i", v);
+  }
+  fprintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "general_constraint_indicator_flags: %lu",
