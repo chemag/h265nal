@@ -46,11 +46,11 @@ class H265ConfigurationBoxParser {
     uint32_t reserved2 = 0;
     uint32_t parallelismType = 0;
     uint32_t reserved3 = 0;
-    uint32_t chromaFormat = 0;
+    uint32_t chroma_format_idc = 0;
     uint32_t reserved4 = 0;
-    uint32_t bitDepthLumaMinus8 = 0;
+    uint32_t bit_depth_luma_minus8 = 0;
     uint32_t reserved5 = 0;
-    uint32_t bitDepthChromaMinus8 = 0;
+    uint32_t bit_depth_chroma_minus8 = 0;
     uint32_t avgFrameRate = 0;
     uint32_t constantFrameRate = 0;
     uint32_t numTemporalLayers = 0;

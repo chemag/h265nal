@@ -108,11 +108,11 @@ TEST_F(H265ConfigurationBoxParserTest, TestSampleConfigurationBox) {
   EXPECT_EQ(0b111111, configuration_box->reserved2);
   EXPECT_EQ(0, configuration_box->parallelismType);
   EXPECT_EQ(0b111111, configuration_box->reserved3);
-  EXPECT_EQ(1, configuration_box->chromaFormat);
+  EXPECT_EQ(1, configuration_box->chroma_format_idc);
   EXPECT_EQ(0b11111, configuration_box->reserved4);
-  EXPECT_EQ(0, configuration_box->bitDepthLumaMinus8);
+  EXPECT_EQ(0, configuration_box->bit_depth_luma_minus8);
   EXPECT_EQ(0b11111, configuration_box->reserved5);
-  EXPECT_EQ(0, configuration_box->bitDepthChromaMinus8);
+  EXPECT_EQ(0, configuration_box->bit_depth_chroma_minus8);
   EXPECT_EQ(0, configuration_box->avgFrameRate);
   EXPECT_EQ(0, configuration_box->constantFrameRate);
   EXPECT_EQ(1, configuration_box->numTemporalLayers);

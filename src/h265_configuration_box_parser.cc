@@ -138,8 +138,8 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     return nullptr;
   }
 
-  // unsigned int(2) chromaFormat;
-  if (!bit_buffer->ReadBits(2, configuration_box->chromaFormat)) {
+  // unsigned int(2) chroma_format_idc;
+  if (!bit_buffer->ReadBits(2, configuration_box->chroma_format_idc)) {
     return nullptr;
   }
 
@@ -155,8 +155,8 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     return nullptr;
   }
 
-  // unsigned int(3) bitDepthLumaMinus8;
-  if (!bit_buffer->ReadBits(3, configuration_box->bitDepthLumaMinus8)) {
+  // unsigned int(3) bit_depth_luma_minus8;
+  if (!bit_buffer->ReadBits(3, configuration_box->bit_depth_luma_minus8)) {
     return nullptr;
   }
 
@@ -172,8 +172,8 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     return nullptr;
   }
 
-  // unsigned int(3) bitDepthChromaMinus8;
-  if (!bit_buffer->ReadBits(3, configuration_box->bitDepthChromaMinus8)) {
+  // unsigned int(3) bit_depth_chroma_minus8;
+  if (!bit_buffer->ReadBits(3, configuration_box->bit_depth_chroma_minus8)) {
     return nullptr;
   }
 
@@ -312,19 +312,19 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
   fprintf(outfp, "reserved3: %i", reserved3);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "chromaFormat: %i", chromaFormat);
+  fprintf(outfp, "chroma_format_idc: %i", chroma_format_idc);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved4: %i", reserved4);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "bitDepthLumaMinus8: %i", bitDepthLumaMinus8);
+  fprintf(outfp, "bit_depth_luma_minus8: %i", bit_depth_luma_minus8);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "reserved5: %i", reserved5);
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "bitDepthChromaMinus8: %i", bitDepthChromaMinus8);
+  fprintf(outfp, "bit_depth_chroma_minus8: %i", bit_depth_chroma_minus8);
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "avgFrameRate: %i", avgFrameRate);
