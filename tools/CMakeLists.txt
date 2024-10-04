@@ -19,19 +19,8 @@ target_link_libraries(h265nal-bin PUBLIC h265nal)
 # rename executable using target properties
 set_target_properties(h265nal-bin PROPERTIES OUTPUT_NAME h265nal)
 
-add_executable(h265nal.nalu h265nal.nalu.cc)
-target_include_directories(h265nal.nalu PUBLIC ../src)
-target_link_libraries(h265nal.nalu PUBLIC h265nal)
-
-add_executable(h265nal.hvcc h265nal.hvcc.cc)
-target_include_directories(h265nal.hvcc PUBLIC ../src)
-target_link_libraries(h265nal.hvcc PUBLIC h265nal)
-
 # getopt port needed on windows
 if(WIN32)
   target_include_directories(h265nal-bin PRIVATE ../ya_getopt)
   target_sources(h265nal-bin PRIVATE ../ya_getopt/ya_getopt.c)
-
-  target_include_directories(h265nal.nalu PRIVATE ../ya_getopt)
-  target_sources(h265nal.nalu PRIVATE ../ya_getopt/ya_getopt.c)
 endif()

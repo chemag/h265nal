@@ -151,7 +151,7 @@ If you have a series of binary blobs with NAL units, use the
 if you have a producer of NAL units (e.g. an encoder), and you want to
 parse them as soon as they are produced.
 
-The following code has been copied from `tools/h265nal.nalu.cc`:
+The following code has been copied from `tools/h265nal.cc`:
 
 ```
   // 2. get the indices for the NALUs in the stream. This is needed
