@@ -26,6 +26,7 @@
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
 #include "h265_configuration_box_parser.h"
+#include "h265_utils.h"
 #include "rtc_common.h"
 
 extern int optind;
@@ -306,25 +307,10 @@ int main(int argc, char **argv) {
   }
 
   // 1. read infile into buffer
-  // TODO(chemag): read the infile incrementally
-  FILE *infp = nullptr;
-  if ((options->infile == nullptr) ||
-      (strlen(options->infile) == 1 && options->infile[0] == '-')) {
-    infp = stdin;
-  } else {
-    infp = fopen(options->infile, "rb");
-  }
-  if (infp == nullptr) {
-    // did not work
-    fprintf(stderr, "Could not open input file: \"%s\"\n", options->infile);
+  std::vector<uint8_t> buffer;
+  if (h265nal::H265Utils::ReadFile(options->infile, buffer) < 0) {
     return -1;
   }
-  fseek(infp, 0, SEEK_END);
-  int64_t size = ftell(infp);
-  fseek(infp, 0, SEEK_SET);
-  // read file into buffer
-  std::vector<uint8_t> buffer(size);
-  fread(reinterpret_cast<char *>(buffer.data()), 1, size, infp);
   uint8_t *data = buffer.data();
   size_t length = buffer.size();
 
@@ -340,21 +326,10 @@ int main(int argc, char **argv) {
   h265nal::H265BitstreamParserState bitstream_parser_state;
   if (options->hvcc_file != nullptr) {
     // 1. read hvcc_file into buffer
-    // TODO(chemag): read the hvcc file incrementally
-    FILE *hvcc_infp = nullptr;
-    hvcc_infp = fopen(options->hvcc_file, "rb");
-    if (hvcc_infp == nullptr) {
-      // did not work
-      fprintf(stderr, "Could not open hvcc file: \"%s\"\n", options->hvcc_file);
+    std::vector<uint8_t> hvcc_buffer;
+    if (h265nal::H265Utils::ReadFile(options->hvcc_file, hvcc_buffer) < 0) {
       return -1;
     }
-    fseek(hvcc_infp, 0, SEEK_END);
-    int64_t hvcc_size = ftell(hvcc_infp);
-    fseek(hvcc_infp, 0, SEEK_SET);
-    // read file into buffer
-    std::vector<uint8_t> hvcc_buffer(hvcc_size);
-    fread(reinterpret_cast<char *>(hvcc_buffer.data()), 1, hvcc_size,
-          hvcc_infp);
     uint8_t *hvcc_data = hvcc_buffer.data();
     size_t hvcc_length = hvcc_buffer.size();
 

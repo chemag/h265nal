@@ -28,6 +28,8 @@ class H265Utils {
   static std::vector<int32_t> GetSliceQpY(
       const uint8_t* data, size_t length,
       H265BitstreamParserState* bitstream_parser_state) noexcept;
+
+  static int ReadFile(const char* filename, std::vector<uint8_t>& buffer);
 };
 
 }  // namespace h265nal
