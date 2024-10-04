@@ -26,6 +26,14 @@ namespace {
 // The size of a shortened NALU start sequence {0 0 1}, that may be used if
 // not the first NALU of an access unit or an SPS or PPS block.
 const size_t kNaluShortStartSequenceSize = 3;
+
+size_t read_nalu_length(const uint8_t* data, size_t nalu_length_bytes) {
+  size_t nalu_length = 0;
+  for (size_t i = 0; i < nalu_length_bytes; ++i) {
+    nalu_length = (nalu_length << 8) + data[i];
+  }
+  return nalu_length;
+}
 }  // namespace
 
 namespace h265nal {
@@ -150,6 +158,86 @@ H265BitstreamParser::ParseBitstream(const uint8_t* data, size_t length,
   // parse the file
   auto bitstream =
       ParseBitstream(data, length, &bitstream_parser_state, parsing_options);
+  if (bitstream == nullptr) {
+    // did not work
+#ifdef FPRINT_ERRORS
+    fprintf(stderr, "Could not init h265 bitstream parser\n");
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
+  bitstream->parsing_options = parsing_options;
+  return bitstream;
+}
+
+// Parse a raw (RBSP) buffer with explicit NAL unit length fields.
+// Function splits the stream in NAL units, and then parses each NAL unit.
+// For that, it unpacks the RBSP inside each NAL unit buffer, and adds the
+// corresponding parsed struct into the `bitstream` list (a `BitstreamState`
+// object).
+// Function returns the said `bitstream` list.
+std::unique_ptr<H265BitstreamParser::BitstreamState>
+H265BitstreamParser::ParseBitstreamNALULength(
+    const uint8_t* data, size_t length, size_t nalu_length_bytes,
+    H265BitstreamParserState* bitstream_parser_state,
+    ParsingOptions parsing_options) noexcept {
+  auto bitstream = std::make_unique<BitstreamState>();
+
+  size_t i = 0;
+
+  if (length < nalu_length_bytes) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "error: got %zu bytes, less than the NALU length size (%zu)\n",
+            length, nalu_length_bytes);
+#endif  // FPRINT_ERRORS
+  }
+
+  // process each of the NAL units
+  for (i = 0; i < length;) {
+    size_t nalu_length = 0;
+    if (nalu_length_bytes > 0) {
+      // (1) read the NALU length
+      nalu_length = read_nalu_length(data, nalu_length_bytes);
+      i += nalu_length_bytes;
+    } else {
+      // assume a single NALU
+      nalu_length = length;
+    }
+
+    // (2) parse the NAL unit, and add it to the vector
+    auto nal_unit = H265NalUnitParser::ParseNalUnit(
+        &data[i], nalu_length, bitstream_parser_state, parsing_options);
+    if (nal_unit == nullptr) {
+      // cannot parse the NalUnit
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "error: cannot parse buffer into NalUnit\n");
+#endif  // FPRINT_ERRORS
+      continue;
+    }
+    // store the offset
+    nal_unit->offset = i;
+    nal_unit->length = nalu_length_bytes;
+
+    bitstream->nal_units.push_back(std::move(nal_unit));
+
+    i += nalu_length;
+  }
+
+  return bitstream;
+}
+
+std::unique_ptr<H265BitstreamParser::BitstreamState>
+H265BitstreamParser::ParseBitstreamNALULength(
+    const uint8_t* data, size_t length, size_t nalu_length_bytes,
+
+    ParsingOptions parsing_options) noexcept {
+  // keep a bitstream parser state (to keep the VPS/PPS/SPS NALUs)
+  H265BitstreamParserState bitstream_parser_state;
+
+  // parse the file
+  auto bitstream =
+      ParseBitstreamNALULength(data, length, nalu_length_bytes,
+                               &bitstream_parser_state, parsing_options);
   if (bitstream == nullptr) {
     // did not work
 #ifdef FPRINT_ERRORS

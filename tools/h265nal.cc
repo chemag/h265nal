@@ -1,9 +1,16 @@
 /*
  *  Copyright (c) Facebook, Inc. and its affiliates.
  *
- * An Annex-B Parser. It reads a full h265 (HEVC) Annex-B file, and parses
- * it using a single function (`H265BitstreamParser::ParseBitstream()`).
- * It then dumps the contents of each NALU read.
+ * An HEVC NALU (Annex-B) Parser. It can operate in 2x modes, depending on
+ * the nalu_length_bytes parameter.
+ * (1) If the parameter is negative (default), it assumes a full h265 (HEVC)
+ *   Annex-B file with explicit NALU separators. In that case, it parses the
+ *   content using a single function (`H265BitstreamParser::ParseBitstream()`).
+ * (2) If the parameter is zero, it assumes a single NALU. It parses it.
+ * (3) If the parameter is greater than zero, it assumes a full h265 (HEVC)
+ *   Annex-B file with explicit NALU length bytes.
+ * In all cases, it returns a vector of NALUs read. The file dumpts the
+ * contents of each NALU read.
  */
 
 #if defined WIN32 || defined _WIN32 || defined __CYGWIN__
@@ -18,10 +25,12 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
 #include "config.h"
 #include "h265_bitstream_parser.h"
 #include "h265_common.h"
+#include "h265_configuration_box_parser.h"
 #include "h265_utils.h"
 #include "rtc_common.h"
 
@@ -36,6 +45,8 @@ typedef struct arg_options {
   bool add_checksum;
   bool add_resolution;
   bool add_contents;
+  int nalu_length_bytes;
+  char *hvcc_file;
   char *infile;
   char *outfile;
 } arg_options;
@@ -50,6 +61,8 @@ arg_options DEFAULT_OPTIONS{
     .add_checksum = false,
     .add_resolution = false,
     .add_contents = false,
+    .nalu_length_bytes = -1,
+    .hvcc_file = nullptr,
     .infile = nullptr,
     .outfile = nullptr,
 };
@@ -61,6 +74,9 @@ void usage(char *name) {
           DEFAULT_OPTIONS.debug);
   fprintf(stderr, "\t-q:\t\tZero debug verbosity\n");
   fprintf(stderr, "\t-i <infile>:\t\tH265 file to parse [default: stdin]\n");
+  fprintf(stderr,
+          "\t--hvcc-file <infile>:\t\thvcC file to parse bitstream state from "
+          "[default: none]\n");
   fprintf(stderr, "\t-o <output>:\t\tH265 parsing output [default: stdout]\n");
   fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag%s\n",
           DEFAULT_OPTIONS.as_one_line ? " [default]" : "");
@@ -90,6 +106,11 @@ void usage(char *name) {
           DEFAULT_OPTIONS.add_contents ? " [default]" : "");
   fprintf(stderr, "\t--no-add-contents:\tReset add_contents flag%s\n",
           !DEFAULT_OPTIONS.add_contents ? " [default]" : "");
+  fprintf(stderr,
+          "\t--nalu-length-bytes:\tSet the number of NALU length bytes: use -1 "
+          "for explicit NALU separators, 0 for a single NALU, and >1 for "
+          "explicit NALU length bytes [default: %i]\n",
+          DEFAULT_OPTIONS.nalu_length_bytes);
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -112,6 +133,8 @@ enum {
   NO_ADD_RESOLUTION_FLAG_OPTION,
   ADD_CONTENTS_FLAG_OPTION,
   NO_ADD_CONTENTS_FLAG_OPTION,
+  HVCC_FILE_OPTION,
+  NALU_LENGTH_BYTES_OPTION,
   VERSION_OPTION,
   HELP_OPTION
 };
@@ -149,6 +172,8 @@ arg_options *parse_args(int argc, char **argv) {
       {"no-add-resolution", no_argument, NULL, NO_ADD_RESOLUTION_FLAG_OPTION},
       {"add-contents", no_argument, NULL, ADD_CONTENTS_FLAG_OPTION},
       {"no-add-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
+      {"hvcc-file", required_argument, NULL, HVCC_FILE_OPTION},
+      {"nalu-length-bytes", required_argument, NULL, NALU_LENGTH_BYTES_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
@@ -162,9 +187,9 @@ arg_options *parse_args(int argc, char **argv) {
         if (longopts[optindex].flag != NULL) {
           break;
         }
-        printf("option %s", longopts[optindex].name);
+        fprintf(stdout, "option %s", longopts[optindex].name);
         if (optarg) {
-          printf(" with arg %s", optarg);
+          fprintf(stdout, " with arg %s", optarg);
         }
         break;
 
@@ -240,8 +265,17 @@ arg_options *parse_args(int argc, char **argv) {
         options.add_contents = false;
         break;
 
+      case HVCC_FILE_OPTION:
+        options.hvcc_file = optarg;
+        break;
+
+      case NALU_LENGTH_BYTES_OPTION: {
+        std::string optarg_str(optarg);
+        options.nalu_length_bytes = std::stoi(optarg_str);
+      } break;
+
       case VERSION_OPTION:
-        printf("version: %s\n", PROJECT_VER);
+        fprintf(stdout, "version: %s\n", PROJECT_VER);
         exit(0);
         break;
 
@@ -251,9 +285,15 @@ arg_options *parse_args(int argc, char **argv) {
         break;
 
       default:
-        printf("Unsupported option: %c\n", c);
+        fprintf(stderr, "Unsupported option: %c\n", c);
         usage(argv[0]);
     }
+  }
+
+  // check there is at least a valid input file to parser
+  if (options.infile == nullptr && options.hvcc_file == nullptr) {
+    fprintf(stderr, "error: need at least one input file to parse\n");
+    usage(argv[0]);
   }
 
   return &options;
@@ -281,9 +321,9 @@ int main(int argc, char **argv) {
   if (options->debug > 1) {
     printf("options->debug = %i\n", options->debug);
     printf("options->infile = %s\n",
-           (options->infile == NULL) ? "null" : options->infile);
+           (options->infile == nullptr) ? "null" : options->infile);
     printf("options->outfile = %s\n",
-           (options->outfile == NULL) ? "null" : options->outfile);
+           (options->outfile == nullptr) ? "null" : options->outfile);
   }
 
   // add_contents requires add_length and add_offset
@@ -292,13 +332,7 @@ int main(int argc, char **argv) {
     options->add_length = true;
   }
 
-  // 1. read infile into buffer
-  std::vector<uint8_t> buffer;
-  if (h265nal::H265Utils::ReadFile(options->infile, buffer) < 0) {
-    return -1;
-  }
-
-  // 2. prepare bitstream parsing
+  // 1. prepare bitstream parsing
   h265nal::ParsingOptions parsing_options;
   parsing_options.add_offset = options->add_offset;
   parsing_options.add_length = options->add_length;
@@ -306,13 +340,57 @@ int main(int argc, char **argv) {
   parsing_options.add_checksum = options->add_checksum;
   parsing_options.add_resolution = options->add_resolution;
 
+  // 2. parse hvcC
+  h265nal::H265BitstreamParserState bitstream_parser_state;
+  std::shared_ptr<h265nal::H265ConfigurationBoxParser::ConfigurationBoxState>
+      configuration_box;
+  if (options->hvcc_file != nullptr) {
+    // use bitstream parser state to keep the SPS/PPS/SubsetSPS NALUs
+    // 2.1. read hvcc_file into buffer
+    std::vector<uint8_t> hvcc_buffer;
+    if (h265nal::H265Utils::ReadFile(options->hvcc_file, hvcc_buffer) < 0) {
+      return -1;
+    }
+    uint8_t *hvcc_data = hvcc_buffer.data();
+    size_t hvcc_length = hvcc_buffer.size();
+
+    // 2.2. parse the hvcC structure
+    configuration_box =
+        h265nal::H265ConfigurationBoxParser::ParseConfigurationBox(
+            hvcc_data, hvcc_length, &bitstream_parser_state, parsing_options);
+    if (configuration_box == nullptr) {
+      // cannot parse the NalUnit
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "error: cannot parse buffer into H265ConfigurationBox\n");
+#endif  // FPRINT_ERRORS
+      return -1;
+    }
+  }
+
   // 3. parse bitstream
-  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream =
-      h265nal::H265BitstreamParser::ParseBitstream(buffer.data(), buffer.size(),
-                                                   parsing_options);
+  std::vector<uint8_t> buffer;
+  std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
+  if (options->infile != nullptr) {
+    // 3.1. read infile into buffer
+    if (h265nal::H265Utils::ReadFile(options->infile, buffer) < 0) {
+      return -1;
+    }
+    // 3.2. read infile into buffer
+    if (options->nalu_length_bytes < 0) {
+      bitstream = h265nal::H265BitstreamParser::ParseBitstream(
+          buffer.data(), buffer.size(), &bitstream_parser_state,
+          parsing_options);
+    } else {
+      bitstream = h265nal::H265BitstreamParser::ParseBitstreamNALULength(
+          buffer.data(), buffer.size(), options->nalu_length_bytes,
+          &bitstream_parser_state, parsing_options);
+    }
+  }
 
 #ifdef FDUMP_DEFINE
-  // get outfile file descriptor
+  // 4. dump parsed output
+
+  // 4.1. get outfile file descriptor
   FILE *outfp;
   if (options->outfile == nullptr ||
       (strlen(options->outfile) == 1 && options->outfile[0] == '-')) {
@@ -328,20 +406,28 @@ int main(int argc, char **argv) {
   }
 
   int indent_level = (options->as_one_line) ? -1 : 0;
-  // 4. dump the contents of each NALU
-  for (auto &nal_unit : bitstream->nal_units) {
-    nal_unit->fdump(outfp, indent_level, parsing_options);
-    if (options->add_contents) {
-      fprintf(outfp, " contents {");
-      for (size_t i = 0; i < nal_unit->length; i++) {
-        fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
-        if ((i + 1) % 16 == 0) {
-          fprintf(outfp, " ");
-        }
-      }
-      fprintf(outfp, " }");
-    }
+  if (options->hvcc_file != nullptr) {
+    // 4.2. dump the contents of the configuration box
+    configuration_box->fdump(outfp, indent_level, parsing_options);
     fprintf(outfp, "\n");
+  }
+
+  if (options->infile != nullptr) {
+    // 4.3. dump the contents of each NALU
+    for (auto &nal_unit : bitstream->nal_units) {
+      nal_unit->fdump(outfp, indent_level, parsing_options);
+      if (options->add_contents) {
+        fprintf(outfp, " contents {");
+        for (size_t i = 0; i < nal_unit->length; i++) {
+          fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
+          if ((i + 1) % 16 == 0) {
+            fprintf(outfp, " ");
+          }
+        }
+        fprintf(outfp, " }");
+      }
+      fprintf(outfp, "\n");
+    }
   }
 #endif  // FDUMP_DEFINE
 
