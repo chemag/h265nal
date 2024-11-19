@@ -188,7 +188,7 @@ bool BitBuffer::ReadBits(size_t bit_count, uint64_t& val) {
 bool BitBuffer::ReadBytes(size_t byte_count, uint8_t* buffer) {
   // There is probably a more efficient way to read a buffer than
   // byte-by-byte.
-  for (int i = 0; i < byte_count; ++i) {
+  for (unsigned int i = 0; i < byte_count; ++i) {
     if (!ReadUInt8(buffer[i])) {
       return false;
     }

@@ -40,7 +40,6 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     struct H265BitstreamParserState* bitstream_parser_state,
     ParsingOptions parsing_options) noexcept {
   uint32_t bits_tmp;
-  uint32_t golomb_tmp;
 
   // H265 configuration box (HEVCDecoderConfigurationRecord()) blob.
   auto configuration_box = std::make_shared<ConfigurationBoxState>();
@@ -207,7 +206,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     return nullptr;
   }
 
-  for (int j = 0; j < configuration_box->numOfArrays; j++) {
+  for (unsigned int j = 0; j < configuration_box->numOfArrays; j++) {
     // bit(1) array_completeness;
     if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
@@ -221,7 +220,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     configuration_box->reserved6.push_back(bits_tmp);
     if (configuration_box->reserved6.back() != 0) {
 #ifdef FPRINT_ERRORS
-      fprintf(stderr, "error: reserved6[%i] is not 0: %u\n", j,
+      fprintf(stderr, "error: reserved6[%u] is not 0: %u\n", j,
               configuration_box->reserved6.back());
 #endif  // FPRINT_ERRORS
       return nullptr;
@@ -241,7 +240,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
 
     configuration_box->nalUnitLength.emplace_back();
     configuration_box->nalUnit.emplace_back();
-    for (int i = 0; i < configuration_box->numNalus.back(); i++) {
+    for (unsigned int i = 0; i < configuration_box->numNalus.back(); i++) {
       // unsigned int(16) nalUnitLength;
       if (!bit_buffer->ReadBits(16, bits_tmp)) {
         return nullptr;
@@ -250,13 +249,13 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
 
       // bit(8*nalUnitLength) nalUnit;
       size_t length = configuration_box->nalUnitLength.back().back();
-      uint8_t data[length];
-      if (!bit_buffer->ReadBytes(length, data)) {
+      std::vector<uint8_t> data(length);
+      if (!bit_buffer->ReadBytes(length, data.data())) {
         return nullptr;
       }
       configuration_box->nalUnit.back().push_back(
-          H265NalUnitParser::ParseNalUnit(data, length, bitstream_parser_state,
-                                          parsing_options));
+          H265NalUnitParser::ParseNalUnit(
+              data.data(), length, bitstream_parser_state, parsing_options));
     }
   }
 
@@ -344,7 +343,7 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "numOfArrays: %i", numOfArrays);
 
-  for (int j = 0; j < numOfArrays; j++) {
+  for (unsigned int j = 0; j < numOfArrays; j++) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "array_completeness[%i]: %i", j, array_completeness[j]);
 
@@ -357,7 +356,7 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "numNalus[%i]: %i", j, numNalus[j]);
 
-    for (int i = 0; i < numNalus[j]; i++) {
+    for (unsigned int i = 0; i < numNalus[j]; i++) {
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "nalUnitLength[%i][%i]: %i", j, i, nalUnitLength[j][i]);
 
