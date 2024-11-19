@@ -1,7 +1,7 @@
 # CMakeLists files in this project can
 # refer to the root source directory of the project as ${MAIN_SOURCE_DIR} and
 # to the root binary directory of the project as ${MAIN_BINARY_DIR}.
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.5)
 
 # https://cmake.org/cmake/help/v3.0/command/project.html
 project(h265nal VERSION 0.44)
