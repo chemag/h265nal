@@ -33,7 +33,7 @@ class H265BitstreamParser {
 #ifdef FDUMP_DEFINE
     void fdump(FILE* outfp, int indent_level) const;
 #endif  // FDUMP_DEFINE
-    struct ParsingOptions parsing_options;
+    struct ParsingOptions parsing_options_;
     // NAL units
     std::vector<std::unique_ptr<struct H265NalUnitParser::NalUnitState>>
         nal_units;
