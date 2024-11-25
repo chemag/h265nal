@@ -74,10 +74,14 @@ class H265VuiParametersParser {
   // range of 0 to 16, inclusive."
   const static uint32_t kMaxBitsPerMinCuDenomMin = 0;
   const static uint32_t kMaxBitsPerMinCuDenomMax = 16;
-  // Section E.3.1: "The values of log2_max_mv_length_horizontal [...] shall
-  // be in the range of 0 to 15, inclusive.
+  // Section E.3.1: "The value of log2_max_mv_length_horizontal shall be in
+  // the range of 0 to 16, inclusive." (2016/12 spec).
+  // Note that the 2018 standard redefines the possible ranges for value as
+  // "The values of log2_max_mv_length_horizontal and
+  // log2_max_mv_length_vertical shall be in the range of 0 to 15, inclusive".
+  // We want to support video that conforms to older versions of the spec.
   const static uint32_t kLog2MaxMvLengthHorizontalMin = 0;
-  const static uint32_t kLog2MaxMvLengthHorizontalMax = 15;
+  const static uint32_t kLog2MaxMvLengthHorizontalMax = 16;
   // Section E.3.1: "The values of [...] log2_max_mv_length_vertical shall
   // be in the range of 0 to 15, inclusive.
   const static uint32_t kLog2MaxMvLengthVerticalMin = 0;
