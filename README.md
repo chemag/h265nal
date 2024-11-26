@@ -277,7 +277,26 @@ List of tasks:
 h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
 
 
-# Appendix 1: MacOS Preparation Notes
+# Appendix 1: cmake Preparation Notes
+
+If you want to build with clang, then you need to specify the c/cpp compilers:
+```
+$ CC=clang CXX=clang++ cmake ..
+```
+
+If you want to build with gcc, then you need to specify the c/cpp compilers and disable
+clang's fuzzer sanitizer:
+```
+$ CC=gcc CXX=g++ cmake -DBUILD_CLANG_FUZZER=OFF ..
+```
+
+If you want to build in debug mode, you need to add some variables:
+```
+$ cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_FLAGS_DEBUG="-g -O0" -DCMAKE_CXX_FLAGS_DEBUG="-g -O0" -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+```
+
+
+# Appendix 2: MacOS Preparation Notes
 
 1. install gtests (see [here](https://stackoverflow.com/questions/15852631/how-to-install-gtest-on-mac-os-x-with-homebrew))
 

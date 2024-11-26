@@ -29,4 +29,9 @@ enable_testing()
 add_subdirectory(src)
 add_subdirectory(tools)
 add_subdirectory(test)
-add_subdirectory(fuzz)
+
+option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" ON)
+
+if(BUILD_CLANG_FUZZER)
+  add_subdirectory(fuzz)
+endif()
