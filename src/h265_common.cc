@@ -261,7 +261,7 @@ bool more_rbsp_data(BitBuffer *bit_buffer) {
   }
   // and then check for the actual values to be 100..000
   bool is_rbsp_trailing_bits =
-      (remaining_bits == (1 << (remaining_bitcount - 1)));
+      (remaining_bits == (unsigned int)(1 << (remaining_bitcount - 1)));
 
   // if the actual values to be 100..000, we are already at the
   // rbsp_trailing_bits, which means there is no more RBSP data

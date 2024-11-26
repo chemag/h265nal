@@ -177,8 +177,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->conf_win_left_offset)) {
       return nullptr;
     }
-    if (sps->conf_win_left_offset < 0 ||
-        sps->conf_win_left_offset > sps->pic_width_in_luma_samples) {
+    if (sps->conf_win_left_offset > sps->pic_width_in_luma_samples) {
 #ifdef FPRINT_ERRORS
       fprintf(stderr,
               "invalid conf_win_left_offset: %" PRIu32
@@ -192,8 +191,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->conf_win_right_offset)) {
       return nullptr;
     }
-    if (sps->conf_win_right_offset < 0 ||
-        sps->conf_win_right_offset > sps->pic_width_in_luma_samples) {
+    if (sps->conf_win_right_offset > sps->pic_width_in_luma_samples) {
 #ifdef FPRINT_ERRORS
       fprintf(stderr,
               "invalid conf_win_right_offset: %" PRIu32
@@ -207,8 +205,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->conf_win_top_offset)) {
       return nullptr;
     }
-    if (sps->conf_win_top_offset < 0 ||
-        sps->conf_win_top_offset > sps->pic_height_in_luma_samples) {
+    if (sps->conf_win_top_offset > sps->pic_height_in_luma_samples) {
 #ifdef FPRINT_ERRORS
       fprintf(stderr,
               "invalid conf_win_top_offset: %" PRIu32
@@ -222,8 +219,7 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->conf_win_bottom_offset)) {
       return nullptr;
     }
-    if (sps->conf_win_bottom_offset < 0 ||
-        sps->conf_win_bottom_offset > sps->pic_height_in_luma_samples) {
+    if (sps->conf_win_bottom_offset > sps->pic_height_in_luma_samples) {
 #ifdef FPRINT_ERRORS
       fprintf(stderr,
               "invalid conf_win_bottom_offset: %" PRIu32
