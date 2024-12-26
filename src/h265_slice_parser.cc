@@ -237,16 +237,6 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       slice_segment_header->num_short_term_ref_pic_sets =
           sps->num_short_term_ref_pic_sets;
-      if (slice_segment_header->num_short_term_ref_pic_sets >
-          h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX) {
-#ifdef FPRINT_ERRORS
-        fprintf(stderr,
-                "error: slice_segment_header->num_short_term_ref_pic_sets == "
-                "%" PRIu32 " > h265limits::NUM_SHORT_TERM_REF_PIC_SETS_MAX\n",
-                slice_segment_header->num_short_term_ref_pic_sets);
-#endif  // FPRINT_ERRORS
-        return nullptr;
-      }
 
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
         // st_ref_pic_set(num_short_term_ref_pic_sets)
