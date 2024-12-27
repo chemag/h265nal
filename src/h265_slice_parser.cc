@@ -242,15 +242,15 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         // use ST RPS defined directly in the slice segment header
         // st_ref_pic_set(num_short_term_ref_pic_sets)
         const auto& st_ref_pic_set = sps->st_ref_pic_set;
-        uint32_t max_num_pics = 0;
-        if (!sps->getMaxNumPics(&max_num_pics)) {
+        uint32_t max_num_negative_pics = 0;
+        if (!sps->getMaxNumNegativePics(&max_num_negative_pics)) {
           return nullptr;
         }
         slice_segment_header->st_ref_pic_set =
             H265StRefPicSetParser::ParseStRefPicSet(
                 bit_buffer, slice_segment_header->num_short_term_ref_pic_sets,
                 slice_segment_header->num_short_term_ref_pic_sets,
-                &st_ref_pic_set, max_num_pics);
+                &st_ref_pic_set, max_num_negative_pics);
         if (slice_segment_header->st_ref_pic_set == nullptr) {
           return nullptr;
         }

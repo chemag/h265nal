@@ -141,7 +141,7 @@ class H265SpsParser {
     uint32_t sps_extension_data_flag = 0;
 
     // derived values
-    bool getMaxNumPics(uint32_t* max_num_pics) const noexcept;
+    bool getMaxNumNegativePics(uint32_t* max_num_negative_pics) const noexcept;
     uint32_t getMinCbLog2SizeY() const noexcept;
     uint32_t getCtbLog2SizeY() const noexcept;
     uint32_t getMinCbSizeY() const noexcept;
