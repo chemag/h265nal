@@ -239,6 +239,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           sps->num_short_term_ref_pic_sets;
 
       if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
+        // use ST RPS defined directly in the slice segment header
         // st_ref_pic_set(num_short_term_ref_pic_sets)
         const auto& st_ref_pic_set = sps->st_ref_pic_set;
         uint32_t max_num_pics = 0;
@@ -255,6 +256,7 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         }
 
       } else if (slice_segment_header->num_short_term_ref_pic_sets > 1) {
+        // use one of the ST RPS defined in the SPS
         // Ceil(Log2(num_short_term_ref_pic_sets));
         size_t short_term_ref_pic_set_idx_len =
             static_cast<size_t>(std::ceil(std::log2(static_cast<float>(
