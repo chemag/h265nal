@@ -859,18 +859,7 @@ void H265SpsParser::SpsState::fdump(FILE* outfp, int indent_level,
 
 bool H265SpsParser::SpsState::getMaxNumNegativePics(
     uint32_t* max_num_negative_pics) const noexcept {
-  if (sps_max_sub_layers_minus1 >= sps_max_dec_pic_buffering_minus1.size()) {
-    // Section 7.4.8: "num_negative_pics specifies the number of entries
-    // in the stRpsIdx-th candidate short-term RPS that have picture order
-    // count values less than the picture order count value of the current
-    // picture. When nuh_layer_id of the current picture is equal to 0, the
-    // value of num_negative_pics shall be in the range of 0 to
-    // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1],
-    // inclusive."""
-    return false;
-  }
-  *max_num_negative_pics =
-      sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1];
+  *max_num_negative_pics = 15;
   return true;
 }
 
