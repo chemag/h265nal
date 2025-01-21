@@ -9,6 +9,7 @@
 #include <memory>
 #include <vector>
 
+#include "h265_pps_multilayer_extension_parser.h"
 #include "h265_pps_scc_extension_parser.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_scaling_list_data_parser.h"
@@ -83,7 +84,9 @@ class H265PpsParser {
     uint32_t pps_extension_4bits = 0;
     std::unique_ptr<struct H265PpsSccExtensionParser::PpsSccExtensionState>
         pps_scc_extension;
-    // pps_multilayer_extension( )
+    std::unique_ptr<
+        struct H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState>
+        pps_multilayer_extension;
     // pps_3d_extension( )
     // pps_scc_extension( )
     uint32_t pps_extension_data_flag = 0;

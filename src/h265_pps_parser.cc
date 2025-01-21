@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "h265_common.h"
+#include "h265_pps_multilayer_extension_parser.h"
 #include "h265_pps_scc_extension_parser.h"
 #include "h265_profile_tier_level_parser.h"
 #include "h265_scaling_list_data_parser.h"
@@ -299,11 +300,9 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   if (pps->pps_multilayer_extension_flag) {
     // pps_multilayer_extension() // specified in Annex F
-    // TODO(chemag): add support for pps_multilayer_extension()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented pps_multilayer_extension() in pps\n");
-#endif  // FPRINT_ERRORS
-    return nullptr;
+    pps->pps_multilayer_extension =
+        H265PpsMultilayerExtensionParser::ParsePpsMultilayerExtension(
+            bit_buffer);
   }
 
   if (pps->pps_3d_extension_flag) {
@@ -527,10 +526,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   }
 
   if (pps_multilayer_extension_flag) {
-    // pps_multilayer_extension() // specified in Annex F
-    // TODO(chemag): add support for pps_multilayer_extension()
-    fprintf(stderr,
-            "error: unimplemented pps_multilayer_extension_flag() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    pps_multilayer_extension->fdump(outfp, indent_level);
   }
 
   if (pps_3d_extension_flag) {
