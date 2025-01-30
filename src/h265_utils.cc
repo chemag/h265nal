@@ -137,6 +137,8 @@ int H265Utils::ReadFile(const char* filename, std::vector<uint8_t>& buffer) {
   // read file into buffer
   buffer.resize(size);
   fread(reinterpret_cast<char*>(buffer.data()), 1, size, infp);
+  // clean up
+  fclose(infp);
   return 0;
 }
 
