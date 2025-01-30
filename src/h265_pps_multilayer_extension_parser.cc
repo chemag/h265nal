@@ -34,7 +34,6 @@ std::unique_ptr<H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState>
 H265PpsMultilayerExtensionParser::ParsePpsMultilayerExtension(
     BitBuffer* bit_buffer) noexcept {
   uint32_t bits_tmp;
-  uint32_t golomb_tmp;
   int32_t sgolomb_tmp;
 
   // H265 pps_multilayer_extension() NAL Unit.
@@ -69,7 +68,7 @@ H265PpsMultilayerExtensionParser::ParsePpsMultilayerExtension(
     return nullptr;
   }
 
-  for (int i = 0; i < pps_multilayer_extension->num_ref_loc_offsets; i++) {
+  for (uint32_t i = 0; i < pps_multilayer_extension->num_ref_loc_offsets; i++) {
     // ref_loc_offset_layer_id[i]  u(6)
     if (!bit_buffer->ReadBits(6, bits_tmp)) {
       return nullptr;
@@ -241,28 +240,28 @@ void H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState::fdump(
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "scaled_ref_layer_left_offset {");
-    for (const uint32_t& v : scaled_ref_layer_left_offset) {
+    for (const int32_t& v : scaled_ref_layer_left_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "scaled_ref_layer_top_offset {");
-    for (const uint32_t& v : scaled_ref_layer_top_offset) {
+    for (const int32_t& v : scaled_ref_layer_top_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "scaled_ref_layer_right_offset {");
-    for (const uint32_t& v : scaled_ref_layer_right_offset) {
+    for (const int32_t& v : scaled_ref_layer_right_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "scaled_ref_layer_bottom_offset {");
-    for (const uint32_t& v : scaled_ref_layer_bottom_offset) {
+    for (const int32_t& v : scaled_ref_layer_bottom_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
@@ -270,69 +269,69 @@ void H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState::fdump(
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "ref_region_offset_present_flag {");
     for (const uint32_t& v : ref_region_offset_present_flag) {
-      fprintf(outfp, " %i", v);
+      fprintf(outfp, " %u", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "ref_region_left_offset {");
-    for (const uint32_t& v : ref_region_left_offset) {
+    for (const int32_t& v : ref_region_left_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "ref_region_top_offset {");
-    for (const uint32_t& v : ref_region_top_offset) {
+    for (const int32_t& v : ref_region_top_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "ref_region_right_offset {");
-    for (const uint32_t& v : ref_region_right_offset) {
+    for (const int32_t& v : ref_region_right_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "ref_region_bottom_offset {");
-    for (const uint32_t& v : ref_region_bottom_offset) {
+    for (const int32_t& v : ref_region_bottom_offset) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "resample_phase_set_present_flag {");
-    for (const uint32_t& v : resample_phase_set_present_flag) {
+    for (const int32_t& v : resample_phase_set_present_flag) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "phase_hor_luma {");
-    for (const uint32_t& v : phase_hor_luma) {
+    for (const int32_t& v : phase_hor_luma) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "phase_ver_luma {");
-    for (const uint32_t& v : phase_ver_luma) {
+    for (const int32_t& v : phase_ver_luma) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "phase_hor_chroma_plus8 {");
-    for (const uint32_t& v : phase_hor_chroma_plus8) {
+    for (const int32_t& v : phase_hor_chroma_plus8) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "phase_ver_chroma_plus8 {");
-    for (const uint32_t& v : phase_ver_chroma_plus8) {
+    for (const int32_t& v : phase_ver_chroma_plus8) {
       fprintf(outfp, " %i", v);
     }
     fprintf(outfp, " }");
