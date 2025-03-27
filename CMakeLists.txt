@@ -23,12 +23,15 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif()
 
-enable_testing()
 
 # Recurse into source code subdirectories.
 add_subdirectory(src)
 add_subdirectory(tools)
-add_subdirectory(test)
+option(BUILD_TESTS "Build h265 gtests" ON)
+if(BUILD_TESTS)
+  enable_testing()
+  add_subdirectory(test)
+endif()
 
 option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" ON)
 
