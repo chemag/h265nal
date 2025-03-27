@@ -22,9 +22,15 @@ $ git clone https://github.com/chemag/h265nal
 $ cd h265nal
 $ mkdir build
 $ cd build
-$ cmake ..  # also cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+$ cmake ..
 $ make
 ```
+
+Some cmake options:
+* "`cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo`":
+* "`cmake -DBUILD_H264_TESTS=OFF`": do not build the tests
+* "`cmake -DBUILD_CLANG_FUZZER=OFF`": do not build the fuzzing tests
+
 
 Feel free to test all the unittests:
 
