@@ -275,7 +275,7 @@ arg_options *parse_args(int argc, char **argv) {
       } break;
 
       case VERSION_OPTION:
-        fprintf(stdout, "version: %s\n", PROJECT_VER);
+        fprintf(stdout, "version: %s\n", PROJECT_VERSION);
         exit(0);
         break;
 
