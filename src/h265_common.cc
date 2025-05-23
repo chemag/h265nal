@@ -373,18 +373,19 @@ void NaluChecksum::fdump(char *output, int output_len) const {
       output[output_len - 1] = '\0';
       break;
     }
-    oi +=
-        sprintf(output + oi, "%02x", static_cast<unsigned char>(checksum[i++]));
+    oi += snprintf(output + oi, output_len - oi, "%02x",
+                   static_cast<unsigned char>(checksum[i++]));
   }
 }
 
 const char *NaluChecksum::GetPrintableChecksum() const {
-  static char buffer[(kMaxLength * 2) + 1];
+#define BUFFER_LEN ((kMaxLength * 2) + 1)
+  static char buffer[BUFFER_LEN];
   int i = 0;
   int oi = 0;
   while (i < length) {
-    oi +=
-        sprintf(buffer + oi, "%02x", static_cast<unsigned char>(checksum[i++]));
+    oi += snprintf(buffer + oi, BUFFER_LEN - oi, "%02x",
+                   static_cast<unsigned char>(checksum[i++]));
   }
   buffer[i] = '\0';
   return buffer;
