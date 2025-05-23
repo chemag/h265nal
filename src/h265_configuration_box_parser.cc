@@ -288,7 +288,7 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
   fprintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
-  fprintf(outfp, "general_constraint_indicator_flags: %lu",
+  fprintf(outfp, "general_constraint_indicator_flags: %" PRIu64,
           general_constraint_indicator_flags);
 
   fdump_indent_level(outfp, indent_level);
