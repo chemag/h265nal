@@ -154,6 +154,86 @@ bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type) {
   return false;
 }
 
+void profileTypeToString(enum ProfileType profile, std::string &str) {
+  switch (profile) {
+    case UNSPECIFIED:
+      str = "Unspecified";
+      break;
+    case MAIN:
+      str = "Main";
+      break;
+    case MAIN_10:
+      str = "Main 10";
+      break;
+    case MAIN_STILL_PICTURE:
+      str = "Main Still Picture";
+      break;
+
+    case MAIN_12:
+      str = "Main 12";
+      break;
+    case MAIN_422_10:
+      str = "Main 4:2:2 10";
+      break;
+    case MAIN_422_12:
+      str = "Main 4:2:2 12";
+      break;
+
+    case MAIN_INTRA:
+      str = "Main Intra";
+      break;
+    case MAIN_10_INTRA:
+      str = "Main 10 Intra";
+      break;
+    case MAIN_12_INTRA:
+      str = "Main 12 Intra";
+      break;
+    case MAIN_422_10_INTRA:
+      str = "Main 4:2:2 10 Intra";
+      break;
+    case MAIN_422_12_INTRA:
+      str = "Main 4:2:2 12 Intra";
+      break;
+
+    case MAIN_444:
+      str = "Main 4:4:4";
+      break;
+    case MAIN_444_10:
+      str = "Main 4:4:4 10";
+      break;
+    case MAIN_444_12:
+      str = "Main 4:4:4 12";
+      break;
+
+    case MAIN_444_INTRA:
+      str = "Main 4:4:4 Intra";
+      break;
+    case MAIN_444_10_INTRA:
+      str = "Main 4:4:4 10 Intra";
+      break;
+    case MAIN_444_12_INTRA:
+      str = "Main 4:4:4 12 Intra";
+      break;
+
+    case SCC_MAIN:
+      str = "SCC Main";
+      break;
+    case SCC_MAIN_10:
+      str = "SCC Main 10";
+      break;
+    case SCC_444_10:
+      str = "SCC 4:4:4 10";
+      break;
+    case SCC_444_12:
+      str = "SCC 4:4:4 12";
+      break;
+
+    default:
+      str = "Unknown";
+      break;
+  }
+}
+
 // NALU packing uses a mechanism to identify the start of a new NALU
 // based on a 3-byte start code sequence. The idea is that every NALU
 // starts with the binary string "\x00\x00\x01" ("start code prefix").

@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <memory>
+#include <string>
 #include <vector>
 
 #include "rtc_common.h"
@@ -81,6 +82,41 @@ enum NalUnitType : uint8_t {
   UNSPEC62 = 62,
   UNSPEC63 = 63,
 };
+
+// Section A.3 Profiles
+enum ProfileType : uint8_t {
+  UNSPECIFIED = 0,
+
+  MAIN = 1,
+  MAIN_10 = 2,
+  MAIN_STILL_PICTURE = 3,
+
+  MAIN_12 = 4,
+  MAIN_422_10 = 5,
+  MAIN_422_12 = 6,
+
+  MAIN_INTRA = 7,
+  MAIN_10_INTRA = 8,
+  MAIN_12_INTRA = 9,
+  MAIN_422_10_INTRA = 10,
+  MAIN_422_12_INTRA = 11,
+
+  MAIN_444 = 12,
+  MAIN_444_10 = 13,
+  MAIN_444_12 = 14,
+
+  MAIN_444_INTRA = 15,
+  MAIN_444_10_INTRA = 16,
+  MAIN_444_12_INTRA = 17,
+
+  SCC_MAIN = 32,
+  SCC_MAIN_10 = 33,
+  SCC_444_10 = 34,
+  SCC_444_12 = 35
+};
+
+enum ProfileType getProfileType();
+void profileTypeToString(enum ProfileType profile, std::string &str);
 
 namespace h265limits {
 // Rec. ITU-T H.265 v5 (02/2018) Page 81

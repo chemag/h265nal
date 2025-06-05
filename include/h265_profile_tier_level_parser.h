@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 
+#include "h265_common.h"
 #include "rtc_common.h"
 
 namespace h265nal {
@@ -59,6 +60,10 @@ class H265ProfileInfoParser {
     uint64_t reserved_zero_43bits = 0;
     uint32_t inbld_flag = 0;
     uint32_t reserved_zero_bit = 0;
+
+    // derived values
+    ProfileType profile_type;
+    ProfileType GetProfileType() const noexcept;
   };
 
   // Unpack RBSP and parse profile_tier_level state from the supplied buffer.

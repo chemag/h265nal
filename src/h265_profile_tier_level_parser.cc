@@ -137,6 +137,8 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
       return nullptr;
     }
   }
+  profile_info->profile_type = profile_info->GetProfileType();
+
   // progressive_source_flag  u(1)
   if (!bit_buffer->ReadBits(1, profile_info->progressive_source_flag)) {
     return nullptr;
@@ -293,6 +295,142 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
   return profile_info;
 }
 
+ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
+    const noexcept {
+  switch (profile_idc) {
+    case 1: {
+      if (profile_compatibility_flag[1]) {
+        return ProfileType::MAIN;
+      }
+      break;
+    }
+    case 2: {
+      if (profile_compatibility_flag[2]) {
+        return ProfileType::MAIN_10;
+      }
+      break;
+    }
+    case 3: {
+      if (profile_compatibility_flag[3]) {
+        return ProfileType::MAIN_STILL_PICTURE;
+      }
+      break;
+    }
+    case 4: {
+      if (profile_compatibility_flag[4]) {
+        return ProfileType::MAIN_12;
+      }
+      break;
+    }
+    case 5: {
+      if (profile_compatibility_flag[5]) {
+        return ProfileType::MAIN_422_10;
+      }
+      break;
+    }
+    case 6: {
+      if (profile_compatibility_flag[6]) {
+        return ProfileType::MAIN_422_12;
+      }
+      break;
+    }
+    case 7: {
+      if (profile_compatibility_flag[7]) {
+        return ProfileType::MAIN_INTRA;
+      }
+      break;
+    }
+    case 8: {
+      if (profile_compatibility_flag[8]) {
+        return ProfileType::MAIN_10_INTRA;
+      }
+      break;
+    }
+    case 9: {
+      if (profile_compatibility_flag[9]) {
+        return ProfileType::MAIN_12_INTRA;
+      }
+      break;
+    }
+    case 10: {
+      if (profile_compatibility_flag[10]) {
+        return ProfileType::MAIN_422_10_INTRA;
+      }
+      break;
+    }
+    case 11: {
+      if (profile_compatibility_flag[11]) {
+        return ProfileType::MAIN_422_12_INTRA;
+      }
+      break;
+    }
+    case 12: {
+      if (profile_compatibility_flag[12]) {
+        return ProfileType::MAIN_444;
+      }
+      break;
+    }
+    case 13: {
+      if (profile_compatibility_flag[13]) {
+        return ProfileType::MAIN_444_10;
+      }
+      break;
+    }
+    case 14: {
+      if (profile_compatibility_flag[14]) {
+        return ProfileType::MAIN_444_12;
+      }
+      break;
+    }
+    case 15: {
+      if (profile_compatibility_flag[15]) {
+        return ProfileType::MAIN_444_INTRA;
+      }
+      break;
+    }
+    case 16: {
+      if (profile_compatibility_flag[16]) {
+        return ProfileType::MAIN_444_10_INTRA;
+      }
+      break;
+    }
+    case 17: {
+      if (profile_compatibility_flag[17]) {
+        return ProfileType::MAIN_444_12_INTRA;
+      }
+      break;
+    }
+    case 32: {
+      if (profile_compatibility_flag[32]) {
+        return ProfileType::SCC_MAIN;
+      }
+      break;
+    }
+    case 33: {
+      if (profile_compatibility_flag[33]) {
+        return ProfileType::SCC_MAIN_10;
+      }
+      break;
+    }
+    case 34: {
+      if (profile_compatibility_flag[34]) {
+        return ProfileType::SCC_444_10;
+      }
+      break;
+    }
+    case 35: {
+      if (profile_compatibility_flag[35]) {
+        return ProfileType::SCC_444_12;
+      }
+      break;
+    }
+    default:
+      break;
+  }
+
+  return ProfileType::UNSPECIFIED;
+}
+
 #ifdef FDUMP_DEFINE
 void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
                                                     int indent_level) const {
@@ -311,6 +449,11 @@ void H265ProfileInfoParser::ProfileInfoState::fdump(FILE* outfp,
     fprintf(outfp, " %i", v);
   }
   fprintf(outfp, " }");
+
+  fdump_indent_level(outfp, indent_level);
+  std::string profile_type_str;
+  profileTypeToString(profile_type, profile_type_str);
+  fprintf(outfp, "profile: %s", profile_type_str.c_str());
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "progressive_source_flag: %i", progressive_source_flag);
