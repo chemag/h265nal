@@ -112,7 +112,16 @@ enum ProfileType : uint8_t {
   SCC_MAIN = 32,
   SCC_MAIN_10 = 33,
   SCC_444_10 = 34,
-  SCC_444_12 = 35
+  SCC_444_12 = 35,
+
+  MONOCHROME = 100,
+  MONOCHROME_10 = 101,
+  MONOCHROME_12 = 102,
+  MONOCHROME_16 = 103,
+  MAIN_12 = 104,
+  MAIN_444_16_INTRA = 105,
+  MAIN_444_STILL_PICTURE = 106,
+  MAIN_444_16_STILL_PICTURE = 107
 };
 
 enum ProfileType getProfileType();

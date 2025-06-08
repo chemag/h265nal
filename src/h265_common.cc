@@ -172,6 +172,39 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
     case FREXT:
       str = "FRExt";
       break;
+
+    case MONOCHROME:
+      str = "Monochrome (8-bit)";
+      break;
+
+    case MONOCHROME_10:
+      str = "Monochrome (10-bit)";
+      break;
+
+    case MONOCHROME_12:
+      str = "Monochrome (12-bit)";
+      break;
+
+    case MONOCHROME_16:
+      str = "Monochrome (16-bit)";
+      break;
+
+    case MAIN_12:
+      str = "Main 12";
+      break;
+
+    case MAIN_444_16_INTRA:
+      str = "Main 4:4:4 16 Intra";
+      break;
+
+    case MAIN_444_STILL_PICTURE:
+      str = "Main 4:4:4 Still Picture";
+      break;
+
+    case MAIN_444_16_STILL_PICTURE:
+      str = "Main 4:4:4 16 Still Picture";
+      break;
+
     case MAIN_422_10:
       str = "Main 4:2:2 10";
       break;
