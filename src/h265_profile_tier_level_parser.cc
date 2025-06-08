@@ -318,7 +318,7 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
     }
     case 4: {
       if (profile_compatibility_flag[4]) {
-        return ProfileType::MAIN_12;
+        return ProfileType::FREXT;
       }
       break;
     }

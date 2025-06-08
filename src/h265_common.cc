@@ -169,8 +169,8 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Main Still Picture";
       break;
 
-    case MAIN_12:
-      str = "Main 12";
+    case FREXT:
+      str = "FRExt";
       break;
     case MAIN_422_10:
       str = "Main 4:2:2 10";

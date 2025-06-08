@@ -91,7 +91,7 @@ enum ProfileType : uint8_t {
   MAIN_10 = 2,
   MAIN_STILL_PICTURE = 3,
 
-  MAIN_12 = 4,
+  FREXT = 4,
   MAIN_422_10 = 5,
   MAIN_422_12 = 6,
 
