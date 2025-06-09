@@ -261,6 +261,23 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "SCC 4:4:4 12";
       break;
 
+    // Table A.3
+    case HIGH_THROUGHPUT_444:
+      str = "High Throughput 4:4:4";
+      break;
+
+    case HIGH_THROUGHPUT_444_10:
+      str = "High Throughput 4:4:4 10";
+      break;
+
+    case HIGH_THROUGHPUT_444_14:
+      str = "High Throughput 4:4:4 14";
+      break;
+
+    case HIGH_THROUGHPUT_444_16_INTRA:
+      str = "High Throughput 4:4:4 16 Intra";
+      break;
+
     default:
       str = "Unknown";
       break;
