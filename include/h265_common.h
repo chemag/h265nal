@@ -136,6 +136,12 @@ enum ProfileType : uint8_t {
   // Appendix H.11.1.1
   SCALABLE_MAIN = 126,
   SCALABLE_MAIN_10 = 127,
+
+  // Table A.5
+  SCREEN_EXTENDED_MAIN = 128,
+  SCREEN_EXTENDED_MAIN_10 = 129,
+  SCREEN_EXTENDED_MAIN_444 = 130,
+  SCREEN_EXTENDED_MAIN_444_10 = 131,
 };
 
 enum ProfileType getProfileType();

@@ -320,6 +320,23 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Scalable Main 10";
       break;
 
+    // Table A.5
+    case SCREEN_EXTENDED_MAIN:
+      str = "Screen-Extended Main";
+      break;
+
+    case SCREEN_EXTENDED_MAIN_10:
+      str = "Screen-Extended Main 10";
+      break;
+
+    case SCREEN_EXTENDED_MAIN_444:
+      str = "Screen-Extended Main 4:4:4";
+      break;
+
+    case SCREEN_EXTENDED_MAIN_444_10:
+      str = "Screen-Extended Main 4:4:4 10";
+      break;
+
     default:
       str = "Unknown";
       break;
