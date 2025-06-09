@@ -192,6 +192,10 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Screen-Extended";
       break;
 
+    case MULTILAYER:
+      str = "Multilayer (Annex F)";
+      break;
+
     case SCREEN_EXTENDED_HIGH_THROUGHPUT:
       str = "Screen-Extended High-Throughput";
       break;

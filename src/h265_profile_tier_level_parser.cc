@@ -661,6 +661,10 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
       return ProfileType::SCREEN_EXTENDED;
       break;
     }
+    case 10: {
+      return ProfileType::MULTILAYER;
+      break;
+    }
     case 11: {
       if ((max_14bit_constraint_flag == 1) &&
           (max_12bit_constraint_flag == 1) &&
