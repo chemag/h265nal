@@ -537,6 +537,55 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
                  (intra_constraint_flag == 1) &&
                  (one_picture_only_constraint_flag == 1)) {
         return ProfileType::MAIN_444_16_STILL_PICTURE;
+      } else {
+        // Non-Explicit FRExt Entries
+        // syntax
+        // (a) bit depth: 8 (implicit), 10, 12, 14, 16
+        //   - flags
+        //     - (1) max_14bit_constraint_flag
+        //     - (2) max_12bit_constraint_flag
+        //     - (3) max_10bit_constraint_flag
+        //     - (4) max_8bit_constraint_flag
+        //   - 8 bit:  1, 1, 1, 1
+        //   - 10 bit: 1, 1, 1, 0
+        //   - 12 bit: 1, 1, 0, 0
+        //   - 14 bit: 1, 0, 0, 0
+        //   - 16 bit: 0, 0, 0, 0
+        // - (b) chroma format: 4:2:0 (implicit), 4:2:2, 4:4:4, monochrome
+        //   - flags
+        //     - (5) max_422chroma_constraint_flag
+        //     - (6) max_420chroma_constraint_flag
+        //     - (7) max_monochrome_constraint_flag
+        //   - 4:2:0:      1, 1, 0
+        //   - 4:2:2:      1, 0, 0
+        //   - 4:4:4:      0, 0, 0
+        //   - monochrome: 1, 1, 1
+        // - (c) intra-only: No (implicit), yes
+        //   - flag
+        //     - (8) intra_constraint_flag
+        //   - Intra-Only: 1
+        //   - Non-Intra-Only: 0
+        // - (d) still-picture: No (implicit), yes
+        //   - flag
+        //     - (9) one_picture_only_constraint_flag
+        //     - note: one_picture_only_constraint_flag == 1 requires
+        //       intra_constraint_flag == 1
+        //     - still picture means intra
+        //   - Still Picture-Only: 1
+        //   - Non-Still Picture-Only: 0
+        // - (e) low-bitrate: ignored for profile ID
+        //   - flag
+        //     - (10) lower_bit_rate_constraint_flag
+        if ((max_12bit_constraint_flag == 1) &&
+            (max_10bit_constraint_flag == 1) &&
+            (max_8bit_constraint_flag == 0) &&
+            (max_422chroma_constraint_flag == 1) &&
+            (max_420chroma_constraint_flag == 1) &&
+            (max_monochrome_constraint_flag == 1) &&
+            (intra_constraint_flag == 1) &&
+            (one_picture_only_constraint_flag == 1)) {
+          return ProfileType::MONOCHROME_10_STILL_PICTURE;
+        }
       }
       return ProfileType::FREXT;
       break;

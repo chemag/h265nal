@@ -354,6 +354,11 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Screen-Extended High Throughput 4:4:4 14";
       break;
 
+    // Non-Explicit FRExt Entries
+    case MONOCHROME_10_STILL_PICTURE:
+      str = "Monochrome (10-bit) Still Picture";
+      break;
+
     default:
       str = "Unknown";
       break;

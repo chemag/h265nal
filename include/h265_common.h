@@ -148,6 +148,9 @@ enum ProfileType : uint8_t {
   SCREEN_EXTENDED_HIGH_THROUGHPUT_444 = 132,
   SCREEN_EXTENDED_HIGH_THROUGHPUT_444_10 = 133,
   SCREEN_EXTENDED_HIGH_THROUGHPUT_444_14 = 134,
+
+  // Non-Explicit FRExt Entries
+  MONOCHROME_10_STILL_PICTURE = 150,
 };
 
 enum ProfileType getProfileType();
