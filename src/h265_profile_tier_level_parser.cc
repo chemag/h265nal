@@ -298,331 +298,302 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
 
 ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
     const noexcept {
+  // All profile checks include "general_profile_idc equal to j or
+  // general_profile_compatibility_flag[j] equal to 1". Moreover, it also
+  // states that "general_profile_compatibility_flag[ j ] equal to 1, when
+  // general_profile_space is equal to 0, indicates that the CVS conforms
+  // to the profile indicated by general_profile_idc equal to j as specified
+  // in Annex A. When general_profile_space is equal to 0,
+  // general_profile_compatibility_flag[ general_profile_idc ] shall be
+  // equal to 1.".
+  // As a safe approach, we will check for general_profile_space to be 0,
+  // and then ignore the profile_compatibility_flag[j] flags.
+  if (profile_space != 0) {
+    return ProfileType::UNSPECIFIED;
+  }
+
   switch (profile_idc) {
     case 1: {
-      if (profile_compatibility_flag[1]) {
-        return ProfileType::MAIN;
-      }
+      return ProfileType::MAIN;
       break;
     }
     case 2: {
-      if (profile_compatibility_flag[2]) {
-        return ProfileType::MAIN_10;
-      }
+      return ProfileType::MAIN_10;
       break;
     }
     case 3: {
-      if (profile_compatibility_flag[3]) {
-        return ProfileType::MAIN_STILL_PICTURE;
-      }
+      return ProfileType::MAIN_STILL_PICTURE;
       break;
     }
     case 4: {
-      if (profile_compatibility_flag[4]) {
-        if ((max_12bit_constraint_flag == 1) &&
-            (max_10bit_constraint_flag == 1) &&
-            (max_8bit_constraint_flag == 1) &&
-            (max_422chroma_constraint_flag == 1) &&
-            (max_420chroma_constraint_flag == 1) &&
-            (max_monochrome_constraint_flag == 1) &&
-            (intra_constraint_flag == 0) &&
-            (one_picture_only_constraint_flag == 0) &&
-            (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MONOCHROME;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 1) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MONOCHROME_10;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 1) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MONOCHROME_12;
-        } else if ((max_12bit_constraint_flag == 0) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 1) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MONOCHROME_16;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_12;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_422_10;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_422_12;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 1) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_444;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_444_10;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 0) &&
-                   (one_picture_only_constraint_flag == 0) &&
-                   (lower_bit_rate_constraint_flag == 1)) {
-          return ProfileType::MAIN_444_12;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 1) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_10_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 1) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_12_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_422_10_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 1) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_422_12_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 1) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_444_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_444_10_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_444_12_INTRA;
-        } else if ((max_12bit_constraint_flag == 0) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 0)) {
-          return ProfileType::MAIN_444_16_INTRA;
-        } else if ((max_12bit_constraint_flag == 1) &&
-                   (max_10bit_constraint_flag == 1) &&
-                   (max_8bit_constraint_flag == 1) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 1)) {
-          return ProfileType::MAIN_444_STILL_PICTURE;
-        } else if ((max_12bit_constraint_flag == 0) &&
-                   (max_10bit_constraint_flag == 0) &&
-                   (max_8bit_constraint_flag == 0) &&
-                   (max_422chroma_constraint_flag == 0) &&
-                   (max_420chroma_constraint_flag == 0) &&
-                   (max_monochrome_constraint_flag == 0) &&
-                   (intra_constraint_flag == 1) &&
-                   (one_picture_only_constraint_flag == 1)) {
-          return ProfileType::MAIN_444_16_STILL_PICTURE;
-        }
-        return ProfileType::FREXT;
+      if ((max_12bit_constraint_flag == 1) &&
+          (max_10bit_constraint_flag == 1) && (max_8bit_constraint_flag == 1) &&
+          (max_422chroma_constraint_flag == 1) &&
+          (max_420chroma_constraint_flag == 1) &&
+          (max_monochrome_constraint_flag == 1) &&
+          (intra_constraint_flag == 0) &&
+          (one_picture_only_constraint_flag == 0) &&
+          (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MONOCHROME;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 1) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MONOCHROME_10;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 1) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MONOCHROME_12;
+      } else if ((max_12bit_constraint_flag == 0) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 1) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MONOCHROME_16;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_12;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_422_10;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_422_12;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 1) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_444;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_444_10;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::MAIN_444_12;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 1) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_10_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 1) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_12_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_422_10_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 1) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_422_12_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 1) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_444_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_444_10_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_444_12_INTRA;
+      } else if ((max_12bit_constraint_flag == 0) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 0)) {
+        return ProfileType::MAIN_444_16_INTRA;
+      } else if ((max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 1) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 1)) {
+        return ProfileType::MAIN_444_STILL_PICTURE;
+      } else if ((max_12bit_constraint_flag == 0) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 1) &&
+                 (one_picture_only_constraint_flag == 1)) {
+        return ProfileType::MAIN_444_16_STILL_PICTURE;
       }
+      return ProfileType::FREXT;
       break;
     }
     case 5: {
-      if (profile_compatibility_flag[5]) {
-        return ProfileType::MAIN_422_10;
-      }
+      return ProfileType::MAIN_422_10;
       break;
     }
     case 6: {
-      if (profile_compatibility_flag[6]) {
-        return ProfileType::MAIN_422_12;
-      }
+      return ProfileType::MAIN_422_12;
       break;
     }
     case 7: {
-      if (profile_compatibility_flag[7]) {
-        return ProfileType::MAIN_INTRA;
-      }
+      return ProfileType::MAIN_INTRA;
       break;
     }
     case 8: {
-      if (profile_compatibility_flag[8]) {
-        return ProfileType::MAIN_10_INTRA;
-      }
+      return ProfileType::MAIN_10_INTRA;
       break;
     }
     case 9: {
-      if (profile_compatibility_flag[9]) {
-        return ProfileType::MAIN_12_INTRA;
-      }
+      return ProfileType::MAIN_12_INTRA;
       break;
     }
     case 10: {
-      if (profile_compatibility_flag[10]) {
-        return ProfileType::MAIN_422_10_INTRA;
-      }
+      return ProfileType::MAIN_422_10_INTRA;
       break;
     }
     case 11: {
-      if (profile_compatibility_flag[11]) {
-        return ProfileType::MAIN_422_12_INTRA;
-      }
+      return ProfileType::MAIN_422_12_INTRA;
       break;
     }
     case 12: {
-      if (profile_compatibility_flag[12]) {
-        return ProfileType::MAIN_444;
-      }
+      return ProfileType::MAIN_444;
       break;
     }
     case 13: {
-      if (profile_compatibility_flag[13]) {
-        return ProfileType::MAIN_444_10;
-      }
+      return ProfileType::MAIN_444_10;
       break;
     }
     case 14: {
-      if (profile_compatibility_flag[14]) {
-        return ProfileType::MAIN_444_12;
-      }
+      return ProfileType::MAIN_444_12;
       break;
     }
     case 15: {
-      if (profile_compatibility_flag[15]) {
-        return ProfileType::MAIN_444_INTRA;
-      }
+      return ProfileType::MAIN_444_INTRA;
       break;
     }
     case 16: {
-      if (profile_compatibility_flag[16]) {
-        return ProfileType::MAIN_444_10_INTRA;
-      }
+      return ProfileType::MAIN_444_10_INTRA;
       break;
     }
     case 17: {
-      if (profile_compatibility_flag[17]) {
-        return ProfileType::MAIN_444_12_INTRA;
-      }
+      return ProfileType::MAIN_444_12_INTRA;
       break;
     }
     case 32: {
-      if (profile_compatibility_flag[32]) {
-        return ProfileType::SCC_MAIN;
-      }
+      return ProfileType::SCC_MAIN;
       break;
     }
     case 33: {
-      if (profile_compatibility_flag[33]) {
-        return ProfileType::SCC_MAIN_10;
-      }
+      return ProfileType::SCC_MAIN_10;
       break;
     }
     case 34: {
-      if (profile_compatibility_flag[34]) {
-        return ProfileType::SCC_444_10;
-      }
+      return ProfileType::SCC_444_10;
       break;
     }
     case 35: {
-      if (profile_compatibility_flag[35]) {
-        return ProfileType::SCC_444_12;
-      }
+      return ProfileType::SCC_444_12;
       break;
     }
     default:
