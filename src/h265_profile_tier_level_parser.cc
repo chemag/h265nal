@@ -577,67 +577,31 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
       break;
     }
     case 6: {
-      return ProfileType::MAIN_422_12;
+      return ProfileType::MULTIVIEW_MAIN;
       break;
     }
     case 7: {
-      return ProfileType::MAIN_INTRA;
+      return ProfileType::SCALABLE;
       break;
     }
     case 8: {
-      return ProfileType::MAIN_10_INTRA;
+      return ProfileType::_3D_MAIN;
       break;
     }
     case 9: {
-      return ProfileType::MAIN_12_INTRA;
-      break;
-    }
-    case 10: {
-      return ProfileType::MAIN_422_10_INTRA;
+      return ProfileType::SCREEN_EXTENDED;
       break;
     }
     case 11: {
-      return ProfileType::MAIN_422_12_INTRA;
+      return ProfileType::SCREEN_EXTENDED_HIGH_THROUGHPUT;
       break;
     }
     case 12: {
-      return ProfileType::MAIN_444;
+      return ProfileType::MULTIVIEW_EXTENDED;
       break;
     }
     case 13: {
-      return ProfileType::MAIN_444_10;
-      break;
-    }
-    case 14: {
-      return ProfileType::MAIN_444_12;
-      break;
-    }
-    case 15: {
-      return ProfileType::MAIN_444_INTRA;
-      break;
-    }
-    case 16: {
-      return ProfileType::MAIN_444_10_INTRA;
-      break;
-    }
-    case 17: {
-      return ProfileType::MAIN_444_12_INTRA;
-      break;
-    }
-    case 32: {
-      return ProfileType::SCC_MAIN;
-      break;
-    }
-    case 33: {
-      return ProfileType::SCC_MAIN_10;
-      break;
-    }
-    case 34: {
-      return ProfileType::SCC_444_10;
-      break;
-    }
-    case 35: {
-      return ProfileType::SCC_444_12;
+      return ProfileType::MULTIVIEW_EXTENDED_10;
       break;
     }
     default:

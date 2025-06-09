@@ -173,6 +173,35 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "FRExt";
       break;
 
+    case MULTIVIEW_MAIN:
+      str = "Multiview Main";
+      break;
+
+    case SCALABLE:
+      str = "Scalable";
+      break;
+
+    case _3D_MAIN:
+      str = "3D-Main";
+      break;
+
+    case SCREEN_EXTENDED:
+      str = "Screen-Extended";
+      break;
+
+    case SCREEN_EXTENDED_HIGH_THROUGHPUT:
+      str = "Screen-Extended High-Throughput";
+      break;
+
+    case MULTIVIEW_EXTENDED:
+      str = "Multiview Extended";
+      break;
+
+    case MULTIVIEW_EXTENDED_10:
+      str = "Multiview Extended 10";
+      break;
+
+    // Table A.2
     case MONOCHROME:
       str = "Monochrome (8-bit)";
       break;
@@ -193,6 +222,58 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Main 12";
       break;
 
+    case MAIN_422_10:
+      str = "Main 4:2:2 10";
+      break;
+
+    case MAIN_422_12:
+      str = "Main 4:2:2 12";
+      break;
+
+    case MAIN_444:
+      str = "Main 4:4:4";
+      break;
+
+    case MAIN_444_10:
+      str = "Main 4:4:4 10";
+      break;
+
+    case MAIN_444_12:
+      str = "Main 4:4:4 12";
+      break;
+
+    case MAIN_INTRA:
+      str = "Main Intra";
+      break;
+
+    case MAIN_10_INTRA:
+      str = "Main 10 Intra";
+      break;
+
+    case MAIN_12_INTRA:
+      str = "Main 12 Intra";
+      break;
+
+    case MAIN_422_10_INTRA:
+      str = "Main 4:2:2 10 Intra";
+      break;
+
+    case MAIN_422_12_INTRA:
+      str = "Main 4:2:2 12 Intra";
+      break;
+
+    case MAIN_444_INTRA:
+      str = "Main 4:4:4 Intra";
+      break;
+
+    case MAIN_444_10_INTRA:
+      str = "Main 4:4:4 10 Intra";
+      break;
+
+    case MAIN_444_12_INTRA:
+      str = "Main 4:4:4 12 Intra";
+      break;
+
     case MAIN_444_16_INTRA:
       str = "Main 4:4:4 16 Intra";
       break;
@@ -203,62 +284,6 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
 
     case MAIN_444_16_STILL_PICTURE:
       str = "Main 4:4:4 16 Still Picture";
-      break;
-
-    case MAIN_422_10:
-      str = "Main 4:2:2 10";
-      break;
-    case MAIN_422_12:
-      str = "Main 4:2:2 12";
-      break;
-
-    case MAIN_INTRA:
-      str = "Main Intra";
-      break;
-    case MAIN_10_INTRA:
-      str = "Main 10 Intra";
-      break;
-    case MAIN_12_INTRA:
-      str = "Main 12 Intra";
-      break;
-    case MAIN_422_10_INTRA:
-      str = "Main 4:2:2 10 Intra";
-      break;
-    case MAIN_422_12_INTRA:
-      str = "Main 4:2:2 12 Intra";
-      break;
-
-    case MAIN_444:
-      str = "Main 4:4:4";
-      break;
-    case MAIN_444_10:
-      str = "Main 4:4:4 10";
-      break;
-    case MAIN_444_12:
-      str = "Main 4:4:4 12";
-      break;
-
-    case MAIN_444_INTRA:
-      str = "Main 4:4:4 Intra";
-      break;
-    case MAIN_444_10_INTRA:
-      str = "Main 4:4:4 10 Intra";
-      break;
-    case MAIN_444_12_INTRA:
-      str = "Main 4:4:4 12 Intra";
-      break;
-
-    case SCC_MAIN:
-      str = "SCC Main";
-      break;
-    case SCC_MAIN_10:
-      str = "SCC Main 10";
-      break;
-    case SCC_444_10:
-      str = "SCC 4:4:4 10";
-      break;
-    case SCC_444_12:
-      str = "SCC 4:4:4 12";
       break;
 
     // Table A.3
