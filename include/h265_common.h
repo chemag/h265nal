@@ -132,6 +132,10 @@ enum ProfileType : uint8_t {
   HIGH_THROUGHPUT_444_10 = 123,
   HIGH_THROUGHPUT_444_14 = 124,
   HIGH_THROUGHPUT_444_16_INTRA = 125,
+
+  // Appendix H.11.1.1
+  SCALABLE_MAIN = 126,
+  SCALABLE_MAIN_10 = 127,
 };
 
 enum ProfileType getProfileType();

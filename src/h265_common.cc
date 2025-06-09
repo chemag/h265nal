@@ -311,6 +311,15 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "High Throughput 4:4:4 16 Intra";
       break;
 
+    // Appendix H.11.1.1
+    case SCALABLE_MAIN:
+      str = "Scalable Main";
+      break;
+
+    case SCALABLE_MAIN_10:
+      str = "Scalable Main 10";
+      break;
+
     default:
       str = "Unknown";
       break;
