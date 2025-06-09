@@ -318,6 +318,9 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
       break;
     }
     case 2: {
+      if (one_picture_only_constraint_flag == 1) {
+        return MAIN_10_STILL_PICTURE;
+      }
       return ProfileType::MAIN_10;
       break;
     }

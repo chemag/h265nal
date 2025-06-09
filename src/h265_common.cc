@@ -159,12 +159,15 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
     case UNSPECIFIED:
       str = "Unspecified";
       break;
+
     case MAIN:
       str = "Main";
       break;
+
     case MAIN_10:
       str = "Main 10";
       break;
+
     case MAIN_STILL_PICTURE:
       str = "Main Still Picture";
       break;
@@ -199,6 +202,11 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
 
     case MULTIVIEW_EXTENDED_10:
       str = "Multiview Extended 10";
+      break;
+
+    // Section A.3.3
+    case MAIN_10_STILL_PICTURE:
+      str = "Main 10 Still Picture";
       break;
 
     // Table A.2
