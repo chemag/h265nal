@@ -167,7 +167,9 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
       profile_info->profile_idc == 9 ||
       profile_info->profile_compatibility_flag[9] == 1 ||
       profile_info->profile_idc == 10 ||
-      profile_info->profile_compatibility_flag[10] == 1) {
+      profile_info->profile_compatibility_flag[10] == 1 ||
+      profile_info->profile_idc == 11 ||
+      profile_info->profile_compatibility_flag[11] == 1) {
     // The number of bits in this syntax structure is not affected by
     // this condition
     // max_12bit_constraint_flag  u(1)
@@ -214,7 +216,9 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
         profile_info->profile_idc == 9 ||
         profile_info->profile_compatibility_flag[9] == 1 ||
         profile_info->profile_idc == 10 ||
-        profile_info->profile_compatibility_flag[10] == 1) {
+        profile_info->profile_compatibility_flag[10] == 1 ||
+        profile_info->profile_idc == 11 ||
+        profile_info->profile_compatibility_flag[11] == 1) {
       // max_14bit_constraint_flag  u(1)
       if (!bit_buffer->ReadBits(1, profile_info->max_14bit_constraint_flag)) {
         return nullptr;
@@ -274,14 +278,20 @@ H265ProfileInfoParser::ParseProfileInfo(BitBuffer* bit_buffer) noexcept {
   profile_info->profile_type = profile_info->GetProfileType();
   // The number of bits in this syntax structure is not affected by
   // this condition
-  if ((profile_info->profile_idc >= 1 && profile_info->profile_idc <= 5) ||
-      profile_info->profile_idc == 9 ||
+  if (profile_info->profile_idc == 1 ||
       profile_info->profile_compatibility_flag[1] == 1 ||
+      profile_info->profile_idc == 2 ||
       profile_info->profile_compatibility_flag[2] == 1 ||
+      profile_info->profile_idc == 3 ||
       profile_info->profile_compatibility_flag[3] == 1 ||
+      profile_info->profile_idc == 4 ||
       profile_info->profile_compatibility_flag[4] == 1 ||
+      profile_info->profile_idc == 5 ||
       profile_info->profile_compatibility_flag[5] == 1 ||
-      profile_info->profile_compatibility_flag[9] == 1) {
+      profile_info->profile_idc == 9 ||
+      profile_info->profile_compatibility_flag[9] == 1 ||
+      profile_info->profile_idc == 11 ||
+      profile_info->profile_compatibility_flag[11] == 1) {
     // inbld_flag  u(1)
     if (!bit_buffer->ReadBits(1, profile_info->inbld_flag)) {
       return nullptr;
