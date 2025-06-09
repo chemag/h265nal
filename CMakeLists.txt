@@ -4,7 +4,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # https://cmake.org/cmake/help/v3.0/command/project.html
-project(h265nal VERSION 0.46)
+project(h265nal VERSION 0.47)
 
 # std::make_ptr requires C++14
 set(CMAKE_CXX_STANDARD 14)
