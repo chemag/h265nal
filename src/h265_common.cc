@@ -337,6 +337,19 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Screen-Extended Main 4:4:4 10";
       break;
 
+    // Table A.7
+    case SCREEN_EXTENDED_HIGH_THROUGHPUT_444:
+      str = "Screen-Extended High Throughput 4:4:4";
+      break;
+
+    case SCREEN_EXTENDED_HIGH_THROUGHPUT_444_10:
+      str = "Screen-Extended High Throughput 4:4:4 10";
+      break;
+
+    case SCREEN_EXTENDED_HIGH_THROUGHPUT_444_14:
+      str = "Screen-Extended High Throughput 4:4:4 14";
+      break;
+
     default:
       str = "Unknown";
       break;

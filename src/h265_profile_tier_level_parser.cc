@@ -662,6 +662,40 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
       break;
     }
     case 11: {
+      if ((max_14bit_constraint_flag == 1) &&
+          (max_12bit_constraint_flag == 1) &&
+          (max_10bit_constraint_flag == 1) && (max_8bit_constraint_flag == 1) &&
+          (max_422chroma_constraint_flag == 0) &&
+          (max_420chroma_constraint_flag == 0) &&
+          (max_monochrome_constraint_flag == 0) &&
+          (intra_constraint_flag == 0) &&
+          (one_picture_only_constraint_flag == 0) &&
+          (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::SCREEN_EXTENDED_HIGH_THROUGHPUT_444;
+      } else if ((max_14bit_constraint_flag == 1) &&
+                 (max_12bit_constraint_flag == 1) &&
+                 (max_10bit_constraint_flag == 1) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::SCREEN_EXTENDED_HIGH_THROUGHPUT_444_10;
+      } else if ((max_14bit_constraint_flag == 1) &&
+                 (max_12bit_constraint_flag == 0) &&
+                 (max_10bit_constraint_flag == 0) &&
+                 (max_8bit_constraint_flag == 0) &&
+                 (max_422chroma_constraint_flag == 0) &&
+                 (max_420chroma_constraint_flag == 0) &&
+                 (max_monochrome_constraint_flag == 0) &&
+                 (intra_constraint_flag == 0) &&
+                 (one_picture_only_constraint_flag == 0) &&
+                 (lower_bit_rate_constraint_flag == 1)) {
+        return ProfileType::SCREEN_EXTENDED_HIGH_THROUGHPUT_444_14;
+      }
+
       return ProfileType::SCREEN_EXTENDED_HIGH_THROUGHPUT;
       break;
     }
