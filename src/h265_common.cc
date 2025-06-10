@@ -363,6 +363,10 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       str = "Monochrome (10-bit) Still Picture";
       break;
 
+    case MAIN_444_10_STILL_PICTURE:
+      str = "Main (8-bit) 4:4:4 Still Picture";
+      break;
+
     default:
       str = "Unknown";
       break;

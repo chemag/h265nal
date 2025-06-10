@@ -152,6 +152,7 @@ enum ProfileType : uint8_t {
   // Non-Explicit FRExt Entries
   MONOCHROME_STILL_PICTURE = 150,
   MONOCHROME_10_STILL_PICTURE = 151,
+  MAIN_444_10_STILL_PICTURE = 152,
 };
 
 enum ProfileType getProfileType();

@@ -594,6 +594,33 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
                    (intra_constraint_flag == 1) &&
                    (one_picture_only_constraint_flag == 1)) {
           return ProfileType::MONOCHROME_10_STILL_PICTURE;
+        } else if ((max_12bit_constraint_flag == 1) &&
+                   (max_10bit_constraint_flag == 1) &&
+                   (max_8bit_constraint_flag == 1) &&
+                   (max_422chroma_constraint_flag == 1) &&
+                   (max_420chroma_constraint_flag == 1) &&
+                   (max_monochrome_constraint_flag == 0) &&
+                   (intra_constraint_flag == 1) &&
+                   (one_picture_only_constraint_flag == 1)) {
+          return ProfileType::MAIN_STILL_PICTURE;
+        } else if ((max_12bit_constraint_flag == 1) &&
+                   (max_10bit_constraint_flag == 1) &&
+                   (max_8bit_constraint_flag == 0) &&
+                   (max_422chroma_constraint_flag == 1) &&
+                   (max_420chroma_constraint_flag == 1) &&
+                   (max_monochrome_constraint_flag == 0) &&
+                   (intra_constraint_flag == 1) &&
+                   (one_picture_only_constraint_flag == 1)) {
+          return ProfileType::MAIN_10_STILL_PICTURE;
+        } else if ((max_12bit_constraint_flag == 1) &&
+                   (max_10bit_constraint_flag == 1) &&
+                   (max_8bit_constraint_flag == 0) &&
+                   (max_422chroma_constraint_flag == 0) &&
+                   (max_420chroma_constraint_flag == 0) &&
+                   (max_monochrome_constraint_flag == 0) &&
+                   (intra_constraint_flag == 1) &&
+                   (one_picture_only_constraint_flag == 1)) {
+          return ProfileType::MAIN_444_10_STILL_PICTURE;
         }
       }
       return ProfileType::FREXT;
