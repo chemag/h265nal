@@ -355,6 +355,10 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
       break;
 
     // Non-Explicit FRExt Entries
+    case MONOCHROME_STILL_PICTURE:
+      str = "Monochrome (8-bit) Still Picture";
+      break;
+
     case MONOCHROME_10_STILL_PICTURE:
       str = "Monochrome (10-bit) Still Picture";
       break;

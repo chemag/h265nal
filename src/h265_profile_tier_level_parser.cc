@@ -578,12 +578,21 @@ ProfileType H265ProfileInfoParser::ProfileInfoState::GetProfileType()
         //     - (10) lower_bit_rate_constraint_flag
         if ((max_12bit_constraint_flag == 1) &&
             (max_10bit_constraint_flag == 1) &&
-            (max_8bit_constraint_flag == 0) &&
+            (max_8bit_constraint_flag == 1) &&
             (max_422chroma_constraint_flag == 1) &&
             (max_420chroma_constraint_flag == 1) &&
             (max_monochrome_constraint_flag == 1) &&
             (intra_constraint_flag == 1) &&
             (one_picture_only_constraint_flag == 1)) {
+          return ProfileType::MONOCHROME_STILL_PICTURE;
+        } else if ((max_12bit_constraint_flag == 1) &&
+                   (max_10bit_constraint_flag == 1) &&
+                   (max_8bit_constraint_flag == 0) &&
+                   (max_422chroma_constraint_flag == 1) &&
+                   (max_420chroma_constraint_flag == 1) &&
+                   (max_monochrome_constraint_flag == 1) &&
+                   (intra_constraint_flag == 1) &&
+                   (one_picture_only_constraint_flag == 1)) {
           return ProfileType::MONOCHROME_10_STILL_PICTURE;
         }
       }
