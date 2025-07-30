@@ -3,8 +3,6 @@
 
 option(H265NAL_SMALL_FOOTPRINT, "xmall footprint build")
 
-add_definitions(-D__STDC_FORMAT_MACROS)
-
 if(H265NAL_SMALL_FOOTPRINT)
   message(STATUS "src: small footprint selected")
   add_compile_definitions(SMALL_FOOTPRINT)
