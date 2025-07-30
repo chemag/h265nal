@@ -4,7 +4,6 @@
 
 #include "h265_sps_3d_extension_parser.h"
 
-#define __STDC_FORMAT_MACROS
 #include <inttypes.h>
 #include <stdio.h>
 
