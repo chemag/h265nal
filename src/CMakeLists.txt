@@ -83,6 +83,27 @@ else()
 )
 endif()
 
+# Add __STDC_FORMAT_MACROS to files that require it
+set_source_files_properties(
+  h265_configuration_box_parser.cc
+  h265_pps_multilayer_extension_parser.cc
+  h265_pps_scc_extension_parser.cc
+  h265_pred_weight_table_parser.cc
+  h265_profile_tier_level_parser.cc
+  h265_scaling_list_data_parser.cc
+  h265_slice_parser.cc
+  h265_sps_3d_extension_parser.cc
+  h265_sps_multilayer_extension_parser.cc
+  h265_sps_parser.cc
+  h265_sps_range_extension_parser.cc
+  h265_sps_scc_extension_parser.cc
+  h265_st_ref_pic_set_parser.cc
+  h265_vps_parser.cc
+  h265_vui_parameters_parser.cc
+  PROPERTIES
+  COMPILE_DEFINITIONS __STDC_FORMAT_MACROS
+)
+
 target_include_directories(h265nal PUBLIC ../include)
 if (WIN32)
   target_link_libraries(h265nal PUBLIC wsock32 ws2_32)
