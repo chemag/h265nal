@@ -4,8 +4,8 @@
 
 #include "h265_pred_weight_table_parser.h"
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+
+#include <cinttypes>
 #include <stdio.h>
 
 #include <cstdint>

@@ -4,7 +4,7 @@
 
 #include "h265_sei_parser.h"
 
-#include <inttypes.h>
+#include <cinttypes>
 #include <stdio.h>
 
 #include <cstdint>

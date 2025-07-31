@@ -4,8 +4,8 @@
 
 #include "h265_pps_scc_extension_parser.h"
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+
+#include <cinttypes>
 #include <stdio.h>
 
 #include <cstdint>

@@ -4,8 +4,8 @@
 
 #include "h265_scaling_list_data_parser.h"
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+
+#include <cinttypes>
 #include <stdio.h>
 
 #include <algorithm>

@@ -4,8 +4,8 @@
 
 #include "h265_configuration_box_parser.h"
 
-#define __STDC_FORMAT_MACROS
-#include <inttypes.h>
+
+#include <cinttypes>
 #include <stdio.h>
 
 #include <cstdint>
