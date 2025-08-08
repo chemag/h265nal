@@ -49,6 +49,7 @@ typedef struct arg_options {
   bool add_resolution;
   bool add_contents;
   int nalu_length_bytes;
+  int frames_per_second;
   char *hvcc_file;
   char *infile;
   char *outfile;
@@ -66,6 +67,7 @@ arg_options DEFAULT_OPTIONS{
     .add_resolution = false,
     .add_contents = false,
     .nalu_length_bytes = -1,
+    .frames_per_second = 30,
     .hvcc_file = nullptr,
     .infile = nullptr,
     .outfile = nullptr,
@@ -117,6 +119,10 @@ void usage(char *name) {
           "for explicit NALU separators, 0 for a single NALU, and >1 for "
           "explicit NALU length bytes [default: %i]\n",
           DEFAULT_OPTIONS.nalu_length_bytes);
+  fprintf(
+      stderr,
+      "\t--frames-per-second:\tSet the fps for dumplength mode [default: %i]\n",
+      DEFAULT_OPTIONS.frames_per_second);
   fprintf(stderr, "\t--version:\t\tDump version number\n");
   fprintf(stderr, "\t-h:\t\tHelp\n");
   exit(-1);
@@ -143,6 +149,7 @@ enum {
   NO_ADD_CONTENTS_FLAG_OPTION,
   HVCC_FILE_OPTION,
   NALU_LENGTH_BYTES_OPTION,
+  FRAMES_PER_SECOND_OPTION,
   VERSION_OPTION,
   HELP_OPTION
 };
@@ -184,6 +191,7 @@ arg_options *parse_args(int argc, char **argv) {
       {"no-add-contents", no_argument, NULL, NO_ADD_CONTENTS_FLAG_OPTION},
       {"hvcc-file", required_argument, NULL, HVCC_FILE_OPTION},
       {"nalu-length-bytes", required_argument, NULL, NALU_LENGTH_BYTES_OPTION},
+      {"frames-per-second", required_argument, NULL, FRAMES_PER_SECOND_OPTION},
       {"version", no_argument, NULL, VERSION_OPTION},
       {"help", no_argument, NULL, HELP_OPTION},
       {NULL, 0, NULL, 0}};
@@ -292,6 +300,11 @@ arg_options *parse_args(int argc, char **argv) {
         options.nalu_length_bytes = std::stoi(optarg_str);
       } break;
 
+      case FRAMES_PER_SECOND_OPTION: {
+        std::string optarg_str(optarg);
+        options.frames_per_second = std::stoi(optarg_str);
+      } break;
+
       case VERSION_OPTION:
         fprintf(stdout, "version: %s\n", PROJECT_VERSION);
         exit(0);
@@ -315,6 +328,10 @@ arg_options *parse_args(int argc, char **argv) {
   }
 
   return &options;
+}
+
+inline std::string opt_value(int value, bool has_value) {
+  return has_value ? std::to_string(value) : std::string{};
 }
 
 int main(int argc, char **argv) {
@@ -347,6 +364,11 @@ int main(int argc, char **argv) {
   // add_contents requires add_length and add_offset
   if (options->add_contents) {
     options->add_offset = true;
+    options->add_length = true;
+  }
+
+  // dump_length requires add_length
+  if (options->dumpmode == dump_length) {
     options->add_length = true;
   }
 
@@ -433,7 +455,18 @@ int main(int argc, char **argv) {
   }
 
   if (options->infile != nullptr) {
+    if (options->dumpmode == dump_length) {
+      // add a CSV header
+      fprintf(outfp,
+              "nal_num,frame_num,nal_unit_type,nal_unit_type_str,"
+              "nal_length_bytes,bitrate_bps,first_slice_segment_in_pic_flag,"
+              "slice_segment_address,slice_pic_order_cnt_lsb\n");
+    }
     // 4.3. dump the contents of each NALU
+    int total_bytes = 0;
+    int nal_num = 0;
+    int frame_num = 0;
+    int last_slice_nal_unit_type = -1;
     for (auto &nal_unit : bitstream->nal_units) {
       if (options->dumpmode == dump_all) {
         nal_unit->fdump(outfp, indent_level, parsing_options);
@@ -448,6 +481,52 @@ int main(int argc, char **argv) {
           fprintf(outfp, " }");
         }
         fprintf(outfp, "\n");
+      } else if (options->dumpmode == dump_length) {
+        int nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;
+        std::string nal_unit_type_str =
+            h265nal::NalUnitTypeToString(nal_unit_type);
+        int nal_length_bytes = nal_unit->length;
+        int bitrate_bps = -1;
+        int first_slice_segment_in_pic_flag = -1;
+        int slice_segment_address = -1;
+        int slice_pic_order_cnt_lsb = -1;
+        bool is_slice_segment = h265nal::IsSliceSegment(nal_unit_type);
+        if (is_slice_segment) {
+          first_slice_segment_in_pic_flag =
+              nal_unit->nal_unit_payload->slice_segment_layer
+                  ->slice_segment_header->first_slice_segment_in_pic_flag;
+          slice_segment_address =
+              nal_unit->nal_unit_payload->slice_segment_layer
+                  ->slice_segment_header->slice_segment_address;
+          slice_pic_order_cnt_lsb =
+              nal_unit->nal_unit_payload->slice_segment_layer
+                  ->slice_segment_header->slice_pic_order_cnt_lsb;
+          if (first_slice_segment_in_pic_flag == 1 && total_bytes > 0) {
+            // dump last frame info
+            bitrate_bps = total_bytes * 8 * options->frames_per_second;
+            fprintf(outfp, ",%i,%i,frame,,%i,,,\n", frame_num,
+                    last_slice_nal_unit_type, bitrate_bps);
+            frame_num += 1;
+            total_bytes = 0;
+          }
+          last_slice_nal_unit_type = nal_unit_type;
+          total_bytes += nal_length_bytes;
+        }
+        fprintf(outfp, "%i,%i,%i,%s,%i,,%s,%s,%s\n", nal_num, frame_num,
+                nal_unit_type, nal_unit_type_str.c_str(), nal_length_bytes,
+                opt_value(first_slice_segment_in_pic_flag, is_slice_segment)
+                    .c_str(),
+                opt_value(slice_segment_address, is_slice_segment).c_str(),
+                opt_value(slice_pic_order_cnt_lsb, is_slice_segment).c_str());
+        nal_num += 1;
+      }
+    }
+    if (options->dumpmode == dump_length) {
+      if (total_bytes > 0) {
+        // dump last frame info
+        int bitrate_bps = total_bytes * 8 * options->frames_per_second;
+        fprintf(outfp, ",%i,%i,frame,,%i,,,\n", frame_num,
+                last_slice_nal_unit_type, bitrate_bps);
       }
     }
   }
