@@ -4,10 +4,9 @@
 
 #include "h265_slice_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cmath>
 #include <cstdint>
 #include <memory>

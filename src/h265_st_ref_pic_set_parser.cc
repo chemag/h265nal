@@ -4,10 +4,9 @@
 
 #include "h265_st_ref_pic_set_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cstdint>
 #include <memory>
 #include <vector>

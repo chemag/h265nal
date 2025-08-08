@@ -4,10 +4,9 @@
 
 #include "h265_pred_weight_table_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cstdint>
 #include <memory>
 #include <vector>

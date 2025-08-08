@@ -4,11 +4,10 @@
 
 #include "h265_scaling_list_data_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
 #include <algorithm>
+#include <cinttypes>
 #include <cstdint>
 #include <memory>
 #include <vector>

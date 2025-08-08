@@ -4,10 +4,9 @@
 
 #include "h265_sps_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cmath>
 #include <cstdint>
 #include <memory>

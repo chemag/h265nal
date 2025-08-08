@@ -4,10 +4,9 @@
 
 #include "h265_profile_tier_level_parser.h"
 
-
-#include <cinttypes>
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cstdint>
 #include <memory>
 #include <vector>
