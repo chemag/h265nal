@@ -180,6 +180,8 @@ const uint32_t VPS_MAX_LAYER_ID_MAX = 62;
 const uint32_t VPS_NUM_LAYER_SETS_MINUS1_MAX = 1023;
 }  // namespace h265limits
 
+std::string NalUnitTypeToString(uint32_t nal_unit_type);
+
 // Slice detector
 bool IsSliceSegment(uint32_t nal_unit_type);
 
