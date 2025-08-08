@@ -36,8 +36,11 @@
 
 extern int optind;
 
+enum Dumpmode { dump_all, dump_length };
+
 typedef struct arg_options {
   int debug;
+  Dumpmode dumpmode;
   bool as_one_line;
   bool add_offset;
   bool add_length;
@@ -54,6 +57,7 @@ typedef struct arg_options {
 // default option values
 arg_options DEFAULT_OPTIONS{
     .debug = 0,
+    .dumpmode = dump_all,
     .as_one_line = true,
     .add_offset = false,
     .add_length = false,
@@ -78,6 +82,8 @@ void usage(char *name) {
           "\t--hvcc-file <infile>:\t\thvcC file to parse bitstream state from "
           "[default: none]\n");
   fprintf(stderr, "\t-o <output>:\t\tH265 parsing output [default: stdout]\n");
+  fprintf(stderr, "\t--dump-all\t\tDump all the parsed contents\n");
+  fprintf(stderr, "\t--dump-length\t\tDump only the length information\n");
   fprintf(stderr, "\t--as-one-line:\tSet as_one_line flag%s\n",
           DEFAULT_OPTIONS.as_one_line ? " [default]" : "");
   fprintf(stderr, "\t--no-as-one-line:\tReset as_one_line flag%s\n",
@@ -119,6 +125,8 @@ void usage(char *name) {
 // long options with no equivalent short option
 enum {
   QUIET_OPTION = CHAR_MAX + 1,
+  DUMP_ALL_OPTION,
+  DUMP_LENGTH_OPTION,
   AS_ONE_LINE_FLAG_OPTION,
   NO_AS_ONE_LINE_FLAG_OPTION,
   ADD_OFFSET_FLAG_OPTION,
@@ -157,6 +165,8 @@ arg_options *parse_args(int argc, char **argv) {
       {"outfile", required_argument, NULL, 'o'},
       // options without a short option
       {"quiet", no_argument, NULL, QUIET_OPTION},
+      {"dump-all", no_argument, NULL, DUMP_ALL_OPTION},
+      {"dump-length", no_argument, NULL, DUMP_LENGTH_OPTION},
       {"as-one-line", no_argument, NULL, AS_ONE_LINE_FLAG_OPTION},
       {"no-as-one-line", no_argument, NULL, NO_AS_ONE_LINE_FLAG_OPTION},
       {"add-offset", no_argument, NULL, ADD_OFFSET_FLAG_OPTION},
@@ -207,6 +217,14 @@ arg_options *parse_args(int argc, char **argv) {
 
       case 'o':
         options.outfile = optarg;
+        break;
+
+      case DUMP_ALL_OPTION:
+        options.dumpmode = dump_all;
+        break;
+
+      case DUMP_LENGTH_OPTION:
+        options.dumpmode = dump_length;
         break;
 
       case AS_ONE_LINE_FLAG_OPTION:
@@ -417,18 +435,20 @@ int main(int argc, char **argv) {
   if (options->infile != nullptr) {
     // 4.3. dump the contents of each NALU
     for (auto &nal_unit : bitstream->nal_units) {
-      nal_unit->fdump(outfp, indent_level, parsing_options);
-      if (options->add_contents) {
-        fprintf(outfp, " contents {");
-        for (size_t i = 0; i < nal_unit->length; i++) {
-          fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
-          if ((i + 1) % 16 == 0) {
-            fprintf(outfp, " ");
+      if (options->dumpmode == dump_all) {
+        nal_unit->fdump(outfp, indent_level, parsing_options);
+        if (options->add_contents) {
+          fprintf(outfp, " contents {");
+          for (size_t i = 0; i < nal_unit->length; i++) {
+            fprintf(outfp, " %02x", buffer[nal_unit->offset + i]);
+            if ((i + 1) % 16 == 0) {
+              fprintf(outfp, " ");
+            }
           }
+          fprintf(outfp, " }");
         }
-        fprintf(outfp, " }");
+        fprintf(outfp, "\n");
       }
-      fprintf(outfp, "\n");
     }
   }
 #endif  // FDUMP_DEFINE
