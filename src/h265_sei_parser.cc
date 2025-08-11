@@ -71,6 +71,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::user_data_unregistered:
       payload_parser = std::make_unique<H265SeiUserDataUnregisteredParser>();
       break;
+    case SeiType::alpha_channel_info:
+      payload_parser = std::make_unique<H265SeiAlphaChannelInfoParser>();
+      break;
     default:
       payload_parser = std::make_unique<H265SeiUnknownParser>();
       break;
@@ -171,6 +174,73 @@ H265SeiUserDataUnregisteredParser::parse_payload(BitBuffer* bit_buffer,
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiAlphaChannelInfoParser::parse_payload(BitBuffer* bit_buffer,
+                                             uint32_t payload_size) {
+  uint32_t bits_tmp;
+
+  // H265 SEI alpha channel info (alpha_channel_info()) parser.
+  // Section F.14.2.8 ("Alpha channel information SEI message syntax") and
+  //  F.14.3.8 ("Alpha channel information SEI message semantics") of
+  // the H.265 standard for a complete description.
+  auto payload_state = std::make_unique<H265SeiAlphaChannelInfoState>();
+
+  // alpha_channel_cancel_flag  u(1)
+  if (!bit_buffer->ReadBits(1, payload_state->alpha_channel_cancel_flag)) {
+    return nullptr;
+  }
+
+  if (!payload_state->alpha_channel_cancel_flag) {
+    // alpha_channel_use_idc  u(3)
+    if (!bit_buffer->ReadBits(3, payload_state->alpha_channel_use_idc)) {
+      return nullptr;
+    }
+
+    // alpha_channel_bit_depth_minus8  u(3)
+    if (!bit_buffer->ReadBits(3,
+                              payload_state->alpha_channel_bit_depth_minus8)) {
+      return nullptr;
+    }
+
+    // alpha_transparent_value  u(v)
+    // The number of bits used for the representation of the
+    // alpha_transparent_value syntax element is
+    // alpha_channel_bit_depth_minus8 + 9
+    if (!bit_buffer->ReadBits(payload_state->alpha_channel_bit_depth_minus8 + 9,
+                              payload_state->alpha_transparent_value)) {
+      return nullptr;
+    }
+
+    // alpha_opaque_value  u(v)
+    // The number of bits used for the representation of the
+    // alpha_opaque_value syntax element is alpha_channel_bit_depth_minus8 + 9
+    if (!bit_buffer->ReadBits(payload_state->alpha_channel_bit_depth_minus8 + 9,
+                              payload_state->alpha_opaque_value)) {
+      return nullptr;
+    }
+
+    // alpha_channel_incr_flag  u(1)
+    if (!bit_buffer->ReadBits(1, payload_state->alpha_channel_incr_flag)) {
+      return nullptr;
+    }
+
+    // alpha_channel_clip_flag  u(1)
+    if (!bit_buffer->ReadBits(1, payload_state->alpha_channel_clip_flag)) {
+      return nullptr;
+    }
+
+    if (payload_state->alpha_channel_clip_flag) {
+      // alpha_channel_clip_type_flag  u(1)
+      if (!bit_buffer->ReadBits(1,
+                                payload_state->alpha_channel_clip_type_flag)) {
+        return nullptr;
+      }
+    }
+  }
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
   // We have no specific details for this sei, just keep all the bytes
@@ -263,6 +333,46 @@ void H265SeiUserDataUnregisteredParser::H265SeiUserDataUnregisteredState::fdump(
     fprintf(outfp, " %u", v);
   }
   fprintf(outfp, " }");
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiAlphaChannelInfoParser::H265SeiAlphaChannelInfoState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "alpha_channel_info {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "alpha_channel_cancel_flag: %i", alpha_channel_cancel_flag);
+
+  if (!alpha_channel_cancel_flag) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_channel_use_idc: %i", alpha_channel_use_idc);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_channel_bit_depth_minus8: %i",
+            alpha_channel_bit_depth_minus8);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_transparent_value: %i", alpha_transparent_value);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_opaque_value: %i", alpha_opaque_value);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_channel_incr_flag: %i", alpha_channel_incr_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "alpha_channel_clip_flag: %i", alpha_channel_clip_flag);
+
+    if (alpha_channel_clip_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "alpha_channel_clip_type_flag: %i",
+              alpha_channel_clip_type_flag);
+    }
+  }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

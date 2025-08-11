@@ -166,6 +166,36 @@ class H265SeiUserDataUnregisteredParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiAlphaChannelInfoParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiAlphaChannelInfoState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiAlphaChannelInfoState() = default;
+    virtual ~H265SeiAlphaChannelInfoState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiAlphaChannelInfoState(const H265SeiAlphaChannelInfoState&) = delete;
+    H265SeiAlphaChannelInfoState(H265SeiAlphaChannelInfoState&&) = delete;
+    H265SeiAlphaChannelInfoState& operator=(
+        const H265SeiAlphaChannelInfoState&) = delete;
+    H265SeiAlphaChannelInfoState& operator=(H265SeiAlphaChannelInfoState&&) =
+        delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    uint32_t alpha_channel_cancel_flag = 0;
+    uint32_t alpha_channel_use_idc = 0;
+    uint32_t alpha_channel_bit_depth_minus8 = 0;
+    uint32_t alpha_transparent_value = 0;
+    uint32_t alpha_opaque_value = 0;
+    uint32_t alpha_channel_incr_flag = 0;
+    uint32_t alpha_channel_clip_flag = 0;
+    uint32_t alpha_channel_clip_type_flag = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState
