@@ -176,8 +176,6 @@ H265SeiUserDataUnregisteredParser::parse_payload(BitBuffer* bit_buffer,
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiAlphaChannelInfoParser::parse_payload(BitBuffer* bit_buffer,
                                              uint32_t payload_size) {
-  uint32_t bits_tmp;
-
   // H265 SEI alpha channel info (alpha_channel_info()) parser.
   // Section F.14.2.8 ("Alpha channel information SEI message syntax") and
   //  F.14.3.8 ("Alpha channel information SEI message semantics") of
