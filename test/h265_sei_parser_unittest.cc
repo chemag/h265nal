@@ -140,4 +140,28 @@ TEST_F(H265SeiParserTest, TestMasteringDisplayColourVolumeSei) {
   EXPECT_EQ(mastering_display_sei->min_display_mastering_luminance, 50);
 }
 
+TEST_F(H265SeiParserTest, TestContentLightLevelInfoSei) {
+  // Test data for content light level info SEI
+  const uint8_t buffer[] = {
+      0x90, 0x01, 0x04,  // payload_type = 144 (content_light_level_info)
+      0x03, 0xe8,  // max_content_light_level = 1000 cd/m^2
+      0x01, 0x90   // max_pic_average_light_level = 400 cd/m^2
+  };
+  
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+  
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type,
+            h265nal::SeiType::content_light_level_info);
+  EXPECT_EQ(sei_message->payload_size, 4);
+  
+  auto content_light_sei = dynamic_cast<
+      H265SeiContentLightLevelInfoParser::H265SeiContentLightLevelInfoState*>(
+      sei_message->payload_state.get());
+  EXPECT_TRUE(content_light_sei != nullptr);
+  
+  EXPECT_EQ(content_light_sei->max_content_light_level, 1000);
+  EXPECT_EQ(content_light_sei->max_pic_average_light_level, 400);
+}
+
 }  // namespace h265nal

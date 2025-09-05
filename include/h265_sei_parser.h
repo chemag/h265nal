@@ -229,6 +229,34 @@ class H265SeiMasteringDisplayColourVolumeParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiContentLightLevelInfoParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiContentLightLevelInfoState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiContentLightLevelInfoState() = default;
+    virtual ~H265SeiContentLightLevelInfoState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiContentLightLevelInfoState(
+        const H265SeiContentLightLevelInfoState&) = delete;
+    H265SeiContentLightLevelInfoState(
+        H265SeiContentLightLevelInfoState&&) = delete;
+    H265SeiContentLightLevelInfoState& operator=(
+        const H265SeiContentLightLevelInfoState&) = delete;
+    H265SeiContentLightLevelInfoState& operator=(
+        H265SeiContentLightLevelInfoState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    // Max content light level (1 cd/m^2)
+    uint16_t max_content_light_level = 0;
+    // Max picture average light level (1 cd/m^2)
+    uint16_t max_pic_average_light_level = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState
