@@ -75,6 +75,10 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
       payload_parser = 
           std::make_unique<H265SeiMasteringDisplayColourVolumeParser>();
       break;
+    case SeiType::content_light_level_info:
+      payload_parser = 
+          std::make_unique<H265SeiContentLightLevelInfoParser>();
+      break;
     case SeiType::alpha_channel_info:
       payload_parser = std::make_unique<H265SeiAlphaChannelInfoParser>();
       break;
@@ -292,6 +296,30 @@ H265SeiMasteringDisplayColourVolumeParser::parse_payload(
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiContentLightLevelInfoParser::parse_payload(BitBuffer* bit_buffer,
+                                                  uint32_t payload_size) {
+  // H265 SEI content light level info (content_light_level_info()) parser.
+  // Section D.2.35 ("Content light level information SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state = std::make_unique<H265SeiContentLightLevelInfoState>();
+
+  // max_content_light_level  u(16)
+  uint32_t max_content_light, max_pic_average;
+  if (!bit_buffer->ReadBits(16, max_content_light)) {
+    return nullptr;
+  }
+  payload_state->max_content_light_level = static_cast<uint16_t>(max_content_light);
+
+  // max_pic_average_light_level  u(16)
+  if (!bit_buffer->ReadBits(16, max_pic_average)) {
+    return nullptr;
+  }
+  payload_state->max_pic_average_light_level = static_cast<uint16_t>(max_pic_average);
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
   // We have no specific details for this sei, just keep all the bytes
@@ -462,6 +490,23 @@ void H265SeiMasteringDisplayColourVolumeParser::
   fprintf(outfp, "min_display_mastering_luminance: %u (%.4f cd/m^2)",
           min_display_mastering_luminance,
           min_display_mastering_luminance * 0.0001);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiContentLightLevelInfoParser::H265SeiContentLightLevelInfoState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "content_light_level_info {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "max_content_light_level: %u cd/m^2", max_content_light_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "max_pic_average_light_level: %u cd/m^2", 
+          max_pic_average_light_level);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
