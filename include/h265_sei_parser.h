@@ -196,6 +196,39 @@ class H265SeiAlphaChannelInfoParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiMasteringDisplayColourVolumeParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiMasteringDisplayColourVolumeState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiMasteringDisplayColourVolumeState() = default;
+    virtual ~H265SeiMasteringDisplayColourVolumeState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiMasteringDisplayColourVolumeState(
+        const H265SeiMasteringDisplayColourVolumeState&) = delete;
+    H265SeiMasteringDisplayColourVolumeState(
+        H265SeiMasteringDisplayColourVolumeState&&) = delete;
+    H265SeiMasteringDisplayColourVolumeState& operator=(
+        const H265SeiMasteringDisplayColourVolumeState&) = delete;
+    H265SeiMasteringDisplayColourVolumeState& operator=(
+        H265SeiMasteringDisplayColourVolumeState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    // Display primaries x and y coordinates (0.00002 increments)
+    uint16_t display_primaries_x[3] = {0};
+    uint16_t display_primaries_y[3] = {0};
+    // White point x and y coordinates (0.00002 increments)
+    uint16_t white_point_x = 0;
+    uint16_t white_point_y = 0;
+    // Max and min display mastering luminance (0.0001 cd/m^2)
+    uint32_t max_display_mastering_luminance = 0;
+    uint32_t min_display_mastering_luminance = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState

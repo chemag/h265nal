@@ -71,6 +71,10 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::user_data_unregistered:
       payload_parser = std::make_unique<H265SeiUserDataUnregisteredParser>();
       break;
+    case SeiType::mastering_display_colour_volume:
+      payload_parser = 
+          std::make_unique<H265SeiMasteringDisplayColourVolumeParser>();
+      break;
     case SeiType::alpha_channel_info:
       payload_parser = std::make_unique<H265SeiAlphaChannelInfoParser>();
       break;
@@ -239,6 +243,55 @@ H265SeiAlphaChannelInfoParser::parse_payload(BitBuffer* bit_buffer,
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiMasteringDisplayColourVolumeParser::parse_payload(
+    BitBuffer* bit_buffer, uint32_t payload_size) {
+  // H265 SEI mastering display colour volume (mastering_display_colour_volume())
+  // parser. Section D.2.28 ("Mastering display colour volume SEI message
+  // syntax") of the H.265 standard for a complete description.
+  auto payload_state =
+      std::make_unique<H265SeiMasteringDisplayColourVolumeState>();
+
+  // display_primaries_x[c] and display_primaries_y[c]  u(16) each
+  for (int c = 0; c < 3; c++) {
+    uint32_t primaries_x, primaries_y;
+    if (!bit_buffer->ReadBits(16, primaries_x)) {
+      return nullptr;
+    }
+    payload_state->display_primaries_x[c] = static_cast<uint16_t>(primaries_x);
+    
+    if (!bit_buffer->ReadBits(16, primaries_y)) {
+      return nullptr;
+    }
+    payload_state->display_primaries_y[c] = static_cast<uint16_t>(primaries_y);
+  }
+
+  // white_point_x  u(16)
+  uint32_t white_x, white_y;
+  if (!bit_buffer->ReadBits(16, white_x)) {
+    return nullptr;
+  }
+  payload_state->white_point_x = static_cast<uint16_t>(white_x);
+
+  // white_point_y  u(16)
+  if (!bit_buffer->ReadBits(16, white_y)) {
+    return nullptr;
+  }
+  payload_state->white_point_y = static_cast<uint16_t>(white_y);
+
+  // max_display_mastering_luminance  u(32)
+  if (!bit_buffer->ReadBits(32, payload_state->max_display_mastering_luminance)) {
+    return nullptr;
+  }
+
+  // min_display_mastering_luminance  u(32)
+  if (!bit_buffer->ReadBits(32, payload_state->min_display_mastering_luminance)) {
+    return nullptr;
+  }
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
   // We have no specific details for this sei, just keep all the bytes
@@ -371,6 +424,44 @@ void H265SeiAlphaChannelInfoParser::H265SeiAlphaChannelInfoState::fdump(
               alpha_channel_clip_type_flag);
     }
   }
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiMasteringDisplayColourVolumeParser::
+    H265SeiMasteringDisplayColourVolumeState::fdump(FILE* outfp,
+                                                    int indent_level) const {
+  fprintf(outfp, "mastering_display_colour_volume {");
+  indent_level = indent_level_incr(indent_level);
+
+  for (int c = 0; c < 3; c++) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "display_primaries[%d]_x: %u (%.5f)", c, 
+            display_primaries_x[c], display_primaries_x[c] * 0.00002);
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "display_primaries[%d]_y: %u (%.5f)", c,
+            display_primaries_y[c], display_primaries_y[c] * 0.00002);
+  }
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "white_point_x: %u (%.5f)", white_point_x, 
+          white_point_x * 0.00002);
+  
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "white_point_y: %u (%.5f)", white_point_y,
+          white_point_y * 0.00002);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "max_display_mastering_luminance: %u (%.4f cd/m^2)",
+          max_display_mastering_luminance, 
+          max_display_mastering_luminance * 0.0001);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "min_display_mastering_luminance: %u (%.4f cd/m^2)",
+          min_display_mastering_luminance,
+          min_display_mastering_luminance * 0.0001);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
