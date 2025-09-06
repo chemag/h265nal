@@ -238,8 +238,8 @@ class H265SeiContentLightLevelInfoParser : public H265SeiPayloadParser {
     // disable copy ctor, move ctor, and copy&move assignments
     H265SeiContentLightLevelInfoState(
         const H265SeiContentLightLevelInfoState&) = delete;
-    H265SeiContentLightLevelInfoState(
-        H265SeiContentLightLevelInfoState&&) = delete;
+    H265SeiContentLightLevelInfoState(H265SeiContentLightLevelInfoState&&) =
+        delete;
     H265SeiContentLightLevelInfoState& operator=(
         const H265SeiContentLightLevelInfoState&) = delete;
     H265SeiContentLightLevelInfoState& operator=(
