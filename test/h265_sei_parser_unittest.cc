@@ -143,7 +143,7 @@ TEST_F(H265SeiParserTest, TestMasteringDisplayColourVolumeSei) {
 TEST_F(H265SeiParserTest, TestContentLightLevelInfoSei) {
   // Test data for content light level info SEI
   const uint8_t buffer[] = {
-      0x90, 0x01, 0x04,  // payload_type = 144 (content_light_level_info)
+      0x90, 0x04,  // payload_type = 144 (content_light_level_info)
       0x03, 0xe8,  // max_content_light_level = 1000 cd/m^2
       0x01, 0x90   // max_pic_average_light_level = 400 cd/m^2
   };
