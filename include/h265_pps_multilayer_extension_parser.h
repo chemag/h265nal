@@ -50,7 +50,7 @@ class H265PpsMultilayerExtensionParser {
     std::vector<int32_t> ref_region_top_offset;
     std::vector<int32_t> ref_region_right_offset;
     std::vector<int32_t> ref_region_bottom_offset;
-    std::vector<int32_t> resample_phase_set_present_flag;
+    std::vector<uint32_t> resample_phase_set_present_flag;
     std::vector<int32_t> phase_hor_luma;
     std::vector<int32_t> phase_ver_luma;
     std::vector<int32_t> phase_hor_chroma_plus8;

@@ -302,8 +302,8 @@ void H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState::fdump(
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "resample_phase_set_present_flag {");
-    for (const int32_t& v : resample_phase_set_present_flag) {
-      fprintf(outfp, " %i", v);
+    for (const uint32_t& v : resample_phase_set_present_flag) {
+      fprintf(outfp, " %u", v);
     }
     fprintf(outfp, " }");
 

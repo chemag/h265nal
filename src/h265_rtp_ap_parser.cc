@@ -84,7 +84,7 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level,
   fdump_indent_level(outfp, indent_level);
   header->fdump(outfp, indent_level);
 
-  for (unsigned int i = 0; i < nal_unit_sizes.size(); ++i) {
+  for (size_t i = 0; i < nal_unit_sizes.size(); ++i) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "nal_unit_size: %zu", nal_unit_sizes[i]);
 
@@ -93,7 +93,8 @@ void H265RtpApParser::RtpApState::fdump(FILE* outfp, int indent_level,
 
     fdump_indent_level(outfp, indent_level);
     nal_unit_payloads[i]->fdump(outfp, indent_level,
-                                nal_unit_headers[i]->nal_unit_type, parsing_options);
+                                nal_unit_headers[i]->nal_unit_type,
+                                parsing_options);
   }
 
   indent_level = indent_level_decr(indent_level);

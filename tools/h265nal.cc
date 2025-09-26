@@ -422,7 +422,8 @@ int main(int argc, char **argv) {
           parsing_options);
     } else {
       bitstream = h265nal::H265BitstreamParser::ParseBitstreamNALULength(
-          buffer.data(), buffer.size(), options->nalu_length_bytes,
+          buffer.data(), buffer.size(),
+          static_cast<size_t>(options->nalu_length_bytes),
           &bitstream_parser_state, parsing_options);
     }
   }
@@ -463,10 +464,10 @@ int main(int argc, char **argv) {
               "slice_segment_address,slice_pic_order_cnt_lsb\n");
     }
     // 4.3. dump the contents of each NALU
-    int total_bytes = 0;
-    int nal_num = 0;
-    int frame_num = 0;
-    int last_slice_nal_unit_type = -1;
+    size_t total_bytes = 0;
+    size_t nal_num = 0;
+    size_t frame_num = 0;
+    uint32_t last_slice_nal_unit_type = 0;
     for (auto &nal_unit : bitstream->nal_units) {
       if (options->dumpmode == dump_all) {
         nal_unit->fdump(outfp, indent_level, parsing_options);
@@ -482,14 +483,14 @@ int main(int argc, char **argv) {
         }
         fprintf(outfp, "\n");
       } else if (options->dumpmode == dump_length) {
-        int nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;
+        uint32_t nal_unit_type = nal_unit->nal_unit_header->nal_unit_type;
         std::string nal_unit_type_str =
             h265nal::NalUnitTypeToString(nal_unit_type);
-        int nal_length_bytes = nal_unit->length;
-        int bitrate_bps = -1;
-        int first_slice_segment_in_pic_flag = -1;
-        int slice_segment_address = -1;
-        int slice_pic_order_cnt_lsb = -1;
+        size_t nal_length_bytes = nal_unit->length;
+        size_t bitrate_bps = 0;
+        uint32_t first_slice_segment_in_pic_flag = 0;
+        uint32_t slice_segment_address = 0;
+        uint32_t slice_pic_order_cnt_lsb = 0;
         bool is_slice_segment = h265nal::IsSliceSegment(nal_unit_type);
         if (is_slice_segment) {
           first_slice_segment_in_pic_flag =
@@ -503,8 +504,9 @@ int main(int argc, char **argv) {
                   ->slice_segment_header->slice_pic_order_cnt_lsb;
           if (first_slice_segment_in_pic_flag == 1 && total_bytes > 0) {
             // dump last frame info
-            bitrate_bps = total_bytes * 8 * options->frames_per_second;
-            fprintf(outfp, ",%i,%i,frame,,%i,,,\n", frame_num,
+            bitrate_bps = total_bytes * 8 *
+                          static_cast<size_t>(options->frames_per_second);
+            fprintf(outfp, ",%zu,%u,frame,,%zu,,,\n", frame_num,
                     last_slice_nal_unit_type, bitrate_bps);
             frame_num += 1;
             total_bytes = 0;
@@ -512,20 +514,26 @@ int main(int argc, char **argv) {
           last_slice_nal_unit_type = nal_unit_type;
           total_bytes += nal_length_bytes;
         }
-        fprintf(outfp, "%i,%i,%i,%s,%i,,%s,%s,%s\n", nal_num, frame_num,
-                nal_unit_type, nal_unit_type_str.c_str(), nal_length_bytes,
-                opt_value(first_slice_segment_in_pic_flag, is_slice_segment)
-                    .c_str(),
-                opt_value(slice_segment_address, is_slice_segment).c_str(),
-                opt_value(slice_pic_order_cnt_lsb, is_slice_segment).c_str());
+        fprintf(
+            outfp, "%zu,%zu,%u,%s,%zu,,%s,%s,%s\n", nal_num, frame_num,
+            nal_unit_type, nal_unit_type_str.c_str(), nal_length_bytes,
+            opt_value(static_cast<int>(first_slice_segment_in_pic_flag),
+                      is_slice_segment)
+                .c_str(),
+            opt_value(static_cast<int>(slice_segment_address), is_slice_segment)
+                .c_str(),
+            opt_value(static_cast<int>(slice_pic_order_cnt_lsb),
+                      is_slice_segment)
+                .c_str());
         nal_num += 1;
       }
     }
     if (options->dumpmode == dump_length) {
       if (total_bytes > 0) {
         // dump last frame info
-        int bitrate_bps = total_bytes * 8 * options->frames_per_second;
-        fprintf(outfp, ",%i,%i,frame,,%i,,,\n", frame_num,
+        size_t bitrate_bps =
+            total_bytes * 8 * static_cast<size_t>(options->frames_per_second);
+        fprintf(outfp, ",%zu,%u,frame,,%zu,,,\n", frame_num,
                 last_slice_nal_unit_type, bitrate_bps);
       }
     }

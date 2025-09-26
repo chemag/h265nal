@@ -73,7 +73,8 @@ H265ScalingListDataParser::ParseScalingListData(
 
       } else {
         uint32_t nextCoef = 8;
-        uint32_t coefNum = std::min(64, (1 << (4 + (sizeId << 1))));
+        uint32_t coefNum =
+            std::min(64U, static_cast<uint32_t>(1 << (4 + (sizeId << 1))));
         if (sizeId > 1) {
           // scaling_list_dc_coef_minus8[sizeId - 2][matrixId]  se(v)
           if (!bit_buffer->ReadSignedExponentialGolomb(
@@ -81,9 +82,10 @@ H265ScalingListDataParser::ParseScalingListData(
                       ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId])) {
             return nullptr;
           }
-          nextCoef = scaling_list_data
-                         ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] +
-                     8;
+          nextCoef = static_cast<uint32_t>(
+              scaling_list_data
+                  ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] +
+              8);
         }
         for (uint32_t i = 0; i < coefNum; i++) {
           // scaling_list_delta_coef  se(v)
@@ -92,7 +94,9 @@ H265ScalingListDataParser::ParseScalingListData(
                   scaling_list_delta_coef)) {
             return nullptr;
           }
-          nextCoef = (nextCoef + scaling_list_delta_coef + 256) % 256;
+          nextCoef = static_cast<uint32_t>(static_cast<int32_t>(nextCoef) +
+                                           scaling_list_delta_coef + 256) %
+                     256;
           scaling_list_data->ScalingList[sizeId][matrixId].push_back(nextCoef);
         }
       }

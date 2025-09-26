@@ -72,7 +72,7 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstream) {
   EXPECT_EQ(4, bitstream->nal_units.size());
 
   // check the 1st NAL unit
-  int index = 0;
+  size_t index = 0;
   EXPECT_EQ(0,
             bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,
@@ -147,7 +147,7 @@ TEST_F(H265BitstreamParserTest, TestSampleBitstreamAlt) {
   int length = 0;
   int counter = 0;
   // 1st NAL unit
-  int index = 0;
+  size_t index = 0;
   length = 0x17;
   counter += 4;
   EXPECT_EQ(counter, bitstream->nal_units[index]->offset);
@@ -302,7 +302,7 @@ TEST_F(H265BitstreamParserTest, TestMultipleBuffers) {
   EXPECT_EQ(4, bitstream->nal_units.size());
 
   // check the 1st NAL unit
-  int index = 0;
+  size_t index = 0;
   EXPECT_EQ(0,
             bitstream->nal_units[index]->nal_unit_header->forbidden_zero_bit);
   EXPECT_EQ(NalUnitType::VPS_NUT,

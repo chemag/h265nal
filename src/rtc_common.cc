@@ -188,7 +188,7 @@ bool BitBuffer::ReadBits(size_t bit_count, uint64_t& val) {
 bool BitBuffer::ReadBytes(size_t byte_count, uint8_t* buffer) {
   // There is probably a more efficient way to read a buffer than
   // byte-by-byte.
-  for (unsigned int i = 0; i < byte_count; ++i) {
+  for (size_t i = 0; i < byte_count; ++i) {
     if (!ReadUInt8(buffer[i])) {
       return false;
     }
@@ -392,12 +392,12 @@ bool BitBufferWriter::WriteSignedExponentialGolomb(int32_t val) {
   if (val == 0) {
     return WriteExponentialGolomb(0);
   } else if (val > 0) {
-    uint32_t signed_val = val;
+    uint32_t signed_val = static_cast<uint32_t>(val);
     return WriteExponentialGolomb((signed_val * 2) - 1);
   } else {
     if (val == std::numeric_limits<int32_t>::min())
       return false;  // Not supported, would cause overflow.
-    uint32_t signed_val = -val;
+    uint32_t signed_val = static_cast<uint32_t>(-val);
     return WriteExponentialGolomb(signed_val * 2);
   }
 }

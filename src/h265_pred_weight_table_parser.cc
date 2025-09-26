@@ -142,7 +142,7 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "luma_weight_l0_flag {");
   for (const uint32_t& v : luma_weight_l0_flag) {
-    fprintf(outfp, " %i", v);
+    fprintf(outfp, " %u", v);
   }
   fprintf(outfp, " }");
 
@@ -150,21 +150,21 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "chroma_weight_l0_flag {");
     for (const uint32_t& v : chroma_weight_l0_flag) {
-      fprintf(outfp, " %i", v);
+      fprintf(outfp, " %u", v);
     }
     fprintf(outfp, " }");
   }
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "delta_luma_weight_l0 {");
-  for (const uint32_t& v : delta_luma_weight_l0) {
+  for (const int32_t& v : delta_luma_weight_l0) {
     fprintf(outfp, " %i", v);
   }
   fprintf(outfp, " }");
 
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "luma_offset_l0 {");
-  for (const uint32_t& v : luma_offset_l0) {
+  for (const int32_t& v : luma_offset_l0) {
     fprintf(outfp, " %i", v);
   }
   fprintf(outfp, " }");
@@ -172,9 +172,9 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
   if (ChromaArrayType != 0) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "delta_chroma_weight_l0 {");
-    for (const std::vector<uint32_t>& vv : delta_chroma_weight_l0) {
+    for (const std::vector<int32_t>& vv : delta_chroma_weight_l0) {
       fprintf(outfp, " {");
-      for (const uint32_t& v : vv) {
+      for (const int32_t& v : vv) {
         fprintf(outfp, " %i", v);
       }
       fprintf(outfp, " }");
@@ -183,9 +183,9 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
 
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "delta_chroma_offset_l0 {");
-    for (const std::vector<uint32_t>& vv : delta_chroma_offset_l0) {
+    for (const std::vector<int32_t>& vv : delta_chroma_offset_l0) {
       fprintf(outfp, " {");
-      for (const uint32_t& v : vv) {
+      for (const int32_t& v : vv) {
         fprintf(outfp, " %i", v);
       }
       fprintf(outfp, " }");

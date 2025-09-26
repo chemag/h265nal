@@ -205,7 +205,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
     return nullptr;
   }
 
-  for (unsigned int j = 0; j < configuration_box->numOfArrays; j++) {
+  for (uint32_t j = 0; j < configuration_box->numOfArrays; j++) {
     // bit(1) array_completeness;
     if (!bit_buffer->ReadBits(1, bits_tmp)) {
       return nullptr;
@@ -239,7 +239,7 @@ H265ConfigurationBoxParser::ParseConfigurationBox(
 
     configuration_box->nalUnitLength.emplace_back();
     configuration_box->nalUnit.emplace_back();
-    for (unsigned int i = 0; i < configuration_box->numNalus.back(); i++) {
+    for (uint32_t i = 0; i < configuration_box->numNalus.back(); i++) {
       // unsigned int(16) nalUnitLength;
       if (!bit_buffer->ReadBits(16, bits_tmp)) {
         return nullptr;
@@ -342,7 +342,7 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "numOfArrays: %i", numOfArrays);
 
-  for (unsigned int j = 0; j < numOfArrays; j++) {
+  for (uint32_t j = 0; j < numOfArrays; j++) {
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "array_completeness[%i]: %i", j, array_completeness[j]);
 
@@ -355,7 +355,7 @@ void H265ConfigurationBoxParser::ConfigurationBoxState::fdump(
     fdump_indent_level(outfp, indent_level);
     fprintf(outfp, "numNalus[%i]: %i", j, numNalus[j]);
 
-    for (unsigned int i = 0; i < numNalus[j]; i++) {
+    for (uint32_t i = 0; i < numNalus[j]; i++) {
       fdump_indent_level(outfp, indent_level);
       fprintf(outfp, "nalUnitLength[%i][%i]: %i", j, i, nalUnitLength[j][i]);
 

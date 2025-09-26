@@ -981,12 +981,12 @@ int H265SpsParser::SpsState::getResolution(int* width,
   // Section 7.4.3.2.1
   int SubWidthC = getSubWidthC();
   int SubHeightC = getSubHeightC();
-  *width = pic_width_in_luma_samples;
-  *height = pic_height_in_luma_samples;
-  *width -=
-      (SubWidthC * conf_win_left_offset + SubWidthC * conf_win_right_offset);
-  *height -= (SubHeightC * conf_win_top_offset) +
-             (SubHeightC * conf_win_bottom_offset);
+  *width = static_cast<int>(pic_width_in_luma_samples);
+  *height = static_cast<int>(pic_height_in_luma_samples);
+  *width -= (SubWidthC * static_cast<int>(conf_win_left_offset) +
+             SubWidthC * static_cast<int>(conf_win_right_offset));
+  *height -= (SubHeightC * static_cast<int>(conf_win_top_offset)) +
+             (SubHeightC * static_cast<int>(conf_win_bottom_offset));
   return 0;
 }
 }  // namespace h265nal

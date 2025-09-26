@@ -275,7 +275,7 @@ TEST_F(H265SpsParserTest, TestComplexStRefPicSet) {
   EXPECT_EQ(12, sps->num_short_term_ref_pic_sets);
 
   // st_ref_pic_set(i)
-  int i = 0;
+  size_t i = 0;
   EXPECT_EQ(4, sps->st_ref_pic_set[i]->num_negative_pics);
   EXPECT_EQ(0, sps->st_ref_pic_set[i]->num_positive_pics);
   EXPECT_THAT(sps->st_ref_pic_set[i]->delta_poc_s0_minus1,
