@@ -236,8 +236,8 @@ class NaluChecksum {
   static std::shared_ptr<NaluChecksum> GetNaluChecksum(
       BitBuffer *bit_buffer) noexcept;
   void fdump(char *output, int output_len) const;
-  const char *GetChecksum() { return checksum; };
-  int GetLength() { return length; };
+  const char *GetChecksum() { return checksum; }
+  int GetLength() { return length; }
   const char *GetPrintableChecksum() const;
 
  private:
