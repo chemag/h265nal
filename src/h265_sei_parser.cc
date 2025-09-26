@@ -183,6 +183,7 @@ H265SeiUserDataUnregisteredParser::parse_payload(BitBuffer* bit_buffer,
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiAlphaChannelInfoParser::parse_payload(BitBuffer* bit_buffer,
                                              uint32_t payload_size) {
+  (void)payload_size;
   // H265 SEI alpha channel info (alpha_channel_info()) parser.
   // Section F.14.2.8 ("Alpha channel information SEI message syntax") and
   //  F.14.3.8 ("Alpha channel information SEI message semantics") of
@@ -248,6 +249,7 @@ H265SeiAlphaChannelInfoParser::parse_payload(BitBuffer* bit_buffer,
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiMasteringDisplayColourVolumeParser::parse_payload(
     BitBuffer* bit_buffer, uint32_t payload_size) {
+  (void)payload_size;
   // H265 SEI mastering display colour volume
   // (mastering_display_colour_volume()) parser. Section D.2.28 ("Mastering
   // display colour volume SEI message syntax") of the H.265 standard for a
@@ -300,6 +302,7 @@ H265SeiMasteringDisplayColourVolumeParser::parse_payload(
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiContentLightLevelInfoParser::parse_payload(BitBuffer* bit_buffer,
                                                   uint32_t payload_size) {
+  (void)payload_size;
   // H265 SEI content light level info (content_light_level_info()) parser.
   // Section D.2.35 ("Content light level information SEI message syntax")
   // of the H.265 standard for a complete description.
