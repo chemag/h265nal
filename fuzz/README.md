@@ -2,8 +2,8 @@
 
 We decided to use the unittests (which show how to test each of the
 parsers, and even provides some interesting input cases) to auto-generate
-both the fuzzers (the cpp files that contain the fuzzing glue) and the
-corpus.
+both the fuzzers (the cpp files that contain the fuzzing glue) and to
+jump-start the corpus.
 
 We provide a script (`converter.py`) that parses unittests in order to
 auto-generate both the fuzzers (in the libfuzzer's case this means the
@@ -54,7 +54,16 @@ constants, and put them into a binary file.
 
 # Operation
 
-(1) In order to re-generate a fuzzing files, use the converter script:
+(0) Get the fuzz/corpus submodule. The submodule is not checked out by
+default. You need to explicitly request it:
+```
+$ cd h265nal
+$ git submodule update --init --checkout --depth 1 -- fuzz/corpus
+Cloning into 'h265nal/fuzz/corpus'...
+Submodule path 'fuzz/corpus': checked out '...'
+```
+
+(1) In order to re-generate a fuzzing file, use the converter script:
 
 ```
 $ ./converter.py ../test/h265_vps_parser_unittest.cc ./

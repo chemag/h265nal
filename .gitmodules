@@ -1,3 +1,9 @@
 [submodule "ya_getopt"]
 	path = ya_getopt
 	url = https://github.com/kubo/ya_getopt
+
+[submodule "fuzz/corpus"]
+	path = fuzz/corpus
+	url = https://github.com/chemag/h265nal-fuzzcorpus
+	update = none   # do NOT populate on default/recursive updates
+	active = false  # exclude from default submodule ops
