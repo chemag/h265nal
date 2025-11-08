@@ -78,6 +78,10 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::content_light_level_info:
       payload_parser = std::make_unique<H265SeiContentLightLevelInfoParser>();
       break;
+    case SeiType::alternative_transfer_characteristics:
+      payload_parser =
+          std::make_unique<H265SeiAlternativeTransferCharacteristicsParser>();
+      break;
     case SeiType::alpha_channel_info:
       payload_parser = std::make_unique<H265SeiAlphaChannelInfoParser>();
       break;
@@ -327,6 +331,28 @@ H265SeiContentLightLevelInfoParser::parse_payload(BitBuffer* bit_buffer,
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiAlternativeTransferCharacteristicsParser::parse_payload(
+    BitBuffer* bit_buffer, uint32_t payload_size) {
+  (void)payload_size;
+  // H265 SEI alternative transfer characteristics
+  // (alternative_transfer_characteristics()) parser.
+  // Section D.2.38 ("Alternative transfer characteristics SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state =
+      std::make_unique<H265SeiAlternativeTransferCharacteristicsState>();
+
+  // preferred_transfer_characteristics  u(8)
+  uint32_t preferred_transfer_char;
+  if (!bit_buffer->ReadBits(8, preferred_transfer_char)) {
+    return nullptr;
+  }
+  payload_state->preferred_transfer_characteristics =
+      static_cast<uint8_t>(preferred_transfer_char);
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
   // We have no specific details for this sei, just keep all the bytes
@@ -514,6 +540,21 @@ void H265SeiContentLightLevelInfoParser::H265SeiContentLightLevelInfoState::
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_pic_average_light_level: %u cd/m^2",
           max_pic_average_light_level);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiAlternativeTransferCharacteristicsParser::
+    H265SeiAlternativeTransferCharacteristicsState::fdump(
+        FILE* outfp, int indent_level) const {
+  fprintf(outfp, "alternative_transfer_characteristics {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "preferred_transfer_characteristics: %u",
+          preferred_transfer_characteristics);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

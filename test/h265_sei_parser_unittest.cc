@@ -164,4 +164,28 @@ TEST_F(H265SeiParserTest, TestContentLightLevelInfoSei) {
   EXPECT_EQ(content_light_sei->max_pic_average_light_level, 400);
 }
 
+TEST_F(H265SeiParserTest, TestAlternativeTransferCharacteristicsSei) {
+  // Test data for alternative transfer characteristics SEI
+  const uint8_t buffer[] = {
+      0x93,  // payload_type = 147 (alternative_transfer_characteristics)
+      0x01,  // payload_size = 1
+      0x12   // preferred_transfer_characteristics = 18 (ARIB STD-B67 / HLG)
+  };
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type,
+            h265nal::SeiType::alternative_transfer_characteristics);
+  EXPECT_EQ(sei_message->payload_size, 1);
+
+  auto alternative_transfer_sei =
+      dynamic_cast<H265SeiAlternativeTransferCharacteristicsParser::
+                       H265SeiAlternativeTransferCharacteristicsState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(alternative_transfer_sei != nullptr);
+
+  EXPECT_EQ(alternative_transfer_sei->preferred_transfer_characteristics, 18);
+}
+
 }  // namespace h265nal

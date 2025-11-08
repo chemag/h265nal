@@ -257,6 +257,33 @@ class H265SeiContentLightLevelInfoParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiAlternativeTransferCharacteristicsParser
+    : public H265SeiPayloadParser {
+ public:
+  struct H265SeiAlternativeTransferCharacteristicsState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiAlternativeTransferCharacteristicsState() = default;
+    virtual ~H265SeiAlternativeTransferCharacteristicsState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiAlternativeTransferCharacteristicsState(
+        const H265SeiAlternativeTransferCharacteristicsState&) = delete;
+    H265SeiAlternativeTransferCharacteristicsState(
+        H265SeiAlternativeTransferCharacteristicsState&&) = delete;
+    H265SeiAlternativeTransferCharacteristicsState& operator=(
+        const H265SeiAlternativeTransferCharacteristicsState&) = delete;
+    H265SeiAlternativeTransferCharacteristicsState& operator=(
+        H265SeiAlternativeTransferCharacteristicsState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    // Preferred transfer characteristics
+    uint8_t preferred_transfer_characteristics = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState
