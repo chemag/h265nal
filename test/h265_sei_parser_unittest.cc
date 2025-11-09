@@ -188,4 +188,32 @@ TEST_F(H265SeiParserTest, TestAlternativeTransferCharacteristicsSei) {
   EXPECT_EQ(alternative_transfer_sei->preferred_transfer_characteristics, 18);
 }
 
+TEST_F(H265SeiParserTest, TestAmbientViewingEnvironmentSei) {
+  // Test data for ambient viewing environment SEI
+  const uint8_t buffer[] = {
+      0x94,  // payload_type = 148 (ambient_viewing_environment)
+      0x08,  // payload_size = 8
+      0x00, 0x01, 0x86, 0xa0,  // ambient_illuminance = 100000 (10 lux)
+      0x3d, 0x13,              // ambient_light_x = 15635 (0.31270 in CIE xy)
+      0x40, 0x85               // ambient_light_y = 16517 (0.33034 in CIE xy)
+  };
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type,
+            h265nal::SeiType::ambient_viewing_environment);
+  EXPECT_EQ(sei_message->payload_size, 8);
+
+  auto ambient_viewing_sei =
+      dynamic_cast<H265SeiAmbientViewingEnvironmentParser::
+                       H265SeiAmbientViewingEnvironmentState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(ambient_viewing_sei != nullptr);
+
+  EXPECT_EQ(ambient_viewing_sei->ambient_illuminance, 100000);
+  EXPECT_EQ(ambient_viewing_sei->ambient_light_x, 15635);
+  EXPECT_EQ(ambient_viewing_sei->ambient_light_y, 16517);
+}
+
 }  // namespace h265nal

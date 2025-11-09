@@ -82,6 +82,10 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
       payload_parser =
           std::make_unique<H265SeiAlternativeTransferCharacteristicsParser>();
       break;
+    case SeiType::ambient_viewing_environment:
+      payload_parser =
+          std::make_unique<H265SeiAmbientViewingEnvironmentParser>();
+      break;
     case SeiType::alpha_channel_info:
       payload_parser = std::make_unique<H265SeiAlphaChannelInfoParser>();
       break;
@@ -353,6 +357,41 @@ H265SeiAlternativeTransferCharacteristicsParser::parse_payload(
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiAmbientViewingEnvironmentParser::parse_payload(BitBuffer* bit_buffer,
+                                                      uint32_t payload_size) {
+  (void)payload_size;
+  // H265 SEI ambient viewing environment
+  // (ambient_viewing_environment()) parser.
+  // Section D.2.39 ("Ambient viewing environment SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state =
+      std::make_unique<H265SeiAmbientViewingEnvironmentState>();
+
+  // ambient_illuminance  u(32)
+  uint32_t ambient_illuminance;
+  if (!bit_buffer->ReadBits(32, ambient_illuminance)) {
+    return nullptr;
+  }
+  payload_state->ambient_illuminance = ambient_illuminance;
+
+  // ambient_light_x  u(16)
+  uint32_t ambient_light_x;
+  if (!bit_buffer->ReadBits(16, ambient_light_x)) {
+    return nullptr;
+  }
+  payload_state->ambient_light_x = static_cast<uint16_t>(ambient_light_x);
+
+  // ambient_light_y  u(16)
+  uint32_t ambient_light_y;
+  if (!bit_buffer->ReadBits(16, ambient_light_y)) {
+    return nullptr;
+  }
+  payload_state->ambient_light_y = static_cast<uint16_t>(ambient_light_y);
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiUnknownParser::parse_payload(BitBuffer* bit_buffer,
                                     uint32_t payload_size) {
   // We have no specific details for this sei, just keep all the bytes
@@ -555,6 +594,26 @@ void H265SeiAlternativeTransferCharacteristicsParser::
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "preferred_transfer_characteristics: %u",
           preferred_transfer_characteristics);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiAmbientViewingEnvironmentParser::
+    H265SeiAmbientViewingEnvironmentState::fdump(FILE* outfp,
+                                                 int indent_level) const {
+  fprintf(outfp, "ambient_viewing_environment {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "ambient_illuminance: %u", ambient_illuminance);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "ambient_light_x: %u", ambient_light_x);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "ambient_light_y: %u", ambient_light_y);
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

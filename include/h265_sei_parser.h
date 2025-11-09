@@ -284,6 +284,38 @@ class H265SeiAlternativeTransferCharacteristicsParser
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiAmbientViewingEnvironmentParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiAmbientViewingEnvironmentState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiAmbientViewingEnvironmentState() = default;
+    virtual ~H265SeiAmbientViewingEnvironmentState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiAmbientViewingEnvironmentState(
+        const H265SeiAmbientViewingEnvironmentState&) = delete;
+    H265SeiAmbientViewingEnvironmentState(
+        H265SeiAmbientViewingEnvironmentState&&) = delete;
+    H265SeiAmbientViewingEnvironmentState& operator=(
+        const H265SeiAmbientViewingEnvironmentState&) = delete;
+    H265SeiAmbientViewingEnvironmentState& operator=(
+        H265SeiAmbientViewingEnvironmentState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    // Ambient illuminance in units of 1/10000 lux
+    uint32_t ambient_illuminance = 0;
+    // Normalized x chromaticity coordinate of ambient light (0.00002
+    // increments)
+    uint16_t ambient_light_x = 0;
+    // Normalized y chromaticity coordinate of ambient light (0.00002
+    // increments)
+    uint16_t ambient_light_y = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiUnknownParser : public H265SeiPayloadParser {
  public:
   struct H265SeiUnknownState
