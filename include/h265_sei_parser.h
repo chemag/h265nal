@@ -257,6 +257,38 @@ class H265SeiContentLightLevelInfoParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiKneeFunctionInfoParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiKneeFunctionInfoState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiKneeFunctionInfoState() = default;
+    virtual ~H265SeiKneeFunctionInfoState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiKneeFunctionInfoState(const H265SeiKneeFunctionInfoState&) = delete;
+    H265SeiKneeFunctionInfoState(H265SeiKneeFunctionInfoState&&) = delete;
+    H265SeiKneeFunctionInfoState& operator=(
+        const H265SeiKneeFunctionInfoState&) = delete;
+    H265SeiKneeFunctionInfoState& operator=(H265SeiKneeFunctionInfoState&&) =
+        delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    uint32_t knee_function_id = 0;
+    uint32_t knee_function_cancel_flag = 0;
+    uint32_t knee_function_persistence_flag = 0;
+    uint32_t input_d_range = 0;
+    uint32_t input_disp_luminance = 0;
+    uint32_t output_d_range = 0;
+    uint32_t output_disp_luminance = 0;
+    uint32_t num_knee_points_minus1 = 0;
+    std::vector<uint16_t> input_knee_point;
+    std::vector<uint16_t> output_knee_point;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiColourRemappingInfoParser : public H265SeiPayloadParser {
  public:
   struct H265SeiColourRemappingInfoState

@@ -216,6 +216,31 @@ TEST_F(H265SeiParserTest, TestAmbientViewingEnvironmentSei) {
   EXPECT_EQ(ambient_viewing_sei->ambient_light_y, 16517);
 }
 
+TEST_F(H265SeiParserTest, TestKneeFunctionInfoSei) {
+  // Test data for knee function info SEI (simple case with cancel flag set)
+  const uint8_t buffer[] = {
+      0x8d,  // payload_type = 141 (knee_function_info)
+      0x01,  // payload_size = 1
+      0xc0   // knee_function_id = 0 (ue(v) = '1'), cancel_flag = 1 (u(1))
+             // Bit pattern: 1 1 000000 (1 bit ue(v) + 1 bit flag + padding)
+  };
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type, h265nal::SeiType::knee_function_info);
+  EXPECT_EQ(sei_message->payload_size, 1);
+
+  auto knee_function_sei =
+      dynamic_cast<
+          H265SeiKneeFunctionInfoParser::H265SeiKneeFunctionInfoState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(knee_function_sei != nullptr);
+
+  EXPECT_EQ(knee_function_sei->knee_function_id, 0);
+  EXPECT_EQ(knee_function_sei->knee_function_cancel_flag, 1);
+}
+
 TEST_F(H265SeiParserTest, TestColourRemappingInfoSei) {
   // Test data for colour remapping info SEI (simple case with cancel flag set)
   const uint8_t buffer[] = {

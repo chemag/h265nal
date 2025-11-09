@@ -78,6 +78,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::content_light_level_info:
       payload_parser = std::make_unique<H265SeiContentLightLevelInfoParser>();
       break;
+    case SeiType::knee_function_info:
+      payload_parser = std::make_unique<H265SeiKneeFunctionInfoParser>();
+      break;
     case SeiType::colour_remapping_info:
       payload_parser = std::make_unique<H265SeiColourRemappingInfoParser>();
       break;
@@ -333,6 +336,81 @@ H265SeiContentLightLevelInfoParser::parse_payload(BitBuffer* bit_buffer,
   }
   payload_state->max_pic_average_light_level =
       static_cast<uint16_t>(max_pic_average);
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiKneeFunctionInfoParser::parse_payload(BitBuffer* bit_buffer,
+                                             uint32_t payload_size) {
+  (void)payload_size;
+  // H265 SEI knee function info (knee_function_info()) parser.
+  // Section D.2.30 ("Knee function information SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state = std::make_unique<H265SeiKneeFunctionInfoState>();
+
+  // knee_function_id  ue(v)
+  if (!bit_buffer->ReadExponentialGolomb(payload_state->knee_function_id)) {
+    return nullptr;
+  }
+
+  // knee_function_cancel_flag  u(1)
+  if (!bit_buffer->ReadBits(1, payload_state->knee_function_cancel_flag)) {
+    return nullptr;
+  }
+
+  if (!payload_state->knee_function_cancel_flag) {
+    // knee_function_persistence_flag  u(1)
+    if (!bit_buffer->ReadBits(1,
+                              payload_state->knee_function_persistence_flag)) {
+      return nullptr;
+    }
+
+    // input_d_range  u(32)
+    if (!bit_buffer->ReadBits(32, payload_state->input_d_range)) {
+      return nullptr;
+    }
+
+    // input_disp_luminance  u(32)
+    if (!bit_buffer->ReadBits(32, payload_state->input_disp_luminance)) {
+      return nullptr;
+    }
+
+    // output_d_range  u(32)
+    if (!bit_buffer->ReadBits(32, payload_state->output_d_range)) {
+      return nullptr;
+    }
+
+    // output_disp_luminance  u(32)
+    if (!bit_buffer->ReadBits(32, payload_state->output_disp_luminance)) {
+      return nullptr;
+    }
+
+    // num_knee_points_minus1  ue(v)
+    if (!bit_buffer->ReadExponentialGolomb(
+            payload_state->num_knee_points_minus1)) {
+      return nullptr;
+    }
+
+    // Read knee points
+    for (uint32_t i = 0; i <= payload_state->num_knee_points_minus1; i++) {
+      // input_knee_point[i]  u(10)
+      uint32_t input_knee;
+      if (!bit_buffer->ReadBits(10, input_knee)) {
+        return nullptr;
+      }
+      payload_state->input_knee_point.push_back(
+          static_cast<uint16_t>(input_knee));
+
+      // output_knee_point[i]  u(10)
+      uint32_t output_knee;
+      if (!bit_buffer->ReadBits(10, output_knee)) {
+        return nullptr;
+      }
+      payload_state->output_knee_point.push_back(
+          static_cast<uint16_t>(output_knee));
+    }
+  }
 
   return payload_state;
 }
@@ -769,6 +847,59 @@ void H265SeiContentLightLevelInfoParser::H265SeiContentLightLevelInfoState::
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_pic_average_light_level: %u cd/m^2",
           max_pic_average_light_level);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiKneeFunctionInfoParser::H265SeiKneeFunctionInfoState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "knee_function_info {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "knee_function_id: %u", knee_function_id);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "knee_function_cancel_flag: %u", knee_function_cancel_flag);
+
+  if (!knee_function_cancel_flag) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "knee_function_persistence_flag: %u",
+            knee_function_persistence_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "input_d_range: %u", input_d_range);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "input_disp_luminance: %u", input_disp_luminance);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "output_d_range: %u", output_d_range);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "output_disp_luminance: %u", output_disp_luminance);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "num_knee_points_minus1: %u", num_knee_points_minus1);
+
+    if (!input_knee_point.empty()) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "input_knee_point: {");
+      for (const auto& val : input_knee_point) {
+        fprintf(outfp, " %u", val);
+      }
+      fprintf(outfp, " }");
+
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "output_knee_point: {");
+      for (const auto& val : output_knee_point) {
+        fprintf(outfp, " %u", val);
+      }
+      fprintf(outfp, " }");
+    }
+  }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);
