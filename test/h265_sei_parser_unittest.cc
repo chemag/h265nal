@@ -216,4 +216,30 @@ TEST_F(H265SeiParserTest, TestAmbientViewingEnvironmentSei) {
   EXPECT_EQ(ambient_viewing_sei->ambient_light_y, 16517);
 }
 
+TEST_F(H265SeiParserTest, TestColourRemappingInfoSei) {
+  // Test data for colour remapping info SEI (simple case with cancel flag set)
+  const uint8_t buffer[] = {
+      0x8e,  // payload_type = 142 (colour_remapping_info)
+      0x01,  // payload_size = 1
+      0xc0   // colour_remap_id = 0 (ue(v) = '1'), cancel_flag = 1 (u(1))
+             // Bit pattern: 1 1 000000 (1 bit ue(v) + 1 bit flag + padding)
+  };
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type,
+            h265nal::SeiType::colour_remapping_info);
+  EXPECT_EQ(sei_message->payload_size, 1);
+
+  auto colour_remap_sei =
+      dynamic_cast<H265SeiColourRemappingInfoParser::
+                       H265SeiColourRemappingInfoState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(colour_remap_sei != nullptr);
+
+  EXPECT_EQ(colour_remap_sei->colour_remap_id, 0);
+  EXPECT_EQ(colour_remap_sei->colour_remap_cancel_flag, 1);
+}
+
 }  // namespace h265nal

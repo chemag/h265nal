@@ -78,6 +78,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::content_light_level_info:
       payload_parser = std::make_unique<H265SeiContentLightLevelInfoParser>();
       break;
+    case SeiType::colour_remapping_info:
+      payload_parser = std::make_unique<H265SeiColourRemappingInfoParser>();
+      break;
     case SeiType::alternative_transfer_characteristics:
       payload_parser =
           std::make_unique<H265SeiAlternativeTransferCharacteristicsParser>();
@@ -335,6 +338,193 @@ H265SeiContentLightLevelInfoParser::parse_payload(BitBuffer* bit_buffer,
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiColourRemappingInfoParser::parse_payload(BitBuffer* bit_buffer,
+                                                uint32_t payload_size) {
+  (void)payload_size;
+  // H265 SEI colour remapping info (colour_remapping_info()) parser.
+  // Section D.2.31 ("Colour remapping information SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state = std::make_unique<H265SeiColourRemappingInfoState>();
+
+  // colour_remap_id  ue(v)
+  if (!bit_buffer->ReadExponentialGolomb(payload_state->colour_remap_id)) {
+    return nullptr;
+  }
+
+  // colour_remap_cancel_flag  u(1)
+  if (!bit_buffer->ReadBits(1, payload_state->colour_remap_cancel_flag)) {
+    return nullptr;
+  }
+
+  if (!payload_state->colour_remap_cancel_flag) {
+    // colour_remap_persistence_flag  u(1)
+    if (!bit_buffer->ReadBits(1,
+                              payload_state->colour_remap_persistence_flag)) {
+      return nullptr;
+    }
+
+    // colour_remap_video_signal_info_present_flag  u(1)
+    if (!bit_buffer->ReadBits(
+            1, payload_state->colour_remap_video_signal_info_present_flag)) {
+      return nullptr;
+    }
+
+    if (payload_state->colour_remap_video_signal_info_present_flag) {
+      // colour_remap_full_range_flag  u(1)
+      if (!bit_buffer->ReadBits(1,
+                                payload_state->colour_remap_full_range_flag)) {
+        return nullptr;
+      }
+
+      // colour_remap_primaries  u(8)
+      uint32_t primaries, transfer, matrix;
+      if (!bit_buffer->ReadBits(8, primaries)) {
+        return nullptr;
+      }
+      payload_state->colour_remap_primaries = static_cast<uint8_t>(primaries);
+
+      // colour_remap_transfer_function  u(8)
+      if (!bit_buffer->ReadBits(8, transfer)) {
+        return nullptr;
+      }
+      payload_state->colour_remap_transfer_function =
+          static_cast<uint8_t>(transfer);
+
+      // colour_remap_matrix_coefficients  u(8)
+      if (!bit_buffer->ReadBits(8, matrix)) {
+        return nullptr;
+      }
+      payload_state->colour_remap_matrix_coefficients =
+          static_cast<uint8_t>(matrix);
+    }
+
+    // colour_remap_input_bit_depth  u(8)
+    uint32_t input_bit_depth, bit_depth;
+    if (!bit_buffer->ReadBits(8, input_bit_depth)) {
+      return nullptr;
+    }
+    payload_state->colour_remap_input_bit_depth =
+        static_cast<uint8_t>(input_bit_depth);
+
+    // colour_remap_output_bit_depth  u(8)
+    if (!bit_buffer->ReadBits(8, bit_depth)) {
+      return nullptr;
+    }
+    payload_state->colour_remap_output_bit_depth =
+        static_cast<uint8_t>(bit_depth);
+
+    // Initialize vectors for 3 color components
+    payload_state->pre_lut_coded_value.resize(3);
+    payload_state->pre_lut_target_value.resize(3);
+
+    // Pre-LUT
+    for (size_t c = 0; c < 3; c++) {
+      // pre_lut_num_val_minus1[c]  u(8)
+      uint32_t num_val_minus1;
+      if (!bit_buffer->ReadBits(8, num_val_minus1)) {
+        return nullptr;
+      }
+      payload_state->pre_lut_num_val_minus1[c] =
+          static_cast<uint8_t>(num_val_minus1);
+
+      if (payload_state->pre_lut_num_val_minus1[c] > 0) {
+        uint32_t bit_depth_used = static_cast<uint32_t>(
+            ((payload_state->colour_remap_input_bit_depth + 7) >> 3) << 3);
+        for (uint32_t i = 0; i <= payload_state->pre_lut_num_val_minus1[c];
+             i++) {
+          // pre_lut_coded_value[c][i]  u(v)
+          // The number of bits used to represent pre_lut_coded_value[c][i]
+          // is ((colour_remap_input_bit_depth + 7) >> 3) << 3
+          uint32_t coded_value;
+          if (!bit_buffer->ReadBits(bit_depth_used, coded_value)) {
+            return nullptr;
+          }
+          payload_state->pre_lut_coded_value[c].push_back(coded_value);
+
+          // pre_lut_target_value[c][i]  u(v)
+          // The number of bits used to represent pre_lut_target_value[c][i]
+          // is ((colour_remap_output_bit_depth + 7) >> 3) << 3
+          uint32_t target_value;
+          if (!bit_buffer->ReadBits(bit_depth_used, target_value)) {
+            return nullptr;
+          }
+          payload_state->pre_lut_target_value[c].push_back(target_value);
+        }
+      }
+    }
+
+    // colour_remap_matrix_present_flag  u(1)
+    if (!bit_buffer->ReadBits(
+            1, payload_state->colour_remap_matrix_present_flag)) {
+      return nullptr;
+    }
+
+    if (payload_state->colour_remap_matrix_present_flag) {
+      // log2_matrix_denom  u(4)
+      if (!bit_buffer->ReadBits(4, payload_state->log2_matrix_denom)) {
+        return nullptr;
+      }
+
+      // Initialize matrix (3x3)
+      payload_state->colour_remap_coeffs.resize(3);
+      for (size_t c = 0; c < 3; c++) {
+        payload_state->colour_remap_coeffs[c].resize(3);
+        for (size_t i = 0; i < 3; i++) {
+          // colour_remap_coeffs[c][i]  se(v)
+          int32_t coeff;
+          if (!bit_buffer->ReadSignedExponentialGolomb(coeff)) {
+            return nullptr;
+          }
+          payload_state->colour_remap_coeffs[c][i] = coeff;
+        }
+      }
+    }
+
+    // Post-LUT
+    payload_state->post_lut_coded_value.resize(3);
+    payload_state->post_lut_target_value.resize(3);
+
+    for (size_t c = 0; c < 3; c++) {
+      // post_lut_num_val_minus1[c]  u(8)
+      uint32_t num_val_minus1;
+      if (!bit_buffer->ReadBits(8, num_val_minus1)) {
+        return nullptr;
+      }
+      payload_state->post_lut_num_val_minus1[c] =
+          static_cast<uint8_t>(num_val_minus1);
+
+      if (payload_state->post_lut_num_val_minus1[c] > 0) {
+        uint32_t bit_depth_used = static_cast<uint32_t>(
+            ((payload_state->colour_remap_output_bit_depth + 7) >> 3) << 3);
+        for (uint32_t i = 0; i <= payload_state->post_lut_num_val_minus1[c];
+             i++) {
+          // post_lut_coded_value[c][i]  u(v)
+          // [...] the number of bits used to represent
+          // post_lut_coded_value[c][i] is
+          // ((colour_remap_output_bit_depth + 7) >> 3) << 3
+          uint32_t coded_value;
+          if (!bit_buffer->ReadBits(bit_depth_used, coded_value)) {
+            return nullptr;
+          }
+          payload_state->post_lut_coded_value[c].push_back(coded_value);
+
+          // [...] colour_remap_input_bit_depth is replaced by
+          // colour_remap_output_bit_depth in the semantics
+          // post_lut_target_value[c][i]  u(v)
+          uint32_t target_value;
+          if (!bit_buffer->ReadBits(bit_depth_used, target_value)) {
+            return nullptr;
+          }
+          payload_state->post_lut_target_value[c].push_back(target_value);
+        }
+      }
+    }
+  }
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiAlternativeTransferCharacteristicsParser::parse_payload(
     BitBuffer* bit_buffer, uint32_t payload_size) {
   (void)payload_size;
@@ -579,6 +769,125 @@ void H265SeiContentLightLevelInfoParser::H265SeiContentLightLevelInfoState::
   fdump_indent_level(outfp, indent_level);
   fprintf(outfp, "max_pic_average_light_level: %u cd/m^2",
           max_pic_average_light_level);
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiColourRemappingInfoParser::H265SeiColourRemappingInfoState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "colour_remapping_info {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "colour_remap_id: %u", colour_remap_id);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "colour_remap_cancel_flag: %u", colour_remap_cancel_flag);
+
+  if (!colour_remap_cancel_flag) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "colour_remap_persistence_flag: %u",
+            colour_remap_persistence_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "colour_remap_video_signal_info_present_flag: %u",
+            colour_remap_video_signal_info_present_flag);
+
+    if (colour_remap_video_signal_info_present_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "colour_remap_full_range_flag: %u",
+              colour_remap_full_range_flag);
+
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "colour_remap_primaries: %u", colour_remap_primaries);
+
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "colour_remap_transfer_function: %u",
+              colour_remap_transfer_function);
+
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "colour_remap_matrix_coefficients: %u",
+              colour_remap_matrix_coefficients);
+    }
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "colour_remap_input_bit_depth: %u",
+            colour_remap_input_bit_depth);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "colour_remap_output_bit_depth: %u",
+            colour_remap_output_bit_depth);
+
+    // Pre-LUT
+    for (size_t c = 0; c < 3; c++) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "pre_lut_num_val_minus1[%zu]: %u", c,
+              pre_lut_num_val_minus1[c]);
+
+      if (pre_lut_num_val_minus1[c] > 0 && c < pre_lut_coded_value.size()) {
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "pre_lut_coded_value[%zu]: {", c);
+        for (const auto& val : pre_lut_coded_value[c]) {
+          fprintf(outfp, " %u", val);
+        }
+        fprintf(outfp, " }");
+
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "pre_lut_target_value[%zu]: {", c);
+        for (const auto& val : pre_lut_target_value[c]) {
+          fprintf(outfp, " %u", val);
+        }
+        fprintf(outfp, " }");
+      }
+    }
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "colour_remap_matrix_present_flag: %u",
+            colour_remap_matrix_present_flag);
+
+    if (colour_remap_matrix_present_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "log2_matrix_denom: %u", log2_matrix_denom);
+
+      if (!colour_remap_coeffs.empty()) {
+        for (size_t c = 0; c < 3; c++) {
+          if (c < colour_remap_coeffs.size()) {
+            fdump_indent_level(outfp, indent_level);
+            fprintf(outfp, "colour_remap_coeffs[%zu]: {", c);
+            for (const auto& val : colour_remap_coeffs[c]) {
+              fprintf(outfp, " %d", val);
+            }
+            fprintf(outfp, " }");
+          }
+        }
+      }
+    }
+
+    // Post-LUT
+    for (size_t c = 0; c < 3; c++) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "post_lut_num_val_minus1[%zu]: %u", c,
+              post_lut_num_val_minus1[c]);
+
+      if (post_lut_num_val_minus1[c] > 0 && c < post_lut_coded_value.size()) {
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "post_lut_coded_value[%zu]: {", c);
+        for (const auto& val : post_lut_coded_value[c]) {
+          fprintf(outfp, " %u", val);
+        }
+        fprintf(outfp, " }");
+
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "post_lut_target_value[%zu]: {", c);
+        for (const auto& val : post_lut_target_value[c]) {
+          fprintf(outfp, " %u", val);
+        }
+        fprintf(outfp, " }");
+      }
+    }
+  }
 
   indent_level = indent_level_decr(indent_level);
   fdump_indent_level(outfp, indent_level);

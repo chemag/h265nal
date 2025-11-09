@@ -257,6 +257,48 @@ class H265SeiContentLightLevelInfoParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiColourRemappingInfoParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiColourRemappingInfoState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiColourRemappingInfoState() = default;
+    virtual ~H265SeiColourRemappingInfoState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiColourRemappingInfoState(const H265SeiColourRemappingInfoState&) =
+        delete;
+    H265SeiColourRemappingInfoState(H265SeiColourRemappingInfoState&&) = delete;
+    H265SeiColourRemappingInfoState& operator=(
+        const H265SeiColourRemappingInfoState&) = delete;
+    H265SeiColourRemappingInfoState& operator=(
+        H265SeiColourRemappingInfoState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    uint32_t colour_remap_id = 0;
+    uint32_t colour_remap_cancel_flag = 0;
+    uint32_t colour_remap_persistence_flag = 0;
+    uint32_t colour_remap_video_signal_info_present_flag = 0;
+    uint32_t colour_remap_full_range_flag = 0;
+    uint8_t colour_remap_primaries = 0;
+    uint8_t colour_remap_transfer_function = 0;
+    uint8_t colour_remap_matrix_coefficients = 0;
+    uint8_t colour_remap_input_bit_depth = 0;
+    uint8_t colour_remap_output_bit_depth = 0;
+    uint8_t pre_lut_num_val_minus1[3] = {0};
+    std::vector<std::vector<uint32_t>> pre_lut_coded_value;
+    std::vector<std::vector<uint32_t>> pre_lut_target_value;
+    uint32_t colour_remap_matrix_present_flag = 0;
+    uint32_t log2_matrix_denom = 0;
+    std::vector<std::vector<int32_t>> colour_remap_coeffs;
+    uint8_t post_lut_num_val_minus1[3] = {0};
+    std::vector<std::vector<uint32_t>> post_lut_coded_value;
+    std::vector<std::vector<uint32_t>> post_lut_target_value;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiAlternativeTransferCharacteristicsParser
     : public H265SeiPayloadParser {
  public:
