@@ -156,7 +156,7 @@ enum ProfileType : uint8_t {
 };
 
 enum ProfileType getProfileType();
-void profileTypeToString(enum ProfileType profile, std::string &str);
+void profileTypeToString(enum ProfileType profile, std::string& str);
 
 namespace h265limits {
 // Rec. ITU-T H.265 v5 (02/2018) Page 81
@@ -199,19 +199,19 @@ bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type);
 // Remove any emulation byte escaping from a buffer. This is needed for
 // byte-stream format packetization (e.g. Annex B data), but not for
 // packet-stream format packetization (e.g. RTP payloads).
-std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length);
+std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length);
 
 // Syntax functions and descriptors) (Section 7.2)
-bool byte_aligned(BitBuffer *bit_buffer);
-size_t get_current_offset(BitBuffer *bit_buffer);
-bool more_rbsp_data(BitBuffer *bit_buffer);
-bool rbsp_trailing_bits(BitBuffer *bit_buffer);
+bool byte_aligned(BitBuffer* bit_buffer);
+size_t get_current_offset(BitBuffer* bit_buffer);
+bool more_rbsp_data(BitBuffer* bit_buffer);
+bool rbsp_trailing_bits(BitBuffer* bit_buffer);
 
 #if defined(FDUMP_DEFINE)
 // fdump() indentation help
 int indent_level_incr(int indent_level);
 int indent_level_decr(int indent_level);
-void fdump_indent_level(FILE *outfp, int indent_level);
+void fdump_indent_level(FILE* outfp, int indent_level);
 #endif  // FDUMP_DEFINE
 
 // Generic Parsing Options
@@ -234,11 +234,11 @@ class NaluChecksum {
   // maximum length (in bytes)
   const static int kMaxLength = 32;
   static std::shared_ptr<NaluChecksum> GetNaluChecksum(
-      BitBuffer *bit_buffer) noexcept;
-  void fdump(char *output, int output_len) const;
-  const char *GetChecksum() { return checksum; }
+      BitBuffer* bit_buffer) noexcept;
+  void fdump(char* output, int output_len) const;
+  const char* GetChecksum() { return checksum; }
   int GetLength() { return length; }
-  const char *GetPrintableChecksum() const;
+  const char* GetPrintableChecksum() const;
 
  private:
   char checksum[kMaxLength];

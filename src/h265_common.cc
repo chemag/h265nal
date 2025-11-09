@@ -289,7 +289,7 @@ bool IsNalUnitTypeUnspecified(uint32_t nal_unit_type) {
   return false;
 }
 
-void profileTypeToString(enum ProfileType profile, std::string &str) {
+void profileTypeToString(enum ProfileType profile, std::string& str) {
   switch (profile) {
     case UNSPECIFIED:
       str = "Unspecified";
@@ -525,7 +525,7 @@ void profileTypeToString(enum ProfileType profile, std::string &str) {
 // where the first 2x bytes are "\x00" and the third byte is "\x00",
 // "\x01", "\x02", or "\x03" have been escaped (and extra "\x03"
 // has been inserted as third byte), and returns the unescaped one.
-std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
+std::vector<uint8_t> UnescapeRbsp(const uint8_t* data, size_t length) {
   std::vector<uint8_t> out;
   out.reserve(length);
 
@@ -550,7 +550,7 @@ std::vector<uint8_t> UnescapeRbsp(const uint8_t *data, size_t length) {
 }
 
 // Syntax functions and descriptors) (Section 7.2)
-bool byte_aligned(BitBuffer *bit_buffer) {
+bool byte_aligned(BitBuffer* bit_buffer) {
   // If the current position in the bitstream is on a byte boundary, i.e.,
   // the next bit in the bitstream is the first bit in a byte, the return
   // value of byte_aligned() is equal to TRUE.
@@ -561,14 +561,14 @@ bool byte_aligned(BitBuffer *bit_buffer) {
   return (out_bit_offset == 0);
 }
 
-size_t get_current_offset(BitBuffer *bit_buffer) {
+size_t get_current_offset(BitBuffer* bit_buffer) {
   size_t out_byte_offset, out_bit_offset;
   bit_buffer->GetCurrentOffset(&out_byte_offset, &out_bit_offset);
 
   return out_byte_offset + ((out_bit_offset == 0) ? 0 : 1);
 }
 
-bool more_rbsp_data(BitBuffer *bit_buffer) {
+bool more_rbsp_data(BitBuffer* bit_buffer) {
   // > If there is no more data in the raw byte sequence payload (RBSP), the
   // > return value of more_rbsp_data() is equal to FALSE.
   uint64_t remaining_bitcount = bit_buffer->RemainingBitCount();
@@ -622,7 +622,7 @@ bool more_rbsp_data(BitBuffer *bit_buffer) {
   return !is_rbsp_trailing_bits;
 }
 
-bool rbsp_trailing_bits(BitBuffer *bit_buffer) {
+bool rbsp_trailing_bits(BitBuffer* bit_buffer) {
   uint32_t bits_tmp;
 
   // rbsp_stop_one_bit  f(1) // equal to 1
@@ -654,7 +654,7 @@ int indent_level_decr(int indent_level) {
   return (indent_level == -1) ? -1 : (indent_level - 1);
 }
 
-void fdump_indent_level(FILE *outfp, int indent_level) {
+void fdump_indent_level(FILE* outfp, int indent_level) {
   if (indent_level == -1) {
     // no indent
     fprintf(outfp, " ");
@@ -666,7 +666,7 @@ void fdump_indent_level(FILE *outfp, int indent_level) {
 #endif  // FDUMP_DEFINE
 
 std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
-    BitBuffer *bit_buffer) noexcept {
+    BitBuffer* bit_buffer) noexcept {
   // save the bit buffer current state
   size_t byte_offset = 0;
   size_t bit_offset = 0;
@@ -709,7 +709,7 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
   uint32_t answer = ~sum;
 
   // write sum into (generic) checksum buffer (network order)
-  *(reinterpret_cast<uint32_t *>(checksum->checksum)) = htonl(answer);
+  *(reinterpret_cast<uint32_t*>(checksum->checksum)) = htonl(answer);
   checksum->length = 4;
 
   // return the bit buffer to the original state
@@ -718,7 +718,7 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
   return checksum;
 }
 
-void NaluChecksum::fdump(char *output, int output_len) const {
+void NaluChecksum::fdump(char* output, int output_len) const {
   int i = 0;
   int oi = 0;
   while (i < length) {
@@ -732,7 +732,7 @@ void NaluChecksum::fdump(char *output, int output_len) const {
   }
 }
 
-const char *NaluChecksum::GetPrintableChecksum() const {
+const char* NaluChecksum::GetPrintableChecksum() const {
 #define BUFFER_LEN ((kMaxLength * 2) + 1)
   static char buffer[BUFFER_LEN];
   int i = 0;

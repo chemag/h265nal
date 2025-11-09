@@ -50,9 +50,9 @@ typedef struct arg_options {
   bool add_contents;
   int nalu_length_bytes;
   int frames_per_second;
-  char *hvcc_file;
-  char *infile;
-  char *outfile;
+  char* hvcc_file;
+  char* infile;
+  char* outfile;
 } arg_options;
 
 // default option values
@@ -73,7 +73,7 @@ arg_options DEFAULT_OPTIONS{
     .outfile = nullptr,
 };
 
-void usage(char *name) {
+void usage(char* name) {
   fprintf(stderr, "usage: %s [options]\n", name);
   fprintf(stderr, "where options are:\n");
   fprintf(stderr, "\t-d:\t\tIncrease debug verbosity [default: %i]\n",
@@ -154,7 +154,7 @@ enum {
   HELP_OPTION
 };
 
-arg_options *parse_args(int argc, char **argv) {
+arg_options* parse_args(int argc, char** argv) {
   int c;
   static arg_options options;
 
@@ -334,8 +334,8 @@ inline std::string opt_value(int value, bool has_value) {
   return has_value ? std::to_string(value) : std::string{};
 }
 
-int main(int argc, char **argv) {
-  arg_options *options;
+int main(int argc, char** argv) {
+  arg_options* options;
 
   // parse args
   options = parse_args(argc, argv);
@@ -391,7 +391,7 @@ int main(int argc, char **argv) {
     if (h265nal::H265Utils::ReadFile(options->hvcc_file, hvcc_buffer) < 0) {
       return -1;
     }
-    uint8_t *hvcc_data = hvcc_buffer.data();
+    uint8_t* hvcc_data = hvcc_buffer.data();
     size_t hvcc_length = hvcc_buffer.size();
 
     // 2.2. parse the hvcC structure
@@ -432,7 +432,7 @@ int main(int argc, char **argv) {
   // 4. dump parsed output
 
   // 4.1. get outfile file descriptor
-  FILE *outfp;
+  FILE* outfp;
   bool must_close_fp = false;
   if (options->outfile == nullptr ||
       (strlen(options->outfile) == 1 && options->outfile[0] == '-')) {
@@ -468,7 +468,7 @@ int main(int argc, char **argv) {
     size_t nal_num = 0;
     size_t frame_num = 0;
     uint32_t last_slice_nal_unit_type = 0;
-    for (auto &nal_unit : bitstream->nal_units) {
+    for (auto& nal_unit : bitstream->nal_units) {
       if (options->dumpmode == dump_all) {
         nal_unit->fdump(outfp, indent_level, parsing_options);
         if (options->add_contents) {
