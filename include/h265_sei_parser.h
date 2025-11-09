@@ -331,6 +331,41 @@ class H265SeiColourRemappingInfoParser : public H265SeiPayloadParser {
       BitBuffer* bit_buffer, uint32_t payload_size);
 };
 
+class H265SeiContentColourVolumeParser : public H265SeiPayloadParser {
+ public:
+  struct H265SeiContentColourVolumeState
+      : public H265SeiPayloadParser::H265SeiPayloadState {
+    H265SeiContentColourVolumeState() = default;
+    virtual ~H265SeiContentColourVolumeState() = default;
+    // disable copy ctor, move ctor, and copy&move assignments
+    H265SeiContentColourVolumeState(const H265SeiContentColourVolumeState&) =
+        delete;
+    H265SeiContentColourVolumeState(H265SeiContentColourVolumeState&&) = delete;
+    H265SeiContentColourVolumeState& operator=(
+        const H265SeiContentColourVolumeState&) = delete;
+    H265SeiContentColourVolumeState& operator=(
+        H265SeiContentColourVolumeState&&) = delete;
+
+#ifdef FDUMP_DEFINE
+    virtual void fdump(FILE* outfp, int indent_level) const;
+#endif  // FDUMP_DEFINE
+    uint32_t ccv_cancel_flag = 0;
+    uint32_t ccv_persistence_flag = 0;
+    uint32_t ccv_primaries_present_flag = 0;
+    uint32_t ccv_min_luminance_value_present_flag = 0;
+    uint32_t ccv_max_luminance_value_present_flag = 0;
+    uint32_t ccv_avg_luminance_value_present_flag = 0;
+    uint32_t ccv_reserved_zero_2bits = 0;
+    int32_t ccv_primaries_x[3] = {0};
+    int32_t ccv_primaries_y[3] = {0};
+    uint32_t ccv_min_luminance_value = 0;
+    uint32_t ccv_max_luminance_value = 0;
+    uint32_t ccv_avg_luminance_value = 0;
+  };
+  virtual std::unique_ptr<H265SeiPayloadState> parse_payload(
+      BitBuffer* bit_buffer, uint32_t payload_size);
+};
+
 class H265SeiAlternativeTransferCharacteristicsParser
     : public H265SeiPayloadParser {
  public:

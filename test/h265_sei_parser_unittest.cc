@@ -241,6 +241,99 @@ TEST_F(H265SeiParserTest, TestKneeFunctionInfoSei) {
   EXPECT_EQ(knee_function_sei->knee_function_cancel_flag, 1);
 }
 
+TEST_F(H265SeiParserTest, TestContentColourVolumeSei) {
+  // Test data for content colour volume SEI (simple case with cancel flag set)
+  const uint8_t buffer[] = {
+      0x95,  // payload_type = 149 (content_colour_volume)
+      0x01,  // payload_size = 1
+      0x80   // ccv_cancel_flag = 1 (u(1)) + padding
+  };
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type, h265nal::SeiType::content_colour_volume);
+  EXPECT_EQ(sei_message->payload_size, 1);
+
+  auto content_colour_volume_sei =
+      dynamic_cast<
+          H265SeiContentColourVolumeParser::H265SeiContentColourVolumeState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(content_colour_volume_sei != nullptr);
+
+  EXPECT_EQ(content_colour_volume_sei->ccv_cancel_flag, 1);
+}
+
+TEST_F(H265SeiParserTest, TestContentColourVolumeComplexSei) {
+  // Test data for content colour volume SEI (complex case with all fields)
+  // Using values that avoid SEI emulation prevention byte sequences
+  // clang-format off
+  const uint8_t buffer[] = {
+      0x95,  // payload_type = 149 (content_colour_volume)
+      0x25,  // payload_size = 37
+      // First byte: ccv_cancel_flag(0), ccv_persistence_flag(1),
+      // ccv_primaries_present_flag(1), ccv_min_luminance_value_present_flag(1),
+      // ccv_max_luminance_value_present_flag(1),
+      // ccv_avg_luminance_value_present_flag(1), ccv_reserved_zero_2bits(00)
+      0x7c,
+      // ccv_primaries_x[0] = 0x12340000 (i(32))
+      0x12, 0x34, 0x00, 0x00,
+      // ccv_primaries_y[0] = 0x56780000 (i(32))
+      0x56, 0x78, 0x00, 0x00,
+      // ccv_primaries_x[1] = 0xaabbccdd (i(32))
+      0xaa, 0xbb, 0xcc, 0xdd,
+      // ccv_primaries_y[1] = 0x11223344 (i(32))
+      0x11, 0x22, 0x33, 0x44,
+      // ccv_primaries_x[2] = 0x55667788 (i(32))
+      0x55, 0x66, 0x77, 0x88,
+      // ccv_primaries_y[2] = 0x99aabbcc (i(32))
+      0x99, 0xaa, 0xbb, 0xcc,
+      // ccv_min_luminance_value = 0x10203040 (u(32))
+      0x10, 0x20, 0x30, 0x40,
+      // ccv_max_luminance_value = 0x50607080 (u(32))
+      0x50, 0x60, 0x70, 0x80,
+      // ccv_avg_luminance_value = 0xa0b0c0d0 (u(32))
+      0xa0, 0xb0, 0xc0, 0xd0
+  };
+  // clang-format on
+
+  auto sei_message = H265SeiMessageParser::ParseSei(buffer, arraysize(buffer));
+
+  EXPECT_TRUE(sei_message != nullptr);
+  EXPECT_EQ(sei_message->payload_type, h265nal::SeiType::content_colour_volume);
+  EXPECT_EQ(sei_message->payload_size, 37);
+
+  auto content_colour_volume_sei =
+      dynamic_cast<
+          H265SeiContentColourVolumeParser::H265SeiContentColourVolumeState*>(
+          sei_message->payload_state.get());
+  EXPECT_TRUE(content_colour_volume_sei != nullptr);
+
+  EXPECT_EQ(content_colour_volume_sei->ccv_cancel_flag, 0);
+  EXPECT_EQ(content_colour_volume_sei->ccv_persistence_flag, 1);
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_present_flag, 1);
+  EXPECT_EQ(content_colour_volume_sei->ccv_min_luminance_value_present_flag, 1);
+  EXPECT_EQ(content_colour_volume_sei->ccv_max_luminance_value_present_flag, 1);
+  EXPECT_EQ(content_colour_volume_sei->ccv_avg_luminance_value_present_flag, 1);
+  EXPECT_EQ(content_colour_volume_sei->ccv_reserved_zero_2bits, 0);
+
+  // Check primaries arrays (note: i(32) values are treated as signed, so
+  // 0xaabbccdd becomes negative when cast to int32_t)
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_x[0], 0x12340000);
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_y[0], 0x56780000);
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_x[1],
+            static_cast<int32_t>(0xaabbccdd));
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_y[1], 0x11223344);
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_x[2], 0x55667788);
+  EXPECT_EQ(content_colour_volume_sei->ccv_primaries_y[2],
+            static_cast<int32_t>(0x99aabbcc));
+
+  // Check luminance values
+  EXPECT_EQ(content_colour_volume_sei->ccv_min_luminance_value, 0x10203040);
+  EXPECT_EQ(content_colour_volume_sei->ccv_max_luminance_value, 0x50607080);
+  EXPECT_EQ(content_colour_volume_sei->ccv_avg_luminance_value, 0xa0b0c0d0);
+}
+
 TEST_F(H265SeiParserTest, TestColourRemappingInfoSei) {
   // Test data for colour remapping info SEI (simple case with cancel flag set)
   const uint8_t buffer[] = {

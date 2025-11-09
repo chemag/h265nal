@@ -84,6 +84,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     case SeiType::colour_remapping_info:
       payload_parser = std::make_unique<H265SeiColourRemappingInfoParser>();
       break;
+    case SeiType::content_colour_volume:
+      payload_parser = std::make_unique<H265SeiContentColourVolumeParser>();
+      break;
     case SeiType::alternative_transfer_characteristics:
       payload_parser =
           std::make_unique<H265SeiAlternativeTransferCharacteristicsParser>();
@@ -603,6 +606,97 @@ H265SeiColourRemappingInfoParser::parse_payload(BitBuffer* bit_buffer,
 }
 
 std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
+H265SeiContentColourVolumeParser::parse_payload(BitBuffer* bit_buffer,
+                                                uint32_t payload_size) {
+  (void)payload_size;
+  // H265 SEI content colour volume (content_colour_volume()) parser.
+  // Section D.2.40 ("Content colour volume SEI message syntax")
+  // of the H.265 standard for a complete description.
+  auto payload_state = std::make_unique<H265SeiContentColourVolumeState>();
+
+  // ccv_cancel_flag  u(1)
+  if (!bit_buffer->ReadBits(1, payload_state->ccv_cancel_flag)) {
+    return nullptr;
+  }
+
+  if (!payload_state->ccv_cancel_flag) {
+    // ccv_persistence_flag  u(1)
+    if (!bit_buffer->ReadBits(1, payload_state->ccv_persistence_flag)) {
+      return nullptr;
+    }
+
+    // ccv_primaries_present_flag  u(1)
+    if (!bit_buffer->ReadBits(1, payload_state->ccv_primaries_present_flag)) {
+      return nullptr;
+    }
+
+    // ccv_min_luminance_value_present_flag  u(1)
+    if (!bit_buffer->ReadBits(
+            1, payload_state->ccv_min_luminance_value_present_flag)) {
+      return nullptr;
+    }
+
+    // ccv_max_luminance_value_present_flag  u(1)
+    if (!bit_buffer->ReadBits(
+            1, payload_state->ccv_max_luminance_value_present_flag)) {
+      return nullptr;
+    }
+
+    // ccv_avg_luminance_value_present_flag  u(1)
+    if (!bit_buffer->ReadBits(
+            1, payload_state->ccv_avg_luminance_value_present_flag)) {
+      return nullptr;
+    }
+
+    // ccv_reserved_zero_2bits  u(2)
+    if (!bit_buffer->ReadBits(2, payload_state->ccv_reserved_zero_2bits)) {
+      return nullptr;
+    }
+
+    if (payload_state->ccv_primaries_present_flag) {
+      for (int c = 0; c < 3; c++) {
+        // ccv_primaries_x[c]  i(32)
+        uint32_t primaries_x;
+        if (!bit_buffer->ReadBits(32, primaries_x)) {
+          return nullptr;
+        }
+        payload_state->ccv_primaries_x[c] = static_cast<int32_t>(primaries_x);
+
+        // ccv_primaries_y[c]  i(32)
+        uint32_t primaries_y;
+        if (!bit_buffer->ReadBits(32, primaries_y)) {
+          return nullptr;
+        }
+        payload_state->ccv_primaries_y[c] = static_cast<int32_t>(primaries_y);
+      }
+    }
+
+    if (payload_state->ccv_min_luminance_value_present_flag) {
+      // ccv_min_luminance_value  u(32)
+      if (!bit_buffer->ReadBits(32, payload_state->ccv_min_luminance_value)) {
+        return nullptr;
+      }
+    }
+
+    if (payload_state->ccv_max_luminance_value_present_flag) {
+      // ccv_max_luminance_value  u(32)
+      if (!bit_buffer->ReadBits(32, payload_state->ccv_max_luminance_value)) {
+        return nullptr;
+      }
+    }
+
+    if (payload_state->ccv_avg_luminance_value_present_flag) {
+      // ccv_avg_luminance_value  u(32)
+      if (!bit_buffer->ReadBits(32, payload_state->ccv_avg_luminance_value)) {
+        return nullptr;
+      }
+    }
+  }
+
+  return payload_state;
+}
+
+std::unique_ptr<H265SeiPayloadParser::H265SeiPayloadState>
 H265SeiAlternativeTransferCharacteristicsParser::parse_payload(
     BitBuffer* bit_buffer, uint32_t payload_size) {
   (void)payload_size;
@@ -1017,6 +1111,68 @@ void H265SeiColourRemappingInfoParser::H265SeiColourRemappingInfoState::fdump(
         }
         fprintf(outfp, " }");
       }
+    }
+  }
+
+  indent_level = indent_level_decr(indent_level);
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "}");
+}
+
+void H265SeiContentColourVolumeParser::H265SeiContentColourVolumeState::fdump(
+    FILE* outfp, int indent_level) const {
+  fprintf(outfp, "content_colour_volume {");
+  indent_level = indent_level_incr(indent_level);
+
+  fdump_indent_level(outfp, indent_level);
+  fprintf(outfp, "ccv_cancel_flag: %u", ccv_cancel_flag);
+
+  if (!ccv_cancel_flag) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_persistence_flag: %u", ccv_persistence_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_primaries_present_flag: %u",
+            ccv_primaries_present_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_min_luminance_value_present_flag: %u",
+            ccv_min_luminance_value_present_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_max_luminance_value_present_flag: %u",
+            ccv_max_luminance_value_present_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_avg_luminance_value_present_flag: %u",
+            ccv_avg_luminance_value_present_flag);
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "ccv_reserved_zero_2bits: %u", ccv_reserved_zero_2bits);
+
+    if (ccv_primaries_present_flag) {
+      for (int c = 0; c < 3; c++) {
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "ccv_primaries_x[%d]: %d", c, ccv_primaries_x[c]);
+
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "ccv_primaries_y[%d]: %d", c, ccv_primaries_y[c]);
+      }
+    }
+
+    if (ccv_min_luminance_value_present_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "ccv_min_luminance_value: %u", ccv_min_luminance_value);
+    }
+
+    if (ccv_max_luminance_value_present_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "ccv_max_luminance_value: %u", ccv_max_luminance_value);
+    }
+
+    if (ccv_avg_luminance_value_present_flag) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "ccv_avg_luminance_value: %u", ccv_avg_luminance_value);
     }
   }
 
