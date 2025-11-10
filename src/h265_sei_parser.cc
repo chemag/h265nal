@@ -494,6 +494,14 @@ H265SeiColourRemappingInfoParser::parse_payload(BitBuffer* bit_buffer,
     payload_state->colour_remap_output_bit_depth =
         static_cast<uint8_t>(bit_depth);
 
+    // Validate bit depths to avoid division by zero in bit_depth_used formula.
+    // The formula ((bit_depth + 7) >> 3) << 3 evaluates to 0 when bit_depth is
+    // 0, which would cause ReadBits(0, ...) to fail with an assertion.
+    if (payload_state->colour_remap_input_bit_depth == 0 ||
+        payload_state->colour_remap_output_bit_depth == 0) {
+      return nullptr;
+    }
+
     // Initialize vectors for 3 color components
     payload_state->pre_lut_coded_value.resize(3);
     payload_state->pre_lut_target_value.resize(3);
