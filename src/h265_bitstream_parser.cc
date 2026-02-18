@@ -202,6 +202,9 @@ H265BitstreamParser::ParseBitstreamNALULength(
       // (1) read the NALU length
       nalu_length = read_nalu_length(data, nalu_length_bytes);
       i += nalu_length_bytes;
+      if (nalu_length == 0 || i + nalu_length > length) {
+        break;
+      }
     } else {
       // assume a single NALU
       nalu_length = length;
@@ -215,6 +218,7 @@ H265BitstreamParser::ParseBitstreamNALULength(
 #ifdef FPRINT_ERRORS
       fprintf(stderr, "error: cannot parse buffer into NalUnit\n");
 #endif  // FPRINT_ERRORS
+      i += nalu_length;
       continue;
     }
     // store the offset
