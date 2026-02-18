@@ -200,7 +200,7 @@ H265BitstreamParser::ParseBitstreamNALULength(
     size_t nalu_length = 0;
     if (nalu_length_bytes > 0) {
       // (1) read the NALU length
-      nalu_length = read_nalu_length(data, nalu_length_bytes);
+      nalu_length = read_nalu_length(data + i, nalu_length_bytes);
       i += nalu_length_bytes;
       if (nalu_length == 0 || i + nalu_length > length) {
         break;
