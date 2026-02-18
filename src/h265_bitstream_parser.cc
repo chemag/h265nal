@@ -94,6 +94,9 @@ H265BitstreamParser::FindNaluIndicesExplicitFraming(const uint8_t* data,
   const size_t end = length;
   for (size_t i = 0; i < end;) {
     // read a nal_unit_size (4 bytes)
+    if (i + 4 > length) {
+      break;
+    }
     uint32_t nal_unit_size = ntohl(*(uint32_t*)(data + i));
     // This is a start sequence
     NaluIndex index = {i, i + 4, nal_unit_size};
