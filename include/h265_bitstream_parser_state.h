@@ -26,6 +26,10 @@ struct H265BitstreamParserState {
   H265BitstreamParserState& operator=(const H265BitstreamParserState&) = delete;
   H265BitstreamParserState& operator=(H265BitstreamParserState&&) = delete;
 
+  // VPS, SPS, and PPS use shared_ptr because they are referenced by
+  // multiple NAL units (e.g., each slice header refers back to its
+  // active PPS, which in turn refers to its active SPS and VPS).
+
   // VPS state
   std::map<uint32_t, std::shared_ptr<struct H265VpsParser::VpsState>> vps;
   // SPS state
