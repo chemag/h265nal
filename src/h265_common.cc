@@ -732,17 +732,17 @@ void NaluChecksum::fdump(char* output, int output_len) const {
   }
 }
 
-const char* NaluChecksum::GetPrintableChecksum() const {
+std::string NaluChecksum::GetPrintableChecksum() const {
 #define BUFFER_LEN ((kMaxLength * 2) + 1)
-  static char buffer[BUFFER_LEN];
+  char buffer[BUFFER_LEN];
   int i = 0;
   int oi = 0;
   while (i < length) {
     oi += snprintf(buffer + oi, static_cast<size_t>(BUFFER_LEN - oi), "%02x",
                    static_cast<unsigned char>(checksum[i++]));
   }
-  buffer[i] = '\0';
-  return buffer;
+  buffer[oi] = '\0';
+  return std::string(buffer);
 }
 
 }  // namespace h265nal

@@ -238,7 +238,7 @@ class NaluChecksum {
   void fdump(char* output, int output_len) const;
   const char* GetChecksum() { return checksum; }
   int GetLength() { return length; }
-  const char* GetPrintableChecksum() const;
+  std::string GetPrintableChecksum() const;
 
  private:
   char checksum[kMaxLength];
