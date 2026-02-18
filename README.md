@@ -28,7 +28,7 @@ $ make
 
 Some cmake options:
 * "`cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo`":
-* "`cmake -DBUILD_H264_TESTS=OFF`": do not build the tests
+* "`cmake -DBUILD_H265_TESTS=OFF`": do not build the tests
 * "`cmake -DBUILD_CLANG_FUZZER=OFF`": do not build the fuzzing tests
 
 
