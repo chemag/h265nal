@@ -155,7 +155,6 @@ enum ProfileType : uint8_t {
   MAIN_444_10_STILL_PICTURE = 152,
 };
 
-enum ProfileType getProfileType();
 void profileTypeToString(enum ProfileType profile, std::string& str);
 
 namespace h265limits {
