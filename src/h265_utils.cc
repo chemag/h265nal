@@ -150,6 +150,11 @@ int H265Utils::ReadFile(const char* filename, std::vector<uint8_t>& buffer) {
   }
   fseek(infp, 0, SEEK_END);
   int64_t size = ftell(infp);
+  if (size <= 0) {
+    fprintf(stderr, "Could not determine file size: \"%s\"\n", filename);
+    fclose(infp);
+    return -1;
+  }
   fseek(infp, 0, SEEK_SET);
   // read file into buffer
   buffer.resize(static_cast<size_t>(size));
