@@ -8,8 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-#ifndef H265_RTC_COMMON_H_
-#define H265_RTC_COMMON_H_
+#pragma once
 
 #include <stddef.h>  // For size_t.
 #include <stdint.h>  // For integer types.
@@ -193,5 +192,3 @@ class BitBufferWriter : public BitBuffer {
 };
 
 }  // namespace h265nal
-
-#endif  // H265_RTC_COMMON_H_
