@@ -32,6 +32,11 @@ endif()
 set(CMAKE_C_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
 set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
 
+# Ensure CMake honors normal variable values when calling option()
+if(POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
+
 # Recurse into source code subdirectories.
 add_subdirectory(src)
 add_subdirectory(tools)
@@ -41,10 +46,6 @@ if(BUILD_H265_TESTS)
   add_subdirectory(test)
 endif()
 
-# Ensure CMake honors normal variable values when calling option()
-if(POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif()
 option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" ON)
 
 if(BUILD_CLANG_FUZZER)
