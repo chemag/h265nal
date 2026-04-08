@@ -46,9 +46,18 @@ if(BUILD_H265_TESTS)
   add_subdirectory(test)
 endif()
 
-option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" ON)
+option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" OFF)
+if(NOT DEFINED BUILD_CLANG_FUZZER_SET_BY_USER)
+  # Auto-enable fuzzer when using Clang
+  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(BUILD_CLANG_FUZZER ON)
+  endif()
+endif()
 
 if(BUILD_CLANG_FUZZER)
+  if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "BUILD_CLANG_FUZZER requires Clang (found ${CMAKE_CXX_COMPILER_ID})")
+  endif()
   add_subdirectory(fuzz)
 endif()
 

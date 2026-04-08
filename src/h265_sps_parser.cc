@@ -461,6 +461,10 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     if (!bit_buffer->ReadExponentialGolomb(sps->num_long_term_ref_pics_sps)) {
       return nullptr;
     }
+    // num_long_term_ref_pics_sps must be in range 0-32 per spec
+    if (sps->num_long_term_ref_pics_sps > 32) {
+      return nullptr;
+    }
 
     for (uint32_t i = 0; i < sps->num_long_term_ref_pics_sps; i++) {
       // lt_ref_pic_poc_lsb_sps[i] u(v)  log2_max_pic_order_cnt_lsb_minus4 + 4

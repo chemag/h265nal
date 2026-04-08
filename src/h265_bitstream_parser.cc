@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #endif
 #include <stdio.h>
+#include <string.h>
 
 #include <cstdint>
 #include <memory>
@@ -27,12 +28,16 @@ namespace {
 // not the first NALU of an access unit or an SPS or PPS block.
 const size_t kNaluShortStartSequenceSize = 3;
 
-size_t read_nalu_length(const uint8_t* data, size_t nalu_length_bytes) {
-  size_t nalu_length = 0;
-  for (size_t i = 0; i < nalu_length_bytes; ++i) {
-    nalu_length = (nalu_length << 8) + data[i];
+bool read_nalu_length(const uint8_t* data, size_t data_length,
+                      size_t nalu_length_bytes, size_t* nalu_length) {
+  if (nalu_length_bytes > data_length) {
+    return false;
   }
-  return nalu_length;
+  *nalu_length = 0;
+  for (size_t i = 0; i < nalu_length_bytes; ++i) {
+    *nalu_length = (*nalu_length << 8) + data[i];
+  }
+  return true;
 }
 }  // namespace
 
@@ -97,7 +102,13 @@ H265BitstreamParser::FindNaluIndicesExplicitFraming(const uint8_t* data,
     if (i + 4 > length) {
       break;
     }
-    uint32_t nal_unit_size = ntohl(*(uint32_t*)(data + i));
+    uint32_t nal_unit_size;
+    memcpy(&nal_unit_size, data + i, sizeof(uint32_t));
+    nal_unit_size = ntohl(nal_unit_size);
+    // Validate that the NALU payload fits in the remaining buffer
+    if (nal_unit_size > length - i - 4) {
+      break;
+    }
     // This is a start sequence
     NaluIndex index = {i, i + 4, nal_unit_size};
     sequences.push_back(index);
@@ -200,7 +211,10 @@ H265BitstreamParser::ParseBitstreamNALULength(
     size_t nalu_length = 0;
     if (nalu_length_bytes > 0) {
       // (1) read the NALU length
-      nalu_length = read_nalu_length(data + i, nalu_length_bytes);
+      if (!read_nalu_length(data + i, length - i, nalu_length_bytes,
+                            &nalu_length)) {
+        break;
+      }
       i += nalu_length_bytes;
       if (nalu_length == 0 || i + nalu_length > length) {
         break;

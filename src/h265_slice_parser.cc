@@ -287,8 +287,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           return nullptr;
         }
 
-        for (uint32_t i = 0; i < slice_segment_header->num_long_term_sps +
-                                     slice_segment_header->num_long_term_pics;
+        for (uint32_t i = 0;
+             i < (uint64_t)slice_segment_header->num_long_term_sps +
+                     slice_segment_header->num_long_term_pics;
              i++) {
           if (i < slice_segment_header->num_long_term_sps) {
             if (slice_segment_header->num_long_term_ref_pics_sps > 1) {
@@ -617,14 +618,18 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
               "error: invalid slice_segment_header->num_entry_point_offsets: "
               "%" PRIu32 "\n",
               slice_segment_header->num_entry_point_offsets);
-      return nullptr;
 #endif  // FPRINT_ERRORS
+      return nullptr;
     }
 
     if (slice_segment_header->num_entry_point_offsets > 0) {
       // offset_len_minus1  ue(v)
       if (!bit_buffer->ReadExponentialGolomb(
               slice_segment_header->offset_len_minus1)) {
+        return nullptr;
+      }
+      // offset_len_minus1 must be in range 0-31 per spec
+      if (slice_segment_header->offset_len_minus1 > 31) {
         return nullptr;
       }
 

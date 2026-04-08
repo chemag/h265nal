@@ -44,6 +44,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
     if (!bit_buffer->ReadBits(8, ff_byte)) {
       return nullptr;
     }
+    if (payload_type > UINT32_MAX - ff_byte) {
+      return nullptr;
+    }
     payload_type += ff_byte;
   }
   sei_message_state->payload_type = static_cast<SeiType>(payload_type);
@@ -52,6 +55,9 @@ H265SeiMessageParser::ParseSei(BitBuffer* bit_buffer) noexcept {
   ff_byte = 0xff;
   while (ff_byte == 0xff) {
     if (!bit_buffer->ReadBits(8, ff_byte)) {
+      return nullptr;
+    }
+    if (payload_size > UINT32_MAX - ff_byte) {
       return nullptr;
     }
     payload_size += ff_byte;

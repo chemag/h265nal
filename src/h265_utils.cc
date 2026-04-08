@@ -163,7 +163,8 @@ int H265Utils::ReadFile(const char* filename, std::vector<uint8_t>& buffer) {
   // clean up
   fclose(infp);
   if (bytes_read != static_cast<size_t>(size)) {
-    fprintf(stderr, "Could not read entire file: \"%s\" "
+    fprintf(stderr,
+            "Could not read entire file: \"%s\" "
             "(read %zu of %zu bytes)\n",
             filename, bytes_read, static_cast<size_t>(size));
     return -1;
