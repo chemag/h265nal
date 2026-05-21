@@ -62,12 +62,6 @@ if(BUILD_H265_TESTS)
 endif()
 
 option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" OFF)
-if(NOT DEFINED BUILD_CLANG_FUZZER_SET_BY_USER)
-  # Auto-enable fuzzer when using Clang
-  if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(BUILD_CLANG_FUZZER ON)
-  endif()
-endif()
 
 if(BUILD_CLANG_FUZZER)
   if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
