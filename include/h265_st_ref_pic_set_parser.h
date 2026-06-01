@@ -69,7 +69,7 @@ class H265StRefPicSetParser {
     std::vector<uint32_t> used_by_curr_pic_s1_flag;
 
     // helper functions
-    void DeriveValues(
+    bool DeriveValues(
         const std::vector<std::unique_ptr<struct StRefPicSetState>>*
             st_ref_pic_set_state_vector,
         const uint32_t RefRpsIdx) noexcept;

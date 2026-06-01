@@ -33,7 +33,7 @@ H265StRefPicSetParser::ParseStRefPicSet(
                           st_ref_pic_set_state_vector, max_num_pics);
 }
 
-void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
+bool H265StRefPicSetParser::StRefPicSetState::DeriveValues(
     const std::vector<std::unique_ptr<struct StRefPicSetState>>*
         st_ref_pic_set_state_vector,
     const uint32_t RefRpsIdx) noexcept {
@@ -54,11 +54,17 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
 
   int32_t d_poc = 0;
   for (uint32_t i = 0; i < ref->num_negative_pics; i++) {
+    if (i >= HEVC_MAX_REFS) {
+      return false;
+    }
     d_poc -= static_cast<int32_t>(ref->delta_poc_s0_minus1[i]) + 1;
     ref_delta_poc_s0[i] = d_poc;
   }
   d_poc = 0;
   for (uint32_t i = 0; i < ref->num_positive_pics; i++) {
+    if (i >= HEVC_MAX_REFS) {
+      return false;
+    }
     d_poc += static_cast<int32_t>(ref->delta_poc_s1_minus1[i]) + 1;
     ref_delta_poc_s1[i] = d_poc;
   }
@@ -70,6 +76,9 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
       d_poc = ref_delta_poc_s1[j] + delta_rps;
       if (d_poc < 0 &&
           use_delta_flag[ref->num_negative_pics + static_cast<uint32_t>(j)]) {
+        if (i >= HEVC_MAX_REFS) {
+          return false;
+        }
         delta_poc_s0[i] = d_poc;
         used_by_curr_pic_s0[i++] =
             used_by_curr_pic_flag[ref->num_negative_pics +
@@ -78,12 +87,18 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
     }
   }
   if (delta_rps < 0 && use_delta_flag[ref_num_delta_pocs]) {
+    if (i >= HEVC_MAX_REFS) {
+      return false;
+    }
     delta_poc_s0[i] = delta_rps;
     used_by_curr_pic_s0[i++] = used_by_curr_pic_flag[ref_num_delta_pocs];
   }
   for (int32_t j = 0; j < static_cast<int32_t>(ref->num_negative_pics); j++) {
     d_poc = ref_delta_poc_s0[j] + delta_rps;
     if (d_poc < 0 && use_delta_flag[static_cast<size_t>(j)]) {
+      if (i >= HEVC_MAX_REFS) {
+        return false;
+      }
       delta_poc_s0[i] = d_poc;
       used_by_curr_pic_s0[i++] = used_by_curr_pic_flag[static_cast<size_t>(j)];
     }
@@ -102,6 +117,9 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
          j--) {
       d_poc = ref_delta_poc_s0[j] + delta_rps;
       if (d_poc > 0 && use_delta_flag[static_cast<size_t>(j)]) {
+        if (i >= HEVC_MAX_REFS) {
+          return false;
+        }
         delta_poc_s1[i] = d_poc;
         used_by_curr_pic_s1[i++] =
             used_by_curr_pic_flag[static_cast<size_t>(j)];
@@ -109,6 +127,9 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
     }
   }
   if (delta_rps > 0 && use_delta_flag[ref_num_delta_pocs]) {
+    if (i >= HEVC_MAX_REFS) {
+      return false;
+    }
     delta_poc_s1[i] = delta_rps;
     used_by_curr_pic_s1[i++] = used_by_curr_pic_flag[ref_num_delta_pocs];
   }
@@ -116,6 +137,9 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
     d_poc = ref_delta_poc_s1[j] + delta_rps;
     if (d_poc > 0 &&
         use_delta_flag[ref->num_negative_pics + static_cast<uint32_t>(j)]) {
+      if (i >= HEVC_MAX_REFS) {
+        return false;
+      }
       delta_poc_s1[i] = d_poc;
       used_by_curr_pic_s1[i++] =
           used_by_curr_pic_flag[ref->num_negative_pics +
@@ -129,6 +153,8 @@ void H265StRefPicSetParser::StRefPicSetState::DeriveValues(
         delta_poc_s1[i] - (i == 0 ? 0 : delta_poc_s1[i - 1]) - 1));
     used_by_curr_pic_s1_flag.push_back(used_by_curr_pic_s1[i]);
   }
+
+  return true;
 }
 
 std::unique_ptr<H265StRefPicSetParser::StRefPicSetState>
@@ -246,7 +272,9 @@ H265StRefPicSetParser::ParseStRefPicSet(
       st_ref_pic_set->use_delta_flag.push_back(bits_tmp);
     }
 
-    st_ref_pic_set->DeriveValues(st_ref_pic_set_state_vector, RefRpsIdx);
+    if (!st_ref_pic_set->DeriveValues(st_ref_pic_set_state_vector, RefRpsIdx)) {
+      return nullptr;
+    }
 
   } else {
     // num_negative_pics  ue(v)
