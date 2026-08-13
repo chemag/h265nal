@@ -11,6 +11,7 @@
 #endif
 #include <stdio.h>
 
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -663,7 +664,36 @@ void fdump_indent_level(FILE* outfp, int indent_level) {
   fprintf(outfp, "\n");
   fprintf(outfp, "%*s", 2 * indent_level, "");
 }
+
+void fdump_unimplemented(FILE* outfp, const char* structure) {
+  // note that this goes to outfp, not to stderr: a dump of a bitstream we
+  // do not fully support is still a dump, not an error
+  fprintf(outfp, "%s { unimplemented }", structure);
+}
 #endif  // FDUMP_DEFINE
+
+namespace {
+std::atomic<uint32_t> unimplemented_count{0};
+}  // namespace
+
+void report_unimplemented(const char* structure,
+                          const char* context) noexcept {
+  unimplemented_count.fetch_add(1, std::memory_order_relaxed);
+#ifdef FPRINT_ERRORS
+  fprintf(stderr, "error: unimplemented %s in %s\n", structure, context);
+#else
+  (void)structure;
+  (void)context;
+#endif  // FPRINT_ERRORS
+}
+
+uint32_t get_unimplemented_count() noexcept {
+  return unimplemented_count.load(std::memory_order_relaxed);
+}
+
+void reset_unimplemented_count() noexcept {
+  unimplemented_count.store(0, std::memory_order_relaxed);
+}
 
 std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
     BitBuffer* bit_buffer) noexcept {

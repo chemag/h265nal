@@ -22,6 +22,7 @@
 #include <stdlib.h>
 
 #include <cerrno>
+#include <cinttypes>
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
@@ -38,6 +39,11 @@
 extern int optind;
 
 enum Dumpmode { dump_all, dump_length };
+
+// exit codes: tell a bitstream we do not support from a broken one
+constexpr int kExitOk = 0;
+constexpr int kExitInvalidBitstream = 1;
+constexpr int kExitUnimplemented = 2;
 
 typedef struct arg_options {
   int debug;
@@ -419,6 +425,7 @@ int main(int argc, char** argv) {
   }
 
   // 3. parse bitstream
+  h265nal::reset_unimplemented_count();
   std::vector<uint8_t> buffer;
   std::unique_ptr<h265nal::H265BitstreamParser::BitstreamState> bitstream;
   if (options.infile != nullptr) {
@@ -558,5 +565,33 @@ int main(int argc, char** argv) {
     fclose(outfp);
   }
 
-  return 0;
+  // 5. report how the parse went
+  //   kExitOk: every NAL unit parsed
+  //   kExitInvalidBitstream: at least one NAL unit payload did not parse
+  //   kExitUnimplemented: the bitstream needs syntax we do not support yet
+  if (options.infile == nullptr || bitstream == nullptr) {
+    return kExitOk;
+  }
+  size_t unparsed_nal_units = 0;
+  for (auto& nal_unit : bitstream->nal_units) {
+    if (!nal_unit->nal_unit_payload->IsPayloadParsed(
+            nal_unit->nal_unit_header->nal_unit_type)) {
+      unparsed_nal_units += 1;
+    }
+  }
+  uint32_t unimplemented = h265nal::get_unimplemented_count();
+  if (unimplemented > 0) {
+    fprintf(stderr,
+            "error: bitstream uses %" PRIu32
+            " unimplemented syntax structure(s), "
+            "%zu NAL unit(s) left unparsed\n",
+            unimplemented, unparsed_nal_units);
+    return kExitUnimplemented;
+  }
+  if (unparsed_nal_units > 0) {
+    fprintf(stderr, "error: %zu NAL unit(s) left unparsed\n",
+            unparsed_nal_units);
+    return kExitInvalidBitstream;
+  }
+  return kExitOk;
 }

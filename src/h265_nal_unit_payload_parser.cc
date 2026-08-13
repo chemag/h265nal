@@ -161,6 +161,29 @@ H265NalUnitPayloadParser::ParseNalUnitPayload(
   return nal_unit_payload;
 }
 
+bool H265NalUnitPayloadParser::NalUnitPayloadState::IsPayloadParsed(
+    uint32_t nal_unit_type) const noexcept {
+  switch (nal_unit_type) {
+    case VPS_NUT:
+      return vps != nullptr;
+    case SPS_NUT:
+      return sps != nullptr;
+    case PPS_NUT:
+      return pps != nullptr;
+    case AUD_NUT:
+      return aud != nullptr;
+    case PREFIX_SEI_NUT:
+    case SUFFIX_SEI_NUT:
+      return sei != nullptr;
+    default:
+      if (IsSliceSegment(nal_unit_type)) {
+        return slice_segment_layer != nullptr;
+      }
+      // a payload we do not parse: nothing is missing
+      return true;
+  }
+}
+
 #ifdef FDUMP_DEFINE
 void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
     FILE* outfp, int indent_level, uint32_t nal_unit_type,

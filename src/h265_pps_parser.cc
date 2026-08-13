@@ -292,9 +292,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps->pps_range_extension_flag) {
     // pps_range_extension()
     // TODO(chemag): add support for pps_range_extension()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
-#endif  // FPRINT_ERRORS
+    report_unimplemented("pps_range_extension()", "pps()");
     return nullptr;
   }
 
@@ -311,9 +309,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (pps->pps_3d_extension_flag) {
     // pps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for pps_3d_extension()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr, "error: unimplemented pps_3d_extension() in pps\n");
-#endif  // FPRINT_ERRORS
+    report_unimplemented("pps_3d_extension()", "pps()");
     return nullptr;
   }
 
@@ -525,7 +521,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   if (pps_range_extension_flag) {
     // pps_range_extension()
     // TODO(chemag): add support for pps_range_extension()
-    fprintf(stderr, "error: unimplemented pps_range_extension() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    fdump_unimplemented(outfp, "pps_range_extension");
   }
 
   if (pps_multilayer_extension_flag) {
@@ -536,7 +533,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
   if (pps_3d_extension_flag) {
     // pps_3d_extension() // specified in Annex I
     // TODO(chemag): add support for pps_3d_extension()
-    fprintf(stderr, "error: unimplemented pps_3d_extension_flag() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    fdump_unimplemented(outfp, "pps_3d_extension");
   }
 
   if (pps_scc_extension_flag) {

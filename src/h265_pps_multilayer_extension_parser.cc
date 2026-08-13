@@ -187,12 +187,9 @@ H265PpsMultilayerExtensionParser::ParsePpsMultilayerExtension(
 
   if (pps_multilayer_extension->colour_mapping_enabled_flag) {
     // colour_mapping_table(()
-    // TODO(chemag): add support for colour_mapping_table(()
-#ifdef FPRINT_ERRORS
-    fprintf(stderr,
-            "error: unimplemented colour_mapping_table(() in "
-            "pps_multilayer_extension(\n");
-#endif  // FPRINT_ERRORS
+    // TODO(chemag): add support for colour_mapping_table()
+    report_unimplemented("colour_mapping_table()",
+                         "pps_multilayer_extension()");
     return nullptr;
   }
 
@@ -343,7 +340,8 @@ void H265PpsMultilayerExtensionParser::PpsMultilayerExtensionState::fdump(
   if (colour_mapping_enabled_flag) {
     // colour_mapping_table() // specified in Annex F
     // TODO(chemag): add support for colour_mapping_table()
-    fprintf(stderr, "error: unimplemented colour_mapping_table() in pps\n");
+    fdump_indent_level(outfp, indent_level);
+    fdump_unimplemented(outfp, "colour_mapping_table");
   }
 
   indent_level = indent_level_decr(indent_level);

@@ -150,4 +150,26 @@ INSTANTIATE_TEST_SUITE_P(
     Parameter, H265CommonMoreRbspDataTest,
     ::testing::ValuesIn(kH265CommonMoreRbspDataParameterTestcases));
 
+class H265CommonUnimplementedTest : public ::testing::Test {
+ public:
+  H265CommonUnimplementedTest() {}
+  ~H265CommonUnimplementedTest() override {}
+};
+
+TEST_F(H265CommonUnimplementedTest, TestUnimplementedCount) {
+  // the count is what lets the h265nal tool tell a bitstream we do not
+  // support yet from a bitstream that is broken
+  reset_unimplemented_count();
+  EXPECT_EQ(0, get_unimplemented_count());
+
+  report_unimplemented("pps_range_extension()", "pps()");
+  EXPECT_EQ(1, get_unimplemented_count());
+
+  report_unimplemented("colour_mapping_table()", "pps_multilayer_extension()");
+  EXPECT_EQ(2, get_unimplemented_count());
+
+  reset_unimplemented_count();
+  EXPECT_EQ(0, get_unimplemented_count());
+}
+
 }  // namespace h265nal

@@ -211,7 +211,19 @@ bool rbsp_trailing_bits(BitBuffer* bit_buffer);
 int indent_level_incr(int indent_level);
 int indent_level_decr(int indent_level);
 void fdump_indent_level(FILE* outfp, int indent_level);
+// fdump() marker for a syntax structure that we do not parse yet
+void fdump_unimplemented(FILE* outfp, const char* structure);
 #endif  // FDUMP_DEFINE
+
+// Report an syntax structure that we do not parse yet, e.g.
+//   report_unimplemented("pps_range_extension()", "pps()")
+// Every parser bails out through here, so that the message is worded the
+// same way everywhere, and so that a caller can tell a bitstream we do not
+// support from a bitstream that is broken. The count is process-wide:
+// reset it before a parse if you mean to check it after one.
+void report_unimplemented(const char* structure, const char* context) noexcept;
+uint32_t get_unimplemented_count() noexcept;
+void reset_unimplemented_count() noexcept;
 
 // Generic Parsing Options
 struct ParsingOptions {

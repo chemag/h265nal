@@ -186,6 +186,9 @@ TEST_F(H265NalUnitParserTest, TestTruncatedAudNalUnitFdump) {
   EXPECT_TRUE(nal_unit != nullptr);
   EXPECT_EQ(NalUnitType::AUD_NUT, nal_unit->nal_unit_header->nal_unit_type);
   EXPECT_TRUE(nal_unit->nal_unit_payload->aud == nullptr);
+  // which is what IsPayloadParsed() reports to the caller
+  EXPECT_FALSE(nal_unit->nal_unit_payload->IsPayloadParsed(
+      NalUnitType::AUD_NUT));
 
   // dumping the null aud used to dereference it
   FILE* outfp = tmpfile();

@@ -78,11 +78,21 @@ def run_h265nal(input_path, h265nal_path, timeout):
     return result.stdout, status
 
 
+# h265nal tells apart a bitstream it does not support from a broken one
+EXIT_CODES = {
+    1: "invalid bitstream",
+    2: "unimplemented syntax",
+}
+
+
 def format_returncode(returncode):
     """Describe a non-zero h265nal exit, including deaths by signal."""
     if returncode < 0:
         name = signal.Signals(-returncode).name
         return f"h265nal killed by {name}"
+    reason = EXIT_CODES.get(returncode)
+    if reason is not None:
+        return f"h265nal: {reason}"
     return f"h265nal exited with {returncode}"
 
 

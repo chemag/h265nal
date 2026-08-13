@@ -38,6 +38,13 @@ class H265NalUnitPayloadParser {
                ParsingOptions parsing_options) const;
 #endif  // FDUMP_DEFINE
 
+    // Whether the payload of a NAL unit of the given type was parsed. A
+    // NAL unit whose payload fails to parse is not fatal (we keep the NAL
+    // unit, with an empty payload), so this is how a caller notices.
+    // Types whose payload we do not parse at all (e.g. EOS_NUT) count as
+    // parsed: there is nothing missing.
+    bool IsPayloadParsed(uint32_t nal_unit_type) const noexcept;
+
     std::shared_ptr<struct H265VpsParser::VpsState> vps;
     std::shared_ptr<struct H265SpsParser::SpsState> sps;
     std::shared_ptr<struct H265PpsParser::PpsState> pps;
