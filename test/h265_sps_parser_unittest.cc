@@ -413,10 +413,12 @@ TEST_F(H265SpsParserTest, TestSpsMultiLayerExtension) {
   // i.e. that the h265nal tool can tell an sps we do not support from an
   // sps that is broken. That is what the mvhevcs_[abefghi].bit and the
   // shvc bitstreams of the 201810 conformance suite need.
+  // note that the count is test scaffolding, so it stays outside the
+  // fuzzer::conv markers: the fuzzer only wants the parse call
+  reset_unimplemented_count();
   // fuzzer::conv: data
   const uint8_t buffer[] = {0x0e};
   // fuzzer::conv: begin
-  reset_unimplemented_count();
   auto sps = H265SpsParser::ParseSps(buffer, arraysize(buffer));
   // fuzzer::conv: end
 
