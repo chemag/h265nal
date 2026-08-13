@@ -45,6 +45,12 @@ bool H265StRefPicSetParser::StRefPicSetState::DeriveValues(
   uint8_t used_by_curr_pic_s0[HEVC_MAX_REFS] = {0};
   uint8_t used_by_curr_pic_s1[HEVC_MAX_REFS] = {0};
 
+  // RefRpsIdx indexes the st_ref_pic_set() list that the caller passed in,
+  // which is only as long as the number of sets parsed so far
+  if (st_ref_pic_set_state_vector == nullptr ||
+      RefRpsIdx >= st_ref_pic_set_state_vector->size()) {
+    return false;
+  }
   const auto& ref = (*st_ref_pic_set_state_vector)[RefRpsIdx];
 
   // Equation 7-60
@@ -241,6 +247,24 @@ H265StRefPicSetParser::ParseStRefPicSet(
     // Equation 7-59
     const uint32_t RefRpsIdx =
         st_ref_pic_set->stRpsIdx - (st_ref_pic_set->delta_idx_minus1 + 1);
+
+    // The delta_idx_minus1 check above keeps RefRpsIdx from going negative,
+    // but says nothing about the length of the st_ref_pic_set() list that
+    // the caller passed in: a slice segment header hands us the sps list,
+    // which is only as long as the number of sets the sps actually
+    // carried.
+    if (st_ref_pic_set_state_vector == nullptr ||
+        RefRpsIdx >= st_ref_pic_set_state_vector->size()) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid RefRpsIdx: %" PRIu32 " not in range [0, %zu]\n",
+              RefRpsIdx,
+              st_ref_pic_set_state_vector == nullptr
+                  ? 0
+                  : st_ref_pic_set_state_vector->size());
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
 
     // Equation 7-71
     const auto& ref = (*st_ref_pic_set_state_vector)[RefRpsIdx];

@@ -78,4 +78,25 @@ TEST_F(H265StRefPicSetParserTest, TestDeriveValuesOobBoundsCheck) {
   EXPECT_FALSE(result);
 }
 
+TEST_F(H265StRefPicSetParserTest, TestRefRpsIdxOobBoundsCheck) {
+  // A synthetic st_ref_pic_set() with inter_ref_pic_set_prediction_flag
+  // set and delta_idx_minus1 0, so RefRpsIdx is stRpsIdx - 1, i.e. 0. The
+  // st_ref_pic_set() list we hand in is empty, so index 0 is already out
+  // of bounds: the delta_idx_minus1 check keeps RefRpsIdx from going
+  // negative, but nothing tied it to the length of the list.
+  //
+  // A slice segment header passes the sps list here, and the two can
+  // disagree, which is how h265_slice_parser_fuzzer found this.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0xd0};
+  // fuzzer::conv: begin
+  std::vector<std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>>
+      st_ref_pic_set_state_vector;
+  auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
+      buffer, arraysize(buffer), 1, 1, &st_ref_pic_set_state_vector, 16);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(st_ref_pic_set == nullptr);
+}
+
 }  // namespace h265nal
