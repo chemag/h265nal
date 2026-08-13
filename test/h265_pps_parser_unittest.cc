@@ -65,4 +65,51 @@ TEST_F(H265PpsParserTest, TestSamplePPS) {
 #endif
 }
 
+// A minimal PPS carrying a pps_multilayer_extension(), with every other
+// field set to zero. colour_mapping_enabled_flag is the last bit before
+// the rbsp trailing bits, so the two buffers below only differ in the
+// final byte.
+
+TEST_F(H265PpsParserTest, TestSamplePPSWithMultilayerExtension) {
+  // colour_mapping_enabled_flag: 0
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0x71, 0x80, 0x15, 0x00, 0xa0
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps != nullptr);
+
+  EXPECT_EQ(1, pps->pps_extension_present_flag);
+  EXPECT_EQ(0, pps->pps_range_extension_flag);
+  EXPECT_EQ(1, pps->pps_multilayer_extension_flag);
+  EXPECT_EQ(0, pps->pps_3d_extension_flag);
+  EXPECT_EQ(0, pps->pps_scc_extension_flag);
+
+  EXPECT_TRUE(pps->pps_multilayer_extension != nullptr);
+  EXPECT_EQ(0, pps->pps_multilayer_extension->poc_reset_info_present_flag);
+  EXPECT_EQ(0, pps->pps_multilayer_extension->pps_infer_scaling_list_flag);
+  EXPECT_EQ(0, pps->pps_multilayer_extension->num_ref_loc_offsets);
+  EXPECT_EQ(0, pps->pps_multilayer_extension->colour_mapping_enabled_flag);
+}
+
+TEST_F(H265PpsParserTest, TestSamplePPSWithUnparseableMultilayerExtension) {
+  // colour_mapping_enabled_flag: 1, which pulls in a colour_mapping_table()
+  // that we do not support yet, so the pps_multilayer_extension() parse
+  // fails. The pps parse must fail with it: it used to keep going and
+  // return a PPS holding a null pps_multilayer_extension, which then got
+  // dereferenced by PpsState::fdump().
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0x71, 0x80, 0x15, 0x00, 0xe0
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps == nullptr);
+}
+
 }  // namespace h265nal

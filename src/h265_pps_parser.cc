@@ -303,6 +303,9 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     pps->pps_multilayer_extension =
         H265PpsMultilayerExtensionParser::ParsePpsMultilayerExtension(
             bit_buffer);
+    if (pps->pps_multilayer_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (pps->pps_3d_extension_flag) {
