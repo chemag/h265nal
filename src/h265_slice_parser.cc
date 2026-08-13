@@ -702,7 +702,7 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
   // ( num_tile_columns_minus1 + 1 ) * PicHeightInCtbsY - 1, inclusive.
   if (tiles_enabled_flag == 1 && entropy_coding_sync_enabled_flag == 1) {
     uint32_t max_num_entry_point_offsets =
-        ((pps->num_tile_columns_minus1 + 1) * (sps->getPicHeightInCtbsY() - 1));
+        (((pps->num_tile_columns_minus1 + 1) * sps->getPicHeightInCtbsY()) - 1);
     return (num_entry_point_offsets_value <= max_num_entry_point_offsets);
   }
 
