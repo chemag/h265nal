@@ -12,6 +12,8 @@
 #include <vector>
 
 #include "h265_common.h"
+// for the SliceType enum
+#include "h265_slice_parser.h"
 
 namespace h265nal {
 
@@ -23,17 +25,20 @@ namespace h265nal {
 std::unique_ptr<H265PredWeightTableParser::PredWeightTableState>
 H265PredWeightTableParser::ParsePredWeightTable(
     const uint8_t* data, size_t length, uint32_t ChromaArrayType,
-    uint32_t num_ref_idx_l0_active_minus1) noexcept {
+    uint32_t slice_type, uint32_t num_ref_idx_l0_active_minus1,
+    uint32_t num_ref_idx_l1_active_minus1) noexcept {
   std::vector<uint8_t> unpacked_buffer = UnescapeRbsp(data, length);
   BitBuffer bit_buffer(unpacked_buffer.data(), unpacked_buffer.size());
-  return ParsePredWeightTable(&bit_buffer, ChromaArrayType,
-                              num_ref_idx_l0_active_minus1);
+  return ParsePredWeightTable(&bit_buffer, ChromaArrayType, slice_type,
+                              num_ref_idx_l0_active_minus1,
+                              num_ref_idx_l1_active_minus1);
 }
 
 std::unique_ptr<H265PredWeightTableParser::PredWeightTableState>
 H265PredWeightTableParser::ParsePredWeightTable(
-    BitBuffer* bit_buffer, uint32_t ChromaArrayType,
-    uint32_t num_ref_idx_l0_active_minus1) noexcept {
+    BitBuffer* bit_buffer, uint32_t ChromaArrayType, uint32_t slice_type,
+    uint32_t num_ref_idx_l0_active_minus1,
+    uint32_t num_ref_idx_l1_active_minus1) noexcept {
   uint32_t bits_tmp;
   int32_t sgolomb_tmp;
 
@@ -43,8 +48,11 @@ H265PredWeightTableParser::ParsePredWeightTable(
   auto pred_weight_table = std::make_unique<PredWeightTableState>();
 
   pred_weight_table->ChromaArrayType = ChromaArrayType;
+  pred_weight_table->slice_type = slice_type;
   pred_weight_table->num_ref_idx_l0_active_minus1 =
       num_ref_idx_l0_active_minus1;
+  pred_weight_table->num_ref_idx_l1_active_minus1 =
+      num_ref_idx_l1_active_minus1;
 
   // luma_log2_weight_denom  ue(v)
   if (!bit_buffer->ReadExponentialGolomb(
@@ -121,6 +129,65 @@ H265PredWeightTableParser::ParsePredWeightTable(
     }
   }
 
+  if (pred_weight_table->slice_type == SliceType_B) {
+    for (uint32_t i = 0; i <= pred_weight_table->num_ref_idx_l1_active_minus1;
+         ++i) {
+      // luma_weight_l1_flag[i]  u(1)
+      if (!bit_buffer->ReadBits(1, bits_tmp)) {
+        return nullptr;
+      }
+      pred_weight_table->luma_weight_l1_flag.push_back(bits_tmp);
+    }
+
+    if (pred_weight_table->ChromaArrayType != 0) {
+      for (uint32_t i = 0; i <= pred_weight_table->num_ref_idx_l1_active_minus1;
+           ++i) {
+        // chroma_weight_l1_flag[i]  u(1)
+        if (!bit_buffer->ReadBits(1, bits_tmp)) {
+          return nullptr;
+        }
+        pred_weight_table->chroma_weight_l1_flag.push_back(bits_tmp);
+      }
+    }
+
+    for (uint32_t i = 0; i <= pred_weight_table->num_ref_idx_l1_active_minus1;
+         ++i) {
+      if (pred_weight_table->luma_weight_l1_flag[i]) {
+        // delta_luma_weight_l1[i]  se(v)
+        if (!bit_buffer->ReadSignedExponentialGolomb(sgolomb_tmp)) {
+          return nullptr;
+        }
+        pred_weight_table->delta_luma_weight_l1.push_back(sgolomb_tmp);
+        // luma_offset_l1[i]  se(v)
+        if (!bit_buffer->ReadSignedExponentialGolomb(sgolomb_tmp)) {
+          return nullptr;
+        }
+        pred_weight_table->luma_offset_l1.push_back(sgolomb_tmp);
+      }
+      if (pred_weight_table->ChromaArrayType != 0) {
+        if (pred_weight_table->chroma_weight_l1_flag[i]) {
+          pred_weight_table->delta_chroma_weight_l1.emplace_back();
+          pred_weight_table->delta_chroma_offset_l1.emplace_back();
+          for (int j = 0; j < 2; ++j) {
+            // delta_chroma_weight_l1[i][j]  se(v)
+            if (!bit_buffer->ReadSignedExponentialGolomb(sgolomb_tmp)) {
+              return nullptr;
+            }
+            pred_weight_table->delta_chroma_weight_l1.back().push_back(
+                sgolomb_tmp);
+
+            // delta_chroma_offset_l1[i][j]  se(v)
+            if (!bit_buffer->ReadSignedExponentialGolomb(sgolomb_tmp)) {
+              return nullptr;
+            }
+            pred_weight_table->delta_chroma_offset_l1.back().push_back(
+                sgolomb_tmp);
+          }
+        }
+      }
+    }
+  }
+
   return pred_weight_table;
 }
 
@@ -191,6 +258,62 @@ void H265PredWeightTableParser::PredWeightTableState::fdump(
       fprintf(outfp, " }");
     }
     fprintf(outfp, " }");
+  }
+
+  if (slice_type == SliceType_B) {
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "luma_weight_l1_flag {");
+    for (const uint32_t& v : luma_weight_l1_flag) {
+      fprintf(outfp, " %u", v);
+    }
+    fprintf(outfp, " }");
+
+    if (ChromaArrayType != 0) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "chroma_weight_l1_flag {");
+      for (const uint32_t& v : chroma_weight_l1_flag) {
+        fprintf(outfp, " %u", v);
+      }
+      fprintf(outfp, " }");
+    }
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "delta_luma_weight_l1 {");
+    for (const int32_t& v : delta_luma_weight_l1) {
+      fprintf(outfp, " %i", v);
+    }
+    fprintf(outfp, " }");
+
+    fdump_indent_level(outfp, indent_level);
+    fprintf(outfp, "luma_offset_l1 {");
+    for (const int32_t& v : luma_offset_l1) {
+      fprintf(outfp, " %i", v);
+    }
+    fprintf(outfp, " }");
+
+    if (ChromaArrayType != 0) {
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "delta_chroma_weight_l1 {");
+      for (const std::vector<int32_t>& vv : delta_chroma_weight_l1) {
+        fprintf(outfp, " {");
+        for (const int32_t& v : vv) {
+          fprintf(outfp, " %i", v);
+        }
+        fprintf(outfp, " }");
+      }
+      fprintf(outfp, " }");
+
+      fdump_indent_level(outfp, indent_level);
+      fprintf(outfp, "delta_chroma_offset_l1 {");
+      for (const std::vector<int32_t>& vv : delta_chroma_offset_l1) {
+        fprintf(outfp, " {");
+        for (const int32_t& v : vv) {
+          fprintf(outfp, " %i", v);
+        }
+        fprintf(outfp, " }");
+      }
+      fprintf(outfp, " }");
+    }
   }
 
   indent_level = indent_level_decr(indent_level);

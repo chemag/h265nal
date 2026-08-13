@@ -34,7 +34,9 @@ class H265PredWeightTableParser {
 
     // input parameters
     uint32_t ChromaArrayType = 0;
+    uint32_t slice_type = 0;
     uint32_t num_ref_idx_l0_active_minus1 = 0;
+    uint32_t num_ref_idx_l1_active_minus1 = 0;
 
     // contents
     uint32_t luma_log2_weight_denom = 0;
@@ -55,12 +57,16 @@ class H265PredWeightTableParser {
   };
 
   // Unpack RBSP and parse PredWeightTable state from the supplied buffer.
+  // Note that the l1 half of the table is only present in B slices, so
+  // slice_type and num_ref_idx_l1_active_minus1 are needed as well.
   static std::unique_ptr<PredWeightTableState> ParsePredWeightTable(
       const uint8_t* data, size_t length, uint32_t ChromaArrayType,
-      uint32_t num_ref_idx_l0_active_minus1) noexcept;
+      uint32_t slice_type, uint32_t num_ref_idx_l0_active_minus1,
+      uint32_t num_ref_idx_l1_active_minus1) noexcept;
   static std::unique_ptr<PredWeightTableState> ParsePredWeightTable(
-      BitBuffer* bit_buffer, uint32_t ChromaArrayType,
-      uint32_t num_ref_idx_l0_active_minus1) noexcept;
+      BitBuffer* bit_buffer, uint32_t ChromaArrayType, uint32_t slice_type,
+      uint32_t num_ref_idx_l0_active_minus1,
+      uint32_t num_ref_idx_l1_active_minus1) noexcept;
 };
 
 }  // namespace h265nal

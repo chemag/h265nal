@@ -476,7 +476,9 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         slice_segment_header->pred_weight_table =
             H265PredWeightTableParser::ParsePredWeightTable(
                 bit_buffer, slice_segment_header->ChromaArrayType,
-                slice_segment_header->num_ref_idx_l0_active_minus1);
+                slice_segment_header->slice_type,
+                slice_segment_header->num_ref_idx_l0_active_minus1,
+                slice_segment_header->num_ref_idx_l1_active_minus1);
         if (slice_segment_header->pred_weight_table == nullptr) {
           return nullptr;
         }

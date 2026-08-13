@@ -162,6 +162,10 @@ def parse_input(lines, debug):
             line = line.replace('H265', 'h265nal::H265')
         if 'NalUnitType::' in line:
             line = line.replace('NalUnitType::', 'h265nal::NalUnitType::')
+        if 'SliceType_' in line:
+            line = line.replace('SliceType_', 'h265nal::SliceType_')
+        if 'ParsingOptions ' in line:
+            line = line.replace('ParsingOptions ', 'h265nal::ParsingOptions ')
         line = line.replace('buffer, arraysize(buffer)', 'data, size')
         output['code'] += line
     output['code'].strip('\n')
