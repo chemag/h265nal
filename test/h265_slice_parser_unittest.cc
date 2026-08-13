@@ -230,4 +230,61 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceContainsShortTermRefPicSet) {
   EXPECT_EQ(39, slice_segment_header->num_entry_point_offsets);
 }
 
+TEST_F(H265SliceSegmentLayerParserTest, TestSliceInfersNumRefIdxFromPps) {
+  // A B slice with num_ref_idx_active_override_flag unset, so the
+  // num_ref_idx_l0_active_minus1 and num_ref_idx_l1_active_minus1 values
+  // come from the pps (Section 7.4.7.1). collocated_ref_idx is only
+  // present because num_ref_idx_l0_active_minus1 ends up above zero, so
+  // reading the pps defaults is what keeps the rest of the slice segment
+  // header (here five_minus_max_num_merge_cand and slice_qp_delta) in
+  // sync with the bitstream.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0xe0, 0x99, 0x51, 0x90};
+
+  // fuzzer::conv: begin
+  // get some mock state
+  H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->chroma_format_idc = 1;
+  sps->sample_adaptive_offset_enabled_flag = 0;
+  sps->log2_max_pic_order_cnt_lsb_minus4 = 4;
+  sps->num_short_term_ref_pic_sets = 1;
+  sps->sps_temporal_mvp_enabled_flag = 1;
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  pps->num_ref_idx_l0_default_active_minus1 = 1;
+  pps->num_ref_idx_l1_default_active_minus1 = 1;
+  bitstream_parser_state.pps[0] = pps;
+
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::TRAIL_R,
+          &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(slice_segment_layer != nullptr);
+
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
+
+  EXPECT_EQ(1, slice_segment_header->first_slice_segment_in_pic_flag);
+  EXPECT_EQ(SliceType_B, slice_segment_header->slice_type);
+  EXPECT_EQ(4, slice_segment_header->slice_pic_order_cnt_lsb);
+  EXPECT_EQ(1, slice_segment_header->slice_temporal_mvp_enabled_flag);
+
+  // inferred from the pps, not read from the slice segment header
+  EXPECT_EQ(0, slice_segment_header->num_ref_idx_active_override_flag);
+  EXPECT_EQ(1, slice_segment_header->num_ref_idx_l0_active_minus1);
+  EXPECT_EQ(1, slice_segment_header->num_ref_idx_l1_active_minus1);
+
+  // present only because num_ref_idx_l0_active_minus1 is above zero
+  EXPECT_EQ(1, slice_segment_header->collocated_from_l0_flag);
+  EXPECT_EQ(1, slice_segment_header->collocated_ref_idx);
+
+  // still in sync after collocated_ref_idx
+  EXPECT_EQ(0, slice_segment_header->five_minus_max_num_merge_cand);
+  EXPECT_EQ(6, slice_segment_header->slice_qp_delta);
+}
+
 }  // namespace h265nal

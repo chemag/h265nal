@@ -391,6 +391,14 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
         return nullptr;
       }
 
+      // Section 7.4.7.1: when num_ref_idx_active_override_flag is 0, the
+      // num_ref_idx_l0_active_minus1 and num_ref_idx_l1_active_minus1
+      // values are inferred from the pps defaults
+      slice_segment_header->num_ref_idx_l0_active_minus1 =
+          pps->num_ref_idx_l0_default_active_minus1;
+      slice_segment_header->num_ref_idx_l1_active_minus1 =
+          pps->num_ref_idx_l1_default_active_minus1;
+
       if (slice_segment_header->num_ref_idx_active_override_flag) {
         // num_ref_idx_l0_active_minus1  ue(v)
         if (!bit_buffer->ReadExponentialGolomb(
