@@ -55,6 +55,20 @@ std::shared_ptr<H265SpsParser::SpsState> H265SpsParser::ParseSps(
     return nullptr;
   }
 
+  // For a NAL unit with nuh_layer_id > 0 this field is really
+  // sps_ext_or_max_sub_layers_minus1, and the value 7 sets
+  // MultiLayerExtSpsFlag, which selects the multi-layer sps of Section
+  // F.7.3.2.2.1: no sps_temporal_id_nesting_flag, no profile_tier_level(),
+  // and an update_rep_format_flag in place of the format fields. We do not
+  // parse that. Note that we do not need nuh_layer_id to tell the two
+  // apart: 7.4.3.2 bounds sps_max_sub_layers_minus1 by
+  // vps_max_sub_layers_minus1, so the value is out of range for a base
+  // layer sps anyway.
+  if (sps->sps_max_sub_layers_minus1 == 7) {
+    report_unimplemented("multi-layer sps extension", "sps()");
+    return nullptr;
+  }
+
   // sps_temporal_id_nesting_flag  u(1)
   if (!bit_buffer->ReadBits(1, sps->sps_temporal_id_nesting_flag)) {
     return nullptr;

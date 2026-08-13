@@ -402,4 +402,26 @@ TEST_F(H265SpsParserTest, TestComplexStRefPicSet) {
   EXPECT_EQ(510, sps->getPicSizeInCtbsY());
 }
 
+TEST_F(H265SpsParserTest, TestSpsMultiLayerExtension) {
+  // A synthetic sps header: sps_video_parameter_set_id is 0, and the u(3)
+  // that follows is 7. In an sps with nuh_layer_id > 0 that field is
+  // sps_ext_or_max_sub_layers_minus1, and the value 7 selects the
+  // multi-layer sps of Section F.7.3.2.2.1, which we do not parse.
+  //
+  // Note that the parse fails either way here (the buffer runs out), so
+  // what this checks is that we bail out through report_unimplemented(),
+  // i.e. that the h265nal tool can tell an sps we do not support from an
+  // sps that is broken. That is what the mvhevcs_[abefghi].bit and the
+  // shvc bitstreams of the 201810 conformance suite need.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0x0e};
+  // fuzzer::conv: begin
+  reset_unimplemented_count();
+  auto sps = H265SpsParser::ParseSps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(sps == nullptr);
+  EXPECT_EQ(1, get_unimplemented_count());
+}
+
 }  // namespace h265nal
