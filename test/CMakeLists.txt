@@ -151,6 +151,11 @@ add_executable(h265_nal_unit_parser_unittest h265_nal_unit_parser_unittest.cc)
 add_test(h265_nal_unit_parser_unittest h265_nal_unit_parser_unittest)
 target_link_libraries(h265_nal_unit_parser_unittest PUBLIC h265nal)
 target_link_libraries(h265_nal_unit_parser_unittest PUBLIC GTest::gtest GTest::gtest_main)
+# the fdump() declarations live behind FDUMP_DEFINE, which src/ adds to its
+# own directory scope only: define it here too so the tests can call them
+if(NOT H265NAL_SMALL_FOOTPRINT)
+  target_compile_definitions(h265_nal_unit_parser_unittest PUBLIC FDUMP_DEFINE)
+endif()
 
 add_executable(h265_configuration_box_parser_unittest h265_configuration_box_parser_unittest.cc)
 add_test(h265_configuration_box_parser_unittest h265_configuration_box_parser_unittest)

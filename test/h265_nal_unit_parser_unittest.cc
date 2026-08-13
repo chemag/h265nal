@@ -134,6 +134,40 @@ TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
   EXPECT_TRUE(nal_unit == nullptr);
 }
 
+#ifdef FDUMP_DEFINE
+TEST_F(H265NalUnitParserTest, TestTruncatedAudNalUnitFdump) {
+  // An AUD NAL unit header (nal_unit_type: 35) and nothing else. The
+  // access_unit_delimiter_rbsp() needs 3 more bits for pic_type, so the
+  // aud parse fails, and the payload keeps a null aud. Note that the NAL
+  // unit itself still parses: an unparseable payload is not fatal here.
+  const uint8_t buffer[] = {0x46, 0x01};
+  H265BitstreamParserState bitstream_parser_state;
+  ParsingOptions parsing_options;
+  auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
+                                                  &bitstream_parser_state,
+                                                  parsing_options);
+
+  EXPECT_TRUE(nal_unit != nullptr);
+  EXPECT_EQ(NalUnitType::AUD_NUT, nal_unit->nal_unit_header->nal_unit_type);
+  EXPECT_TRUE(nal_unit->nal_unit_payload->aud == nullptr);
+
+  // dumping the null aud used to dereference it
+  FILE* outfp = tmpfile();
+  ASSERT_TRUE(outfp != nullptr);
+  // indent_level -1 keeps the dump in a single line
+  nal_unit->fdump(outfp, -1, parsing_options);
+
+  // check the dump ran, and left the payload empty
+  std::vector<char> dump(1024, '\0');
+  rewind(outfp);
+  size_t dump_length = fread(dump.data(), 1, dump.size() - 1, outfp);
+  fclose(outfp);
+  EXPECT_GT(dump_length, 0);
+  EXPECT_THAT(dump.data(), ::testing::HasSubstr("nal_unit_type: 35"));
+  EXPECT_THAT(dump.data(), ::testing::HasSubstr("nal_unit_payload {  }"));
+}
+#endif  // FDUMP_DEFINE
+
 class H265NalUnitHeaderParserTest : public ::testing::Test {
  public:
   H265NalUnitHeaderParserTest() {}

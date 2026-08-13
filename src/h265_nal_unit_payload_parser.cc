@@ -232,7 +232,9 @@ void H265NalUnitPayloadParser::NalUnitPayloadState::fdump(
       }
       break;
     case AUD_NUT:
-      aud->fdump(outfp, indent_level);
+      if (aud) {
+        aud->fdump(outfp, indent_level);
+      }
       break;
     case EOS_NUT:
       // end_of_seq_rbsp()
