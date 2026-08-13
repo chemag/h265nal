@@ -135,6 +135,42 @@ TEST_F(H265NalUnitParserTest, TestEmptyNalUnit) {
 }
 
 #ifdef FDUMP_DEFINE
+TEST_F(H265NalUnitParserTest, TestUnparsedChecksumFdump) {
+  // fdump() takes its own ParsingOptions, so a caller can ask for a
+  // checksum that ParseNalUnit() was never told to calculate. Note that
+  // neither the h265nal tool nor BitstreamState::fdump() can get here:
+  // both hand the same options to the parser and to the dumper.
+  const uint8_t buffer[] = {0x40, 0x01, 0x0c, 0x01, 0xff, 0xff, 0x01, 0x60,
+                            0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03,
+                            0x00, 0x00, 0x03, 0x00, 0x5d, 0xac, 0x59, 0x00};
+  H265BitstreamParserState bitstream_parser_state;
+  ParsingOptions parsing_options;
+  parsing_options.add_checksum = false;
+  auto nal_unit = H265NalUnitParser::ParseNalUnit(buffer, arraysize(buffer),
+                                                  &bitstream_parser_state,
+                                                  parsing_options);
+
+  EXPECT_TRUE(nal_unit != nullptr);
+  EXPECT_TRUE(nal_unit->checksum == nullptr);
+
+  // dumping the null checksum used to dereference it
+  ParsingOptions dump_options;
+  dump_options.add_checksum = true;
+  FILE* outfp = tmpfile();
+  ASSERT_TRUE(outfp != nullptr);
+  // indent_level -1 keeps the dump in a single line
+  nal_unit->fdump(outfp, -1, dump_options);
+
+  // check the dump ran, and just skipped the checksum it does not have
+  std::vector<char> dump(4096, '\0');
+  rewind(outfp);
+  size_t dump_length = fread(dump.data(), 1, dump.size() - 1, outfp);
+  fclose(outfp);
+  EXPECT_GT(dump_length, 0);
+  EXPECT_THAT(dump.data(), ::testing::HasSubstr("nal_unit_type: 32"));
+  EXPECT_THAT(dump.data(), ::testing::Not(::testing::HasSubstr("checksum:")));
+}
+
 TEST_F(H265NalUnitParserTest, TestTruncatedAudNalUnitFdump) {
   // An AUD NAL unit header (nal_unit_type: 35) and nothing else. The
   // access_unit_delimiter_rbsp() needs 3 more bits for pic_type, so the

@@ -108,7 +108,9 @@ void H265NalUnitParser::NalUnitState::fdump(
   }
 
   // nal unit checksum
-  if (parsing_options.add_checksum) {
+  // note that the checksum is only calculated when the NAL unit was parsed
+  // with add_checksum set, which may not be the case here
+  if (parsing_options.add_checksum && checksum) {
     fdump_indent_level(outfp, indent_level);
     char checksum_printable[64] = {};
     checksum->fdump(checksum_printable, 64);
