@@ -52,6 +52,26 @@ if(POLICY CMP0077)
   cmake_policy(SET CMP0077 NEW)
 endif()
 
+option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" OFF)
+
+if(BUILD_CLANG_FUZZER)
+  if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    message(FATAL_ERROR "BUILD_CLANG_FUZZER requires Clang (found ${CMAKE_CXX_COMPILER_ID})")
+  endif()
+  # These have to be set here, before add_subdirectory(src):
+  # add_compile_options() only reaches the targets of the directory it is
+  # called from and of the subdirectories added after it, so setting them
+  # in fuzz/ leaves the library (built in src/) with no sanitizer and no
+  # coverage instrumentation. The fuzzers then link an uninstrumented
+  # libh265nal: libFuzzer gets no feedback from the parsers and mutates
+  # blind, and a memory error inside a parser goes unreported.
+  # Note that we ask for fuzzer-no-link rather than fuzzer: that is what
+  # instruments the library for coverage without linking libFuzzer's
+  # main() into everything. fuzz/ adds -fsanitize=fuzzer at link time.
+  add_compile_options(-fsanitize=address,undefined -fsanitize=fuzzer-no-link)
+  add_link_options(-fsanitize=address,undefined)
+endif()
+
 # Recurse into source code subdirectories.
 add_subdirectory(src)
 add_subdirectory(tools)
@@ -61,12 +81,7 @@ if(BUILD_H265_TESTS)
   add_subdirectory(test)
 endif()
 
-option(BUILD_CLANG_FUZZER "Build clang fuzzer sanitizer targets" OFF)
-
 if(BUILD_CLANG_FUZZER)
-  if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    message(FATAL_ERROR "BUILD_CLANG_FUZZER requires Clang (found ${CMAKE_CXX_COMPILER_ID})")
-  endif()
   add_subdirectory(fuzz)
 endif()
 
