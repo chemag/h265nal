@@ -270,10 +270,19 @@ bool BitBuffer::ReadSignedExponentialGolomb(int32_t& val) {
   if (!ReadExponentialGolomb(unsigned_val)) {
     return false;
   }
+  // Section 9.1.1: codeNum k maps to (-1)^(k+1) * Ceil(k / 2).
+  //
+  // Both halves are computed in uint32_t and converted once, at the end.
+  // Casting first and adding afterwards overflows for k == INT32_MAX,
+  // which is reachable: a 31 zero prefix reads a 32 bit value, so k covers
+  // [INT32_MAX, UINT32_MAX - 1]. Every result of this mapping does fit in
+  // an int32_t, since the extremes are k == UINT32_MAX - 2 giving
+  // +INT32_MAX and k == UINT32_MAX - 1 giving -INT32_MAX, and the largest
+  // odd k plus one is UINT32_MAX - 1, so the addition cannot wrap either.
   if ((unsigned_val & 1) == 0) {
     val = -static_cast<int32_t>(unsigned_val / 2);
   } else {
-    val = (static_cast<int32_t>(unsigned_val) + 1) / 2;
+    val = static_cast<int32_t>((unsigned_val + 1) / 2);
   }
   return true;
 }

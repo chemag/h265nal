@@ -172,4 +172,44 @@ TEST_F(H265CommonUnimplementedTest, TestUnimplementedCount) {
   EXPECT_EQ(0, get_unimplemented_count());
 }
 
+class H265CommonSignedGolombTest : public ::testing::Test {
+ public:
+  H265CommonSignedGolombTest() {}
+  ~H265CommonSignedGolombTest() override {}
+};
+
+TEST_F(H265CommonSignedGolombTest, TestReadSignedExponentialGolomb) {
+  // Section 9.1.1 maps codeNum k to (-1)^(k+1) * Ceil(k / 2).
+  struct {
+    std::vector<uint8_t> buffer;
+    int32_t expected;
+    const char* what;
+  } kTestcases[] = {
+      // small values, to pin the mapping itself
+      {{0x80}, 0, "k=0"},
+      {{0x40}, 1, "k=1"},
+      {{0x60}, -1, "k=2"},
+      {{0x20}, 2, "k=3"},
+      // k == INT32_MAX. Reachable: a 31 zero prefix reads a 32 bit value,
+      // so k covers [INT32_MAX, UINT32_MAX - 1]. Computing this branch as
+      // static_cast<int32_t>(k) + 1 overflows a signed int, which is
+      // undefined and in practice wrapped to INT32_MIN, so this returned
+      // -1073741824: the right magnitude with the wrong sign.
+      {{0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00}, 1073741824,
+       "k=INT32_MAX"},
+      // the extremes of the mapping, which do fit in an int32_t
+      {{0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xfc}, 2147483647,
+       "k=UINT32_MAX-2, the largest odd codeNum"},
+      {{0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0xfe}, -2147483647,
+       "k=UINT32_MAX-1, the largest even codeNum"},
+  };
+
+  for (const auto& testcase : kTestcases) {
+    BitBuffer bit_buffer(testcase.buffer.data(), testcase.buffer.size());
+    int32_t value = 0;
+    EXPECT_TRUE(bit_buffer.ReadSignedExponentialGolomb(value)) << testcase.what;
+    EXPECT_EQ(testcase.expected, value) << testcase.what;
+  }
+}
+
 }  // namespace h265nal
