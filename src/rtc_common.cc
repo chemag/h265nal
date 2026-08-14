@@ -23,9 +23,9 @@ namespace h265nal {
 #define RTC_DCHECK(cond) assert(cond)
 #define RTC_CHECK(cond) assert(cond)
 
-#define RTC_DCHECK_LE(v1, v2) RTC_DCHECK(v1 <= v2)
-#define RTC_DCHECK_LT(v1, v2) RTC_DCHECK(v1 < v2)
-#define RTC_DCHECK_GT(v1, v2) RTC_DCHECK(v1 > v2)
+#define RTC_DCHECK_LE(v1, v2) RTC_DCHECK((v1) <= (v2))
+#define RTC_DCHECK_LT(v1, v2) RTC_DCHECK((v1) < (v2))
+#define RTC_DCHECK_GT(v1, v2) RTC_DCHECK((v1) > (v2))
 
 // Returns the lowest (right-most) |bit_count| bits in |byte|.
 uint8_t LowestBits(uint8_t byte, size_t bit_count) {
