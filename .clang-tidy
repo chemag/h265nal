@@ -1,0 +1,37 @@
+# clang-tidy configuration, used both by "make tidy" and by editors that
+# pick up .clang-tidy (clangd, and so on), so that the two agree on what
+# counts as a finding.
+#
+# Check groups were chosen by counting what each costs on this tree:
+#
+#   clang-analyzer-*     0    the static analyzer is clean, keep it that way
+#   performance-*        3
+#   bugprone-*          34    7 once the two noisy checks below are off
+#   modernize-*        511    argues against the C++14 target
+#   readability-*      618
+#   misc-*             715
+#   cert-*             859
+#
+# The last four are left off: several hundred findings cannot be triaged,
+# and drown the ones worth acting on. Of the ones kept, clang-analyzer-*
+# is the path sensitive analyzer, which is the group most likely to catch
+# the memory errors the fuzzers keep finding in the parsers.
+---
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-easily-swappable-parameters,
+  -bugprone-branch-clone,
+  clang-analyzer-*,
+  performance-*
+
+# advisory, not a build gate: "make tidy" is run on purpose, not on every
+# build, and a finding here is a prompt to look rather than a failure
+WarningsAsErrors: ''
+
+# report findings inside this project's own headers, which are analysed as
+# part of the translation units that include them. Anything from a system
+# or third party header is not ours to fix.
+HeaderFilterRegex: '.*/(include|src)/(h265|rtc)[^/]*\.h$'
+
+FormatStyle: google

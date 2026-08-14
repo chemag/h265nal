@@ -10,17 +10,25 @@ project(h265nal VERSION 0.55)
 set(CMAKE_CXX_STANDARD 14)
 
 # clang-tidy: run as "make tidy" (not part of the normal build)
+#
+# The checks come from .clang-tidy in the source root, not from a -checks
+# argument here, so that an editor reading the same file reports the same
+# findings. Without either, clang-tidy enables nothing and exits with
+# "Error: no checks enabled", which is what this target used to do.
+#
+# Only the .cc files are listed. Headers are analysed as part of the
+# translation units that include them, selected by HeaderFilterRegex;
+# passing a header directly has no entry in the compilation database.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 if(CLANG_TIDY_EXE)
   file(GLOB_RECURSE ALL_CXX_SOURCES
     ${CMAKE_SOURCE_DIR}/src/*.cc
-    ${CMAKE_SOURCE_DIR}/include/*.h
   )
   add_custom_target(tidy
     COMMAND ${CLANG_TIDY_EXE}
       -p ${CMAKE_BINARY_DIR}
-      -format-style='google'
+      -quiet
       ${ALL_CXX_SOURCES}
     COMMENT "Running clang-tidy..."
     VERBATIM
