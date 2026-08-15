@@ -287,4 +287,37 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceInfersNumRefIdxFromPps) {
   EXPECT_EQ(6, slice_segment_header->slice_qp_delta);
 }
 
+TEST_F(H265SliceSegmentLayerParserTest, TestSliceZeroPicSizeInCtbsY) {
+  // A synthetic slice segment header with first_slice_segment_in_pic_flag
+  // unset, so the parser reads slice_segment_address, whose width is
+  // Ceil(Log2(PicSizeInCtbsY)) bits. The mock sps leaves the picture
+  // dimensions at zero, which makes PicSizeInCtbsY zero, and Ceil(Log2(0))
+  // is -inf: converting that to size_t is undefined.
+  //
+  // Note that the parse fails either way, so this pins the behaviour
+  // rather than discriminating the fix. What discriminates it is running
+  // h265_slice_parser_fuzzer under UndefinedBehaviorSanitizer.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0x40};
+
+  // fuzzer::conv: begin
+  // get some mock state
+  H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  bitstream_parser_state.pps[0] = pps;
+
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::TRAIL_R,
+          &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  EXPECT_EQ(0, sps->getPicSizeInCtbsY());
+  EXPECT_TRUE(slice_segment_layer == nullptr);
+}
+
 }  // namespace h265nal

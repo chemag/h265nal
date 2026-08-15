@@ -64,5 +64,19 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
           data, size, NalUnitType::TRAIL_R,
           &bitstream_parser_state);
   }
+  {
+  // get some mock state
+  H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  bitstream_parser_state.pps[0] = pps;
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          data, size, NalUnitType::TRAIL_R,
+          &bitstream_parser_state);
+  }
   return 0;
 }

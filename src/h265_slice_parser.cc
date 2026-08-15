@@ -159,6 +159,15 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
     }
     size_t PicSizeInCtbsY = sps->getPicSizeInCtbsY();
+    // Ceil(Log2(0)) is -inf, and converting that to an integer type is
+    // undefined, so the zero has to be caught before the conversion rather
+    // than by the slice_segment_address_len check below.
+    if (PicSizeInCtbsY == 0) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr, "invalid PicSizeInCtbsY: 0\n");
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     size_t slice_segment_address_len = static_cast<size_t>(
         std::ceil(std::log2(static_cast<float>(PicSizeInCtbsY))));
     if (slice_segment_address_len == 0) {
