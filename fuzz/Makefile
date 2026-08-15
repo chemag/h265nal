@@ -185,7 +185,7 @@ FUZZERS = \
     h265_nal_unit_parser_fuzzer \
     h265_configuration_box_parser_fuzzer
 
-.PHONY: fuzz $(FUZZERS)
+.PHONY: fuzz merge $(FUZZERS)
 
 fuzz: $(FUZZERS)
 
@@ -217,3 +217,45 @@ fuzz-report:
 	@grep -lE '^==[0-9]+==ERROR|runtime error:|ERROR: libFuzzer' logs/*.log 2>/dev/null \
 	    || echo 'logs: no findings'
 	@ls artifacts/*/* 2>/dev/null || echo 'artifacts: none'
+
+# Distill each corpus in place. libFuzzer's -merge=1 writes survivors into a
+# destination directory under their content hash, so swapping directories
+# would rename the unittest.*.bin seeds and any crash-* kept as a regression
+# input. Merge to a scratch directory instead and delete only the
+# content-addressed blobs that did not survive, leaving named files alone.
+# The result is a pure set of deletions, reviewable with git diff in the
+# corpus submodule before committing.
+merge: $(FUZZERS:%=merge-%)
+
+# The survivorship test reads "absent from the scratch directory" as "did
+# not survive", so anything that stops the merge early looks like a corpus
+# with no survivors and takes the whole thing with it. A crashing input is
+# enough to cause that, and UBSan findings abort by design since a1a029ab.
+# So check that the merge succeeded and produced something before deleting
+# anything, and leave the corpus alone otherwise.
+# -artifact_prefix matters here too. A merge replays every input in the
+# corpus, so it finds anything already in there that the current build
+# aborts on, and without a prefix libFuzzer writes those crash-<sha> files
+# into the working directory, i.e. loose in fuzz/. Send them to the same
+# artifacts/<target>/ the fuzz runs use.
+merge-%:
+	@mkdir -p artifacts/$*
+	@tmp=$$(mktemp -d); before=$$(ls -1 corpus/$* | wc -l); \
+	if ! ../build/fuzz/$* -merge=1 -merge_control_file=$$tmp/.ctl \
+	        -artifact_prefix=artifacts/$*/ $$tmp corpus/$* \
+	        >$$tmp/.log 2>&1; then \
+		echo "$*: merge failed, corpus untouched"; \
+		tail -3 $$tmp/.log | sed 's/^/    /'; \
+		rm -rf $$tmp; exit 0; \
+	fi; \
+	if [ "$$(ls -1 $$tmp | wc -l)" -eq 0 ]; then \
+		echo "$*: merge produced no survivors, corpus untouched"; \
+		rm -rf $$tmp; exit 0; \
+	fi; \
+	for f in corpus/$*/*; do \
+		b=$$(basename $$f); \
+		echo "$$b" | grep -qE '^[0-9a-f]{40}$$' || continue; \
+		[ -e "$$tmp/$$b" ] || rm -f "$$f"; \
+	done; \
+	rm -rf $$tmp; \
+	echo "$*: $$before -> $$(ls -1 corpus/$* | wc -l) files"
