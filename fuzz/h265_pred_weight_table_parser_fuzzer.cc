@@ -14,21 +14,30 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  // the code below is copied verbatim out of a unit test, where it sits
+  // inside "namespace h265nal", and so refers to the project's types
+  // unqualified. This entry point cannot: it has to be extern "C" at
+  // global scope. Pull the namespace in rather than qualifying each name,
+  // which would mean keeping a list of them here.
+  using namespace h265nal;  // NOLINT(build/namespaces)
+  // a test with no fuzzer::conv markers converts to an empty body
+  (void)data;
+  (void)size;
   {
-  auto pred_weight_table = h265nal::H265PredWeightTableParser::ParsePredWeightTable(
-      data, size, 1, h265nal::SliceType_P, 0, 0);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      data, size, 1, SliceType_P, 0, 0);
   }
   {
-  auto pred_weight_table = h265nal::H265PredWeightTableParser::ParsePredWeightTable(
-      data, size, 1, h265nal::SliceType_P, 2, 0);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      data, size, 1, SliceType_P, 2, 0);
   }
   {
-  auto pred_weight_table = h265nal::H265PredWeightTableParser::ParsePredWeightTable(
-      data, size, 1, h265nal::SliceType_B, 0, 0);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      data, size, 1, SliceType_B, 0, 0);
   }
   {
-  auto pred_weight_table = h265nal::H265PredWeightTableParser::ParsePredWeightTable(
-      data, size, 1, h265nal::SliceType_B, 1, 0);
+  auto pred_weight_table = H265PredWeightTableParser::ParsePredWeightTable(
+      data, size, 1, SliceType_B, 1, 0);
   }
   return 0;
 }

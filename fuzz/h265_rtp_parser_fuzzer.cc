@@ -14,9 +14,18 @@
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  // the code below is copied verbatim out of a unit test, where it sits
+  // inside "namespace h265nal", and so refers to the project's types
+  // unqualified. This entry point cannot: it has to be extern "C" at
+  // global scope. Pull the namespace in rather than qualifying each name,
+  // which would mean keeping a list of them here.
+  using namespace h265nal;  // NOLINT(build/namespaces)
+  // a test with no fuzzer::conv markers converts to an empty body
+  (void)data;
+  (void)size;
   {
-  h265nal::H265BitstreamParserState bitstream_parser_state;
-  auto rtp = h265nal::H265RtpParser::ParseRtp(data, size,
+  H265BitstreamParserState bitstream_parser_state;
+  auto rtp = H265RtpParser::ParseRtp(data, size,
                                      &bitstream_parser_state);
   }
   return 0;
