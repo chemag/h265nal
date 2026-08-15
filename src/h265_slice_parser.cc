@@ -697,6 +697,10 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
   //   is equal to 1, the value of num_entry_point_offsets shall be in the
   //   range of 0 to PicHeightInCtbsY - 1, inclusive.
   if (tiles_enabled_flag == 0 && entropy_coding_sync_enabled_flag == 1) {
+    // sps->getPicHeightInCtbsY() to zero causes -1 to wrap around
+    if (sps->getPicHeightInCtbsY() == 0) {
+      return false;
+    }
     return (num_entry_point_offsets_value <= (sps->getPicHeightInCtbsY() - 1));
   }
 
@@ -717,6 +721,10 @@ bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
   //   num_entry_point_offsets shall be in the range of 0 to
   // ( num_tile_columns_minus1 + 1 ) * PicHeightInCtbsY - 1, inclusive.
   if (tiles_enabled_flag == 1 && entropy_coding_sync_enabled_flag == 1) {
+    // sps->getPicHeightInCtbsY() to zero causes -1 to wrap around
+    if (sps->getPicHeightInCtbsY() == 0) {
+      return false;
+    }
     uint32_t max_num_entry_point_offsets =
         (((pps->num_tile_columns_minus1 + 1) * sps->getPicHeightInCtbsY()) - 1);
     return (num_entry_point_offsets_value <= max_num_entry_point_offsets);
