@@ -4,3 +4,6 @@ build/
 
 # fuzzer crash/oom/timeout artifacts (see fuzz/Makefile)
 artifacts/
+
+# fuzzer run logs (see fuzz/Makefile)
+logs/

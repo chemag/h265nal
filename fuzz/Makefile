@@ -1,3 +1,10 @@
+# The recipes below pipe into tee, and a pipeline reports the status of
+# its last command, so without pipefail a crashing fuzzer would look like
+# a success. pipefail is not in POSIX sh, hence bash. This applies to
+# every recipe in this file.
+SHELL := /bin/bash
+.SHELLFLAGS := -o pipefail -c
+
 
 
 
@@ -118,11 +125,37 @@ h265_configuration_box_parser_fuzzer.cc: ../test/h265_configuration_box_parser_u
 RUNS ?= 1000000
 
 # Extra libFuzzer flags. Fork mode by default: without it libFuzzer exits
-# on the first finding, so one bug ends that target's run. The cost is that
-# -runs stops being exact, because the parent only checks the total at job
-# boundaries; expect it to overshoot by 3-30x. When the run count has to be
-# exact, turn it off with FUZZ_FLAGS= on the command line.
+# on the first finding, so one bug ends that target's run. Note that either
+# way a crash only ends that one target, never the campaign, because the
+# recipe below is prefixed with -.
+#
+# The cost is that -runs stops being exact, because the parent only checks
+# the total at job boundaries; expect it to overshoot by 3-30x. When the run
+# count has to be exact, turn it off with FUZZ_FLAGS= on the command line.
+#
+# Use FUZZ_FLAGS= as well whenever a target is new, or already known to be
+# crashing, and the point of the run is to get a reproducer rather than
+# coverage:
+#
+#   * Fork mode buys the rest of the budget on a target that has already
+#     failed, so it finds more.
+#   * It pays for that in artifacts: one bug can produce many, all replaying
+#     to one site, so triage means replaying each and grouping on the
+#     failure location.
+#   * Worse for a reproducer, a crash in the fork parent, before any child
+#     runs, prints its AddressSanitizer report and exits without writing an
+#     artifact at all. The input is then gone: the seed libFuzzer prints is
+#     the parent's, and replaying it does not reproduce a child's work.
+#
+# So: fork for soaks, FUZZ_FLAGS= when chasing something.
 FUZZ_FLAGS ?= -fork=1 -ignore_crashes=1
+
+# libFuzzer picks a random seed per run and prints it. A finding that does
+# not become an artifact is only reproducible if that seed is known, so it
+# is worth reading out of the log and replaying with SEED=<n>. Empty by
+# default, which leaves libFuzzer's own randomness in place.
+SEED ?=
+SEED_FLAG = $(if $(SEED),-seed=$(SEED),)
 
 FUZZERS = \
     h265_utils_fuzzer \
@@ -162,8 +195,25 @@ fuzz: $(FUZZERS)
 # that same directory means a target that crashes once replays its own
 # crash as a seed and never starts again. Keeping them apart leaves corpus/
 # as the growing input set and artifacts/ as the list of things to act on.
-# The mkdir deliberately has no - prefix: libFuzzer refuses to start when
-# the artifact directory is missing, so failing here is better.
+# Neither mkdir has a - prefix: libFuzzer refuses to start when either the
+# artifact directory or the corpus directory is missing, reporting 'ERROR:
+# The required directory "..." does not exist', so failing here is better.
+# corpus/$@ is created rather than assumed because a target added to
+# FUZZERS has no seeds until its first run.
+# Everything is teed to logs/$@.log. artifacts/ is not sufficient on its
+# own: in fork mode a crash in the parent, before any child runs, prints
+# an AddressSanitizer report and exits without writing an artifact, so the
+# run looks clean by every other measure. The log is the only place it
+# appears.
 $(FUZZERS):
-	mkdir -p artifacts/$@
-	-../build/fuzz/$@ -artifact_prefix=artifacts/$@/ corpus/$@/ -runs=$(RUNS) $(FUZZ_FLAGS)
+	mkdir -p artifacts/$@ corpus/$@ logs
+	-../build/fuzz/$@ -artifact_prefix=artifacts/$@/ corpus/$@/ \
+	    -runs=$(RUNS) $(SEED_FLAG) $(FUZZ_FLAGS) 2>&1 | tee logs/$@.log
+
+# What did the last campaign find? Reads the logs, not just artifacts/,
+# for the reason above.
+.PHONY: fuzz-report
+fuzz-report:
+	@grep -lE '^==[0-9]+==ERROR|runtime error:|ERROR: libFuzzer' logs/*.log 2>/dev/null \
+	    || echo 'logs: no findings'
+	@ls artifacts/*/* 2>/dev/null || echo 'artifacts: none'
