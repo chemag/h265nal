@@ -20,6 +20,9 @@ function(add_fuzzer TARGET SOURCE)
 endfunction()
 
 add_fuzzer(h265_utils_fuzzer h265_utils_fuzzer.cc)
+
+# Hand-written, not produced by converter.py. See the comment in the source.
+add_fuzzer(h265_common__unescape_rbsp_fuzzer h265_common__unescape_rbsp_fuzzer.cc)
 add_fuzzer(h265_profile_tier_level_parser_fuzzer h265_profile_tier_level_parser_fuzzer.cc)
 add_fuzzer(h265_sub_layer_hrd_parameters_parser_fuzzer h265_sub_layer_hrd_parameters_parser_fuzzer.cc)
 add_fuzzer(h265_hrd_parameters_parser_fuzzer h265_hrd_parameters_parser_fuzzer.cc)

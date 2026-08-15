@@ -188,7 +188,8 @@ FUZZERS = \
     h265_slice_parser_fuzzer \
     h265_bitstream_parser_fuzzer \
     h265_nal_unit_parser_fuzzer \
-    h265_configuration_box_parser_fuzzer
+    h265_configuration_box_parser_fuzzer \
+    h265_common__unescape_rbsp_fuzzer
 
 .PHONY: fuzz merge $(FUZZERS)
 
