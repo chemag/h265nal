@@ -117,12 +117,12 @@ h265_configuration_box_parser_fuzzer.cc: ../test/h265_configuration_box_parser_u
 
 RUNS ?= 1000000
 
-# Extra libFuzzer flags. Empty by default so that -runs is honored exactly:
-# in fork mode it degrades to a floor checked at job boundaries, and
-# overshoots by 3-30x. For a long soak, where a finding should not end the
-# run, pass FUZZ_FLAGS='-fork=1 -ignore_crashes=1' and read RUNS as a
-# minimum rather than a count.
-FUZZ_FLAGS ?=
+# Extra libFuzzer flags. Fork mode by default: without it libFuzzer exits
+# on the first finding, so one bug ends that target's run. The cost is that
+# -runs stops being exact, because the parent only checks the total at job
+# boundaries; expect it to overshoot by 3-30x. When the run count has to be
+# exact, turn it off with FUZZ_FLAGS= on the command line.
+FUZZ_FLAGS ?= -fork=1 -ignore_crashes=1
 
 FUZZERS = \
     h265_utils_fuzzer \
