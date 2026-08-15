@@ -38,7 +38,9 @@ uint8_t LowestBits(uint8_t byte, size_t bit_count) {
 uint8_t HighestBits(uint8_t byte, size_t bit_count) {
   RTC_DCHECK_LE(bit_count, 8);
   uint8_t shift = 8 - static_cast<uint8_t>(bit_count);
-  uint8_t mask = 0xFF << shift;
+  // 0xFF promotes to int before the shift; the truncation back to uint8_t
+  // is the point of the mask, not an accident.
+  uint8_t mask = static_cast<uint8_t>(0xFF << shift);
   return (byte & mask) >> shift;
 }
 
