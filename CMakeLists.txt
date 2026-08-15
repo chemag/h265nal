@@ -79,8 +79,20 @@ if(BUILD_CLANG_FUZZER)
   # UBSan defaults to recoverable: it detects real UB, prints to stderr, and
   # lets the process continue, so libFuzzer never sees a crash and writes no
   # artifact. no-sanitize-recover puts it at parity with ASan, which aborts.
-  add_compile_options(-fsanitize=address,undefined -fno-sanitize-recover=undefined -fsanitize=fuzzer-no-link)
-  add_link_options(-fsanitize=address,undefined -fno-sanitize-recover=undefined)
+  # -fsanitize=undefined is a group, not all of UBSan. It leaves unsigned
+  # wraparound and implicit integer truncation unchecked, both of which are
+  # ordinary bugs in a parser reading attacker-controlled widths even though
+  # neither is undefined behaviour. Enable them, but keep them recoverable:
+  # real UB aborts and produces a libFuzzer artifact, while the two new
+  # classes only report, so a noisy one cannot end a campaign. Promote them
+  # with -fno-sanitize-recover once the reports are clean. Order matters,
+  # the later -fsanitize-recover wins over the earlier -fno-.
+  set(H265NAL_SAN_FLAGS
+      -fsanitize=address,undefined,unsigned-integer-overflow,implicit-conversion,local-bounds,float-divide-by-zero
+      -fno-sanitize-recover=undefined
+      -fsanitize-recover=unsigned-integer-overflow,implicit-conversion)
+  add_compile_options(${H265NAL_SAN_FLAGS} -fsanitize=fuzzer-no-link)
+  add_link_options(${H265NAL_SAN_FLAGS})
 endif()
 
 # Recurse into source code subdirectories.
