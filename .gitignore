@@ -1,3 +1,6 @@
 
 # cmake stuff
 build/
+
+# fuzzer crash/oom/timeout artifacts (see fuzz/Makefile)
+artifacts/

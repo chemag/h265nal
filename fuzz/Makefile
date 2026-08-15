@@ -115,9 +115,16 @@ h265_configuration_box_parser_fuzzer.cc: ../test/h265_configuration_box_parser_u
 	./converter.py ../test/h265_configuration_box_parser_unittest.cc ./
 
 
-RUNS?=1000000
+RUNS ?= 1000000
 
-fuzz: \
+# Extra libFuzzer flags. Empty by default so that -runs is honored exactly:
+# in fork mode it degrades to a floor checked at job boundaries, and
+# overshoots by 3-30x. For a long soak, where a finding should not end the
+# run, pass FUZZ_FLAGS='-fork=1 -ignore_crashes=1' and read RUNS as a
+# minimum rather than a count.
+FUZZ_FLAGS ?=
+
+FUZZERS = \
     h265_utils_fuzzer \
     h265_profile_tier_level_parser_fuzzer \
     h265_sub_layer_hrd_parameters_parser_fuzzer \
@@ -145,81 +152,18 @@ fuzz: \
     h265_nal_unit_parser_fuzzer \
     h265_configuration_box_parser_fuzzer
 
-h265_utils_fuzzer:
-	-../build/fuzz/h265_utils_fuzzer -artifact_prefix=corpus/h265_utils_fuzzer/ corpus/h265_utils_fuzzer/ -runs=$(RUNS)
+.PHONY: fuzz $(FUZZERS)
 
-h265_profile_tier_level_parser_fuzzer:
-	-../build/fuzz/h265_profile_tier_level_parser_fuzzer -artifact_prefix=corpus/h265_profile_tier_level_parser_fuzzer/ corpus/h265_profile_tier_level_parser_fuzzer/ -runs=$(RUNS)
+fuzz: $(FUZZERS)
 
-h265_sub_layer_hrd_parameters_parser_fuzzer:
-	-../build/fuzz/h265_sub_layer_hrd_parameters_parser_fuzzer -artifact_prefix=corpus/h265_sub_layer_hrd_parameters_parser_fuzzer/ corpus/h265_sub_layer_hrd_parameters_parser_fuzzer/ -runs=$(RUNS)
-
-h265_hrd_parameters_parser_fuzzer:
-	-../build/fuzz/h265_hrd_parameters_parser_fuzzer -artifact_prefix=corpus/h265_hrd_parameters_parser_fuzzer/ corpus/h265_hrd_parameters_parser_fuzzer/ -runs=$(RUNS)
-
-h265_vps_parser_fuzzer:
-	-../build/fuzz/h265_vps_parser_fuzzer -artifact_prefix=corpus/h265_vps_parser_fuzzer/ corpus/h265_vps_parser_fuzzer/ -runs=$(RUNS)
-
-h265_vui_parameters_parser_fuzzer:
-	-../build/fuzz/h265_vui_parameters_parser_fuzzer -artifact_prefix=corpus/h265_vui_parameters_parser_fuzzer/ corpus/h265_vui_parameters_parser_fuzzer/ -runs=$(RUNS)
-
-h265_pred_weight_table_parser_fuzzer:
-	-../build/fuzz/h265_pred_weight_table_parser_fuzzer -artifact_prefix=corpus/h265_pred_weight_table_parser_fuzzer/ corpus/h265_pred_weight_table_parser_fuzzer/ -runs=$(RUNS)
-
-h265_st_ref_pic_set_parser_fuzzer:
-	-../build/fuzz/h265_st_ref_pic_set_parser_fuzzer -artifact_prefix=corpus/h265_st_ref_pic_set_parser_fuzzer/ corpus/h265_st_ref_pic_set_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sps_scc_extension_parser_fuzzer:
-	-../build/fuzz/h265_sps_scc_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_scc_extension_parser_fuzzer/ corpus/h265_sps_scc_extension_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sps_multilayer_extension_parser_fuzzer:
-	-../build/fuzz/h265_sps_multilayer_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_multilayer_extension_parser_fuzzer/ corpus/h265_sps_multilayer_extension_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sps_3d_extension_parser_fuzzer:
-	-../build/fuzz/h265_sps_3d_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_3d_extension_parser_fuzzer/ corpus/h265_sps_3d_extension_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sps_range_extension_parser_fuzzer:
-	-../build/fuzz/h265_sps_range_extension_parser_fuzzer -artifact_prefix=corpus/h265_sps_range_extension_parser_fuzzer/ corpus/h265_sps_range_extension_parser_fuzzer/ -runs=$(RUNS)
-
-h265_scaling_list_data_parser_fuzzer:
-	-../build/fuzz/h265_scaling_list_data_parser_fuzzer -artifact_prefix=corpus/h265_scaling_list_data_parser_fuzzer/ corpus/h265_scaling_list_data_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sps_parser_fuzzer:
-	-../build/fuzz/h265_sps_parser_fuzzer -artifact_prefix=corpus/h265_sps_parser_fuzzer/ corpus/h265_sps_parser_fuzzer/ -runs=$(RUNS)
-
-h265_pps_scc_extension_parser_fuzzer:
-	-../build/fuzz/h265_pps_scc_extension_parser_fuzzer -artifact_prefix=corpus/h265_pps_scc_extension_parser_fuzzer/ corpus/h265_pps_scc_extension_parser_fuzzer/ -runs=$(RUNS)
-
-h265_pps_parser_fuzzer:
-	-../build/fuzz/h265_pps_parser_fuzzer -artifact_prefix=corpus/h265_pps_parser_fuzzer/ corpus/h265_pps_parser_fuzzer/ -runs=$(RUNS)
-
-h265_aud_parser_fuzzer:
-	-../build/fuzz/h265_aud_parser_fuzzer -artifact_prefix=corpus/h265_aud_parser_fuzzer/ corpus/h265_aud_parser_fuzzer/ -runs=$(RUNS)
-
-h265_sei_parser_fuzzer:
-	-../build/fuzz/h265_sei_parser_fuzzer -artifact_prefix=corpus/h265_sei_parser_fuzzer/ corpus/h265_sei_parser_fuzzer/ -runs=$(RUNS)
-
-h265_rtp_single_parser_fuzzer:
-	-../build/fuzz/h265_rtp_single_parser_fuzzer -artifact_prefix=corpus/h265_rtp_single_parser_fuzzer/ corpus/h265_rtp_single_parser_fuzzer/ -runs=$(RUNS)
-
-h265_rtp_parser_fuzzer:
-	-../build/fuzz/h265_rtp_parser_fuzzer -artifact_prefix=corpus/h265_rtp_parser_fuzzer/ corpus/h265_rtp_parser_fuzzer/ -runs=$(RUNS)
-
-h265_rtp_ap_parser_fuzzer:
-	-../build/fuzz/h265_rtp_ap_parser_fuzzer -artifact_prefix=corpus/h265_rtp_ap_parser_fuzzer/ corpus/h265_rtp_ap_parser_fuzzer/ -runs=$(RUNS)
-
-h265_rtp_fu_parser_fuzzer:
-	-../build/fuzz/h265_rtp_fu_parser_fuzzer -artifact_prefix=corpus/h265_rtp_fu_parser_fuzzer/ corpus/h265_rtp_fu_parser_fuzzer/ -runs=$(RUNS)
-
-h265_slice_parser_fuzzer:
-	-../build/fuzz/h265_slice_parser_fuzzer -artifact_prefix=corpus/h265_slice_parser_fuzzer/ corpus/h265_slice_parser_fuzzer/ -runs=$(RUNS)
-
-h265_bitstream_parser_fuzzer:
-	-../build/fuzz/h265_bitstream_parser_fuzzer -artifact_prefix=corpus/h265_bitstream_parser_fuzzer/ corpus/h265_bitstream_parser_fuzzer/ -runs=$(RUNS)
-
-h265_nal_unit_parser_fuzzer:
-	-../build/fuzz/h265_nal_unit_parser_fuzzer -artifact_prefix=corpus/h265_nal_unit_parser_fuzzer/ corpus/h265_nal_unit_parser_fuzzer/ -runs=$(RUNS)
-
-h265_configuration_box_parser_fuzzer:
-	-../build/fuzz/h265_configuration_box_parser_fuzzer -artifact_prefix=corpus/h265_configuration_box_parser_fuzzer/ corpus/h265_configuration_box_parser_fuzzer/ -runs=$(RUNS)
-
+# Failing inputs go to artifacts/, not into corpus/. libFuzzer executes
+# every file in the corpus directory at startup, and separately writes new
+# coverage-increasing inputs back into it, so pointing -artifact_prefix at
+# that same directory means a target that crashes once replays its own
+# crash as a seed and never starts again. Keeping them apart leaves corpus/
+# as the growing input set and artifacts/ as the list of things to act on.
+# The mkdir deliberately has no - prefix: libFuzzer refuses to start when
+# the artifact directory is missing, so failing here is better.
+$(FUZZERS):
+	mkdir -p artifacts/$@
+	-../build/fuzz/$@ -artifact_prefix=artifacts/$@/ corpus/$@/ -runs=$(RUNS) $(FUZZ_FLAGS)
