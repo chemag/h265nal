@@ -160,4 +160,25 @@ TEST_F(H265ScalingListDataParserTest, TestSampleScalingListData01) {
   EXPECT_EQ(0, scaling_list_data->ScalingList[3][5].size());
 }
 
+TEST_F(H265ScalingListDataParserTest, TestScalingListDeltaCoefOutOfRange) {
+  // A synthetic scaling_list_data() whose first scaling_list_delta_coef is
+  // 128, one past the +127 that Section 7.4.5 allows. nextCoef is derived
+  // from it in an int32_t, so an unbounded value overflows.
+  //
+  // The rest of the structure is well formed: the other 15 coefficients of
+  // the first list are zero, and the remaining 19 matrices are predicted
+  // with a delta of zero. So the parse only fails on the range check, and
+  // the test still means something if that check is removed.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0x80, 0x40, 0x3f, 0xff, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa
+  };
+  // fuzzer::conv: begin
+  auto scaling_list_data = H265ScalingListDataParser::ParseScalingListData(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(scaling_list_data == nullptr);
+}
+
 }  // namespace h265nal

@@ -94,6 +94,18 @@ H265ScalingListDataParser::ParseScalingListData(
                   scaling_list_delta_coef)) {
             return nullptr;
           }
+          if (scaling_list_delta_coef < kScalingListDeltaCoefMin ||
+              scaling_list_delta_coef > kScalingListDeltaCoefMax) {
+#ifdef FPRINT_ERRORS
+            fprintf(stderr,
+                    "invalid scaling_list_delta_coef: %" PRIi32
+                    " not in range "
+                    "[%" PRIi32 ", %" PRIi32 "]\n",
+                    scaling_list_delta_coef, kScalingListDeltaCoefMin,
+                    kScalingListDeltaCoefMax);
+#endif  // FPRINT_ERRORS
+            return nullptr;
+          }
           nextCoef = static_cast<uint32_t>(static_cast<int32_t>(nextCoef) +
                                            scaling_list_delta_coef + 256) %
                      256;

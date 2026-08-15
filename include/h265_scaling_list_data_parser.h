@@ -18,6 +18,11 @@ namespace h265nal {
 // of the 2018-02 standard) from an H265 NALU.
 class H265ScalingListDataParser {
  public:
+  // Section 7.4.5: "The value of scaling_list_delta_coef shall be in the
+  // range of -128 to +127, inclusive."
+  const static int32_t kScalingListDeltaCoefMin = -128;
+  const static int32_t kScalingListDeltaCoefMax = 127;
+
   // The parsed state of the ScalingListData.
   struct ScalingListDataState {
     ScalingListDataState() = default;
