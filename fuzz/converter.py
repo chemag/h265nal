@@ -31,6 +31,15 @@ $include
 
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
+  // the code below is copied verbatim out of a unit test, where it sits
+  // inside "namespace h265nal", and so refers to the project's types
+  // unqualified. This entry point cannot: it has to be extern "C" at
+  // global scope. Pull the namespace in rather than qualifying each name,
+  // which would mean keeping a list of them here.
+  using namespace h265nal;  // NOLINT(build/namespaces)
+  // a test with no fuzzer::conv markers converts to an empty body
+  (void)data;
+  (void)size;
 $code
   return 0;
 }
@@ -155,20 +164,15 @@ def parse_input(lines, debug):
                                             data_bytes)))
 
     # clean the code
-    output['code'] = ''
-    for line in lines_code:
-        # add h265nal namespace if needed
-        if 'H265' in line:
-            line = line.replace('H265', 'h265nal::H265')
-        if 'NalUnitType::' in line:
-            line = line.replace('NalUnitType::', 'h265nal::NalUnitType::')
-        if 'SliceType_' in line:
-            line = line.replace('SliceType_', 'h265nal::SliceType_')
-        if 'ParsingOptions ' in line:
-            line = line.replace('ParsingOptions ', 'h265nal::ParsingOptions ')
-        line = line.replace('buffer, arraysize(buffer)', 'data, size')
-        output['code'] += line
-    output['code'].strip('\n')
+    # feed the fuzzer input in wherever the test passes its own buffer.
+    # The buffer is not always called "buffer": a test declaring more than
+    # one gives each a distinct name, so match whatever name the test used
+    # on both sides of the arraysize() call. Match on the whole block
+    # rather than line by line, because clang-format wraps a long enough
+    # call between the two arguments.
+    output['code'] = ''.join(lines_code)
+    output['code'] = re.sub(r'\b(\w+),\s*arraysize\(\1\)', 'data, size',
+                            output['code'])
     output['code'] = output['code'].strip('\n')
 
     return output
