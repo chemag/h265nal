@@ -25,6 +25,10 @@ class H265StRefPicSetParser {
   // of 0 to 2^15 - 1, inclusive."
   const static uint32_t kAbsDeltaRpsMinus1Min = 0;
   const static uint32_t kAbsDeltaRpsMinus1Max = 32767;
+  // Section 7.4.8: "The value of delta_poc_s0_minus1[i] shall be in the
+  // range of 0 to 2^15 - 1, inclusive." Same for delta_poc_s1_minus1[i].
+  const static uint32_t kDeltaPocSxMinus1Min = 0;
+  const static uint32_t kDeltaPocSxMinus1Max = 32767;
   // Section 7.4.8: "When nuh_layer_id of the current picture is equal to 0,
   // the value of num_negative_pics shall be in the range of 0 to
   // sps_max_dec_pic_buffering_minus1[sps_max_sub_layers_minus1],

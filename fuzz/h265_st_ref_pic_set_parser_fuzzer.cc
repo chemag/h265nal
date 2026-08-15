@@ -36,5 +36,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
       data, size, 1, 1, &st_ref_pic_set_state_vector, 16);
   }
+  {
+  std::vector<std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>>
+      st_ref_pic_set_state_vector;
+  auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
+      data, size, 0, 1, &st_ref_pic_set_state_vector, 16);
+  }
   return 0;
 }

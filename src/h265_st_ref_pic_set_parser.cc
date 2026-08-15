@@ -341,6 +341,17 @@ H265StRefPicSetParser::ParseStRefPicSet(
       if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
         return nullptr;
       }
+      if (golomb_tmp < kDeltaPocSxMinus1Min ||
+          golomb_tmp > kDeltaPocSxMinus1Max) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "invalid delta_poc_s0_minus1: %" PRIu32
+                " not in range "
+                "[%" PRIu32 ", %" PRIu32 "]\n",
+                golomb_tmp, kDeltaPocSxMinus1Min, kDeltaPocSxMinus1Max);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
       st_ref_pic_set->delta_poc_s0_minus1.push_back(golomb_tmp);
 
       // used_by_curr_pic_s0_flag[i] u(1)
@@ -353,6 +364,17 @@ H265StRefPicSetParser::ParseStRefPicSet(
     for (uint32_t i = 0; i < st_ref_pic_set->num_positive_pics; i++) {
       // delta_poc_s1_minus1[i] ue(v)
       if (!bit_buffer->ReadExponentialGolomb(golomb_tmp)) {
+        return nullptr;
+      }
+      if (golomb_tmp < kDeltaPocSxMinus1Min ||
+          golomb_tmp > kDeltaPocSxMinus1Max) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "invalid delta_poc_s1_minus1: %" PRIu32
+                " not in range "
+                "[%" PRIu32 ", %" PRIu32 "]\n",
+                golomb_tmp, kDeltaPocSxMinus1Min, kDeltaPocSxMinus1Max);
+#endif  // FPRINT_ERRORS
         return nullptr;
       }
       st_ref_pic_set->delta_poc_s1_minus1.push_back(golomb_tmp);

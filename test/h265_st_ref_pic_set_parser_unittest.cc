@@ -99,4 +99,21 @@ TEST_F(H265StRefPicSetParserTest, TestRefRpsIdxOobBoundsCheck) {
   EXPECT_TRUE(st_ref_pic_set == nullptr);
 }
 
+TEST_F(H265StRefPicSetParserTest, TestDeltaPocS0Minus1OutOfRange) {
+  // A synthetic st_ref_pic_set() with num_negative_pics 1 and
+  // delta_poc_s0_minus1[0] set to 32768, one past the 2^15 - 1 that
+  // Section 7.4.8 allows. DeriveValues() adds one to that value and
+  // accumulates it in an int32_t, so an unbounded value overflows.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0x50, 0x00, 0x10, 0x00, 0x30};
+  // fuzzer::conv: begin
+  std::vector<std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>>
+      st_ref_pic_set_state_vector;
+  auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
+      buffer, arraysize(buffer), 0, 1, &st_ref_pic_set_state_vector, 16);
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(st_ref_pic_set == nullptr);
+}
+
 }  // namespace h265nal
