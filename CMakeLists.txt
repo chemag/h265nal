@@ -76,8 +76,11 @@ if(BUILD_CLANG_FUZZER)
   # Note that we ask for fuzzer-no-link rather than fuzzer: that is what
   # instruments the library for coverage without linking libFuzzer's
   # main() into everything. fuzz/ adds -fsanitize=fuzzer at link time.
-  add_compile_options(-fsanitize=address,undefined -fsanitize=fuzzer-no-link)
-  add_link_options(-fsanitize=address,undefined)
+  # UBSan defaults to recoverable: it detects real UB, prints to stderr, and
+  # lets the process continue, so libFuzzer never sees a crash and writes no
+  # artifact. no-sanitize-recover puts it at parity with ASan, which aborts.
+  add_compile_options(-fsanitize=address,undefined -fno-sanitize-recover=undefined -fsanitize=fuzzer-no-link)
+  add_link_options(-fsanitize=address,undefined -fno-sanitize-recover=undefined)
 endif()
 
 # Recurse into source code subdirectories.
