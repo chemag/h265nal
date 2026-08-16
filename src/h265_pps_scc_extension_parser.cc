@@ -104,7 +104,7 @@ H265PpsSccExtensionParser::ParsePpsSccExtension(
         return nullptr;
       }
 
-      if (pps_scc_extension->monochrome_palette_flag) {
+      if (!pps_scc_extension->monochrome_palette_flag) {
         // chroma_bit_depth_entry_minus8  ue(v)
         if (!bit_buffer->ReadExponentialGolomb(
                 pps_scc_extension->chroma_bit_depth_entry_minus8)) {
