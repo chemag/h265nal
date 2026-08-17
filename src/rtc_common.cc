@@ -260,7 +260,14 @@ bool BitBuffer::ReadExponentialGolomb(uint32_t& val) {
   // read the value.
   size_t value_bit_count = zero_bit_count + 1;
   if (value_bit_count > 32 || !ReadBits(value_bit_count, val)) {
-    RTC_CHECK(Seek(original_byte_offset, original_bit_offset));
+    // Seek() has to be called, not asserted: RTC_CHECK is assert(), which
+    // does not evaluate its argument under NDEBUG, so in a release build
+    // the rewind never happened and a failed read left the bit buffer
+    // wherever it stopped. Both offsets came from this object, so the
+    // seek cannot fail, but check it rather than discard it.
+    bool seek_ok = Seek(original_byte_offset, original_bit_offset);
+    RTC_CHECK(seek_ok);
+    (void)seek_ok;
     return false;
   }
   val -= 1;

@@ -212,4 +212,37 @@ TEST_F(H265CommonSignedGolombTest, TestReadSignedExponentialGolomb) {
   }
 }
 
+class H265CommonBitBufferTest : public ::testing::Test {
+ public:
+  H265CommonBitBufferTest() {}
+  ~H265CommonBitBufferTest() override {}
+};
+
+TEST_F(H265CommonBitBufferTest, TestReadExponentialGolombRewindsOnFailure) {
+  // 40 leading zero bits, so zero_bit_count reaches 40 and the value would
+  // be 41 bits wide, past the 32 bit cap, and the read fails. Counting
+  // those zeros consumed them, so the failure path has to rewind: a caller
+  // that tries a different syntax element after a failed ue(v) must see
+  // the bit buffer where it left it.
+  //
+  // Note this only discriminates in a build with NDEBUG defined. The
+  // rewind used to sit inside RTC_CHECK(), which is assert(), so it did
+  // run in a debug build and did not in a release one.
+  const uint8_t buffer[] = {0x00, 0x00, 0x00, 0x00, 0x00};
+  BitBuffer bit_buffer(buffer, arraysize(buffer));
+
+  size_t byte_offset = 0;
+  size_t bit_offset = 0;
+  bit_buffer.GetCurrentOffset(&byte_offset, &bit_offset);
+  EXPECT_EQ(0, byte_offset);
+  EXPECT_EQ(0, bit_offset);
+
+  uint32_t val = 0;
+  EXPECT_FALSE(bit_buffer.ReadExponentialGolomb(val));
+
+  bit_buffer.GetCurrentOffset(&byte_offset, &bit_offset);
+  EXPECT_EQ(0, byte_offset);
+  EXPECT_EQ(0, bit_offset);
+}
+
 }  // namespace h265nal
