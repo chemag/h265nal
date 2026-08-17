@@ -25,8 +25,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   {
   auto sps = H265SpsParser::ParseSps(data, size);
   }
-  {
-  auto sps = H265SpsParser::ParseSps(data, size);
-  }
   return 0;
 }

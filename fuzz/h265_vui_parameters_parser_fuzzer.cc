@@ -27,15 +27,5 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
       data, size, sps_max_sub_layers_minus1);
   }
-  {
-  uint32_t sps_max_sub_layers_minus1 = 0;
-  auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
-      data, size, sps_max_sub_layers_minus1);
-  }
-  {
-  uint32_t sps_max_sub_layers_minus1 = 0;
-  auto vui_parameters = H265VuiParametersParser::ParseVuiParameters(
-      data, size, sps_max_sub_layers_minus1);
-  }
   return 0;
 }
