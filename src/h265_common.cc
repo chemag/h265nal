@@ -721,9 +721,18 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
   int i = 0;
   uint8_t val8 = 0;
   val = 0;
-  while (bit_buffer->RemainingBitCount() > 0) {
-    (void)bit_buffer->ReadUInt8(val8);
-    val |= (static_cast<uint32_t>(val8) << (8 * (3 - i)));
+  // The loop above consumes whole 32 bit words, so at most 3 bytes are
+  // left, and i cannot exceed 2. Both bounds are stated anyway rather than
+  // inferred: a bit buffer that is not byte aligned on entry can be left
+  // with 1 to 7 bits, which is "> 0" but not enough for ReadUInt8. A
+  // failed read consumes nothing, so testing RemainingBitCount() > 0 and
+  // discarding the result of ReadUInt8() spins forever, shifting by
+  // 8 * (3 - i) with i climbing past 3.
+  while (bit_buffer->RemainingBitCount() >= 8 && i < 4) {
+    if (!bit_buffer->ReadUInt8(val8)) {
+      break;
+    }
+    val |= static_cast<uint32_t>(val8) << (8 * (3 - i));
     i += 1;
   }
   if (i > 0) {
