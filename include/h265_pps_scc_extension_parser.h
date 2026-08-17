@@ -18,6 +18,13 @@ namespace h265nal {
 // of the 2016-12 standard) from an H265 NALU.
 class H265PpsSccExtensionParser {
  public:
+  // Section 7.4.3.3.3: luma_bit_depth_entry_minus8 shall be equal to
+  // bit_depth_luma_minus8, and chroma_bit_depth_entry_minus8 to
+  // bit_depth_chroma_minus8, both of which Section 7.4.3.2 puts in the
+  // range of 0 to 8, inclusive. Bit depths above 8 + 8 do not exist.
+  const static uint32_t kBitDepthEntryMinus8Min = 0;
+  const static uint32_t kBitDepthEntryMinus8Max = 8;
+
   // The parsed state of the PpsSccExtension.
   struct PpsSccExtensionState {
     PpsSccExtensionState() = default;

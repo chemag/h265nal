@@ -89,4 +89,25 @@ TEST_F(H265PpsSccExtensionParserTest, TestPaletteInitializersNonMonochrome) {
               ::testing::ElementsAreArray({0x303, 0x004}));
 }
 
+TEST_F(H265PpsSccExtensionParserTest, TestLumaBitDepthEntryOutOfRange) {
+  // A synthetic pps_scc_extension() with luma_bit_depth_entry_minus8 set
+  // to 9, one past what Section 7.4.3.2 allows for the bit depth it has
+  // to equal. monochrome_palette_flag is 1, so there is no chroma entry
+  // and a single component.
+  //
+  // The buffer carries the 17 bits that the unbounded code would read, so
+  // without the range check the parse succeeds and reports a 25 bit
+  // palette entry. TestEnormousLumaBitDepth covers only the value that
+  // wraps the "+ 8" to exactly zero; anything else, this one included,
+  // used to sail past that guard.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0x2a, 0x2a, 0xaa, 0xaa};
+  // fuzzer::conv: begin
+  auto pps_scc_extension = H265PpsSccExtensionParser::ParsePpsSccExtension(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps_scc_extension == nullptr);
+}
+
 }  // namespace h265nal

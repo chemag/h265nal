@@ -103,11 +103,39 @@ H265PpsSccExtensionParser::ParsePpsSccExtension(
               pps_scc_extension->luma_bit_depth_entry_minus8)) {
         return nullptr;
       }
+      if (pps_scc_extension->luma_bit_depth_entry_minus8 <
+              kBitDepthEntryMinus8Min ||
+          pps_scc_extension->luma_bit_depth_entry_minus8 >
+              kBitDepthEntryMinus8Max) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "invalid luma_bit_depth_entry_minus8: %" PRIu32
+                " not in range "
+                "[%" PRIu32 ", %" PRIu32 "]\n",
+                pps_scc_extension->luma_bit_depth_entry_minus8,
+                kBitDepthEntryMinus8Min, kBitDepthEntryMinus8Max);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
 
       if (!pps_scc_extension->monochrome_palette_flag) {
         // chroma_bit_depth_entry_minus8  ue(v)
         if (!bit_buffer->ReadExponentialGolomb(
                 pps_scc_extension->chroma_bit_depth_entry_minus8)) {
+          return nullptr;
+        }
+        if (pps_scc_extension->chroma_bit_depth_entry_minus8 <
+                kBitDepthEntryMinus8Min ||
+            pps_scc_extension->chroma_bit_depth_entry_minus8 >
+                kBitDepthEntryMinus8Max) {
+#ifdef FPRINT_ERRORS
+          fprintf(stderr,
+                  "invalid chroma_bit_depth_entry_minus8: %" PRIu32
+                  " not in range "
+                  "[%" PRIu32 ", %" PRIu32 "]\n",
+                  pps_scc_extension->chroma_bit_depth_entry_minus8,
+                  kBitDepthEntryMinus8Min, kBitDepthEntryMinus8Max);
+#endif  // FPRINT_ERRORS
           return nullptr;
         }
       }
@@ -125,22 +153,12 @@ H265PpsSccExtensionParser::ParsePpsSccExtension(
           // pps_palette_predictor_initializers[1,2][*] ->
           // chroma_bit_depth_entry_minus8 + 8
 
+          // both entries are range checked where they are read, so the
+          // sum is in 8..16 and needs no check of its own
           uint32_t bit_depth =
               (comp == 0)
                   ? (pps_scc_extension->luma_bit_depth_entry_minus8 + 8)
                   : (pps_scc_extension->chroma_bit_depth_entry_minus8 + 8);
-          if (bit_depth == 0) {
-#ifdef FPRINT_ERRORS
-            fprintf(stderr,
-                    "error: invalid luma_bit_depth_entry_minus8: "
-                    "%" PRIu32
-                    " or chroma_bit_depth_entry_minus8: "
-                    "%" PRIu32 "\n",
-                    pps_scc_extension->luma_bit_depth_entry_minus8,
-                    pps_scc_extension->chroma_bit_depth_entry_minus8);
-#endif  // FPRINT_ERRORS
-            return nullptr;
-          }
           if (!bit_buffer->ReadBits(bit_depth, bits_tmp)) {
             return nullptr;
           }
