@@ -686,10 +686,22 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
   return slice_segment_header;
 }
 
+// clang-tidy wants the two shared_ptr parameters below taken by const
+// reference, and it is right that this function only reads them. Taking
+// them by value costs four atomic refcount operations per call, which is
+// nothing next to the ue(v) read on either side of it, and the parameter
+// list is declared in a public header, so narrowing it changes the
+// mangled name and breaks the ABI for anything linked against a prebuilt
+// library. These are the only shared_ptr parameters in the public API, so
+// there is no house style to be consistent with either. Worth folding
+// into the next change that breaks the ABI for another reason; not worth
+// breaking it on its own.
 bool H265SliceSegmentHeaderParser::SliceSegmentHeaderState::
     isValidNumEntryPointOffsets(
         uint32_t num_entry_point_offsets_value,
+        // NOLINTNEXTLINE(performance-unnecessary-value-param)
         std::shared_ptr<struct H265SpsParser::SpsState> sps,
+        // NOLINTNEXTLINE(performance-unnecessary-value-param)
         std::shared_ptr<struct H265PpsParser::PpsState> pps) noexcept {
   // Rec. ITU-T H.265 v5 (02/2018) Page 100
   // The value of num_entry_point_offsets is constrained as follows:

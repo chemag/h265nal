@@ -13,6 +13,13 @@
 
 namespace h265nal {
 
+// clang-tidy suggests narrowing this to int16_t, since the enumerators
+// span -1 to 205. They are not the domain: payload_type is accumulated
+// from the bitstream as a uint32_t (Section 7.3.5) and cast in whole, so
+// an unrecognised type above 32767 would be truncated rather than
+// carried through as unknown. The base type is also part of the mangled
+// name of anything taking a SeiType, so narrowing it breaks the ABI.
+// NOLINTNEXTLINE(performance-enum-size)
 enum class SeiType {
   buffering_period = 0,
   pic_timing = 1,
