@@ -774,15 +774,19 @@ void NaluChecksum::fdump(char* output, int output_len) const {
 }
 
 std::string NaluChecksum::GetPrintableChecksum() const {
-#define BUFFER_LEN ((kMaxLength * 2) + 1)
-  char buffer[BUFFER_LEN];
-  int i = 0;
-  int oi = 0;
-  while (i < length) {
-    oi += snprintf(buffer + oi, static_cast<size_t>(BUFFER_LEN - oi), "%02x",
-                   static_cast<unsigned char>(checksum[i++]));
-  }
-  buffer[oi] = '\0';
+  // fdump() does the same hex conversion, so call it rather than keep a
+  // second copy of the loop. The copy here was missing fdump()'s bounds
+  // check, and wrote through static_cast<size_t>(BUFFER_LEN - oi): once oi
+  // reached the end of the buffer that subtraction goes negative and the
+  // cast turns it into a very large size, so snprintf would run off this
+  // stack array. Nothing could reach it, since length is private and only
+  // ever set to 4 against a buffer sized for kMaxLength, but the guard was
+  // being carried by that invariant rather than by the code.
+  //
+  // Zero initialized because fdump() writes nothing when length is 0, and
+  // otherwise terminates only via snprintf or its own truncation path.
+  char buffer[(kMaxLength * 2) + 1] = {};
+  fdump(buffer, static_cast<int>(sizeof(buffer)));
   return std::string(buffer);
 }
 
