@@ -212,6 +212,37 @@ TEST_F(H265CommonSignedGolombTest, TestReadSignedExponentialGolomb) {
   }
 }
 
+class H265CommonZeroWidthReadTest : public ::testing::Test {
+ public:
+  H265CommonZeroWidthReadTest() {}
+  ~H265CommonZeroWidthReadTest() override {}
+};
+
+TEST_F(H265CommonZeroWidthReadTest, TestPeekAndReadZeroBits) {
+  // A zero bit read used to be an RTC_DCHECK, that is an assert(): it
+  // aborted a debug build rather than failing the parse, and vanished
+  // under NDEBUG, where PeekBits() went on to dereference the current
+  // byte before testing anything. With no bits left that reads one byte
+  // past the buffer, which ASan reports as a buffer overflow.
+  const uint8_t buffer[] = {0xab};
+  BitBuffer bit_buffer(buffer, arraysize(buffer));
+
+  uint32_t val32 = 0;
+  uint64_t val64 = 0;
+  // with bits still available
+  EXPECT_FALSE(bit_buffer.PeekBits(0, val32));
+  EXPECT_FALSE(bit_buffer.PeekBits(0, val64));
+  EXPECT_FALSE(bit_buffer.ReadBits(0, val32));
+
+  // and with the buffer exhausted, which is the case that read out of
+  // bounds
+  ASSERT_TRUE(bit_buffer.ReadBits(8, val32));
+  ASSERT_EQ(0u, bit_buffer.RemainingBitCount());
+  EXPECT_FALSE(bit_buffer.PeekBits(0, val32));
+  EXPECT_FALSE(bit_buffer.PeekBits(0, val64));
+  EXPECT_FALSE(bit_buffer.ReadBits(0, val32));
+}
+
 class H265CommonNaluChecksumTest : public ::testing::Test {
  public:
   H265CommonNaluChecksumTest() {}

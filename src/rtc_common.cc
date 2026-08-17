@@ -112,11 +112,20 @@ bool BitBuffer::ReadUInt32(uint32_t& val) {
 }
 
 bool BitBuffer::PeekBits(size_t bit_count, uint32_t& val) {
-  // TODO(nisse): Could allow bit_count == 0 and always return success. But
-  // current code reads one byte beyond end of buffer in the case that
-  // RemainingBitCount() == 0 and bit_count == 0.
-  RTC_DCHECK(bit_count > 0);
-  if (bit_count > RemainingBitCount() || bit_count > 32) {
+  // check the requested width is one we can serve at all. Rejecting 0
+  // rather than asserting on it: this was an RTC_DCHECK, that is an
+  // assert(), which aborts a debug build instead of failing the parse and
+  // disappears entirely under NDEBUG, leaving the body below to
+  // dereference the current byte before testing anything. With no bits
+  // left that reads one byte past the buffer. No caller in this tree can
+  // reach it, as every width computed from the bitstream is at least 1,
+  // but that is a property of those callers and not of this function,
+  // which is public.
+  if (bit_count == 0 || bit_count > 32) {
+    return false;
+  }
+  // check we have enough bits to read
+  if (bit_count > RemainingBitCount()) {
     return false;
   }
   const uint8_t* bytes = bytes_ + byte_offset_;
@@ -146,11 +155,13 @@ bool BitBuffer::PeekBits(size_t bit_count, uint32_t& val) {
 }
 
 bool BitBuffer::PeekBits(size_t bit_count, uint64_t& val) {
-  // TODO(nisse): Could allow bit_count == 0 and always return success. But
-  // current code reads one byte beyond end of buffer in the case that
-  // RemainingBitCount() == 0 and bit_count == 0.
-  RTC_DCHECK(bit_count > 0);
-  if (bit_count > RemainingBitCount() || bit_count > 64) {
+  // check the requested width is one we can serve at all. See the
+  // uint32_t overload above for why 0 is rejected rather than asserted on.
+  if (bit_count == 0 || bit_count > 64) {
+    return false;
+  }
+  // check we have enough bits to read
+  if (bit_count > RemainingBitCount()) {
     return false;
   }
   const uint8_t* bytes = bytes_ + byte_offset_;
