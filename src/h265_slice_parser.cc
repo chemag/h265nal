@@ -428,12 +428,21 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
           pps->lists_modification_present_flag;
       // TODO(chemag): calculate NumPicTotalCurr support (page 99)
       slice_segment_header->NumPicTotalCurr = 0;
-      if (slice_segment_header->lists_modification_present_flag &&
-          slice_segment_header->NumPicTotalCurr > 1) {
+      if (slice_segment_header->lists_modification_present_flag) {
         // ref_pic_lists_modification()
         // TODO(chemag): add support for ref_pic_lists_modification()
+        //
+        // Section 7.3.6.1 has the structure present when
+        // "lists_modification_present_flag && NumPicTotalCurr > 1", and we
+        // do not derive NumPicTotalCurr (Equation 7-57), so we cannot tell
+        // whether it is there. Bail on the flag alone. That rejects the
+        // streams where NumPicTotalCurr is 0 or 1 and the structure is
+        // genuinely absent, which we would parse correctly, but the
+        // alternative is to keep reading and desync on the ones where it
+        // is present.
         report_unimplemented("ref_pic_lists_modification()",
                              "slice_segment_header()");
+        return nullptr;
       }
 
       if (slice_segment_header->slice_type == SliceType_B) {
