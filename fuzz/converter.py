@@ -17,6 +17,7 @@ default_values = {
     'outdir': './',
 }
 
+project = "h265nal"
 
 CODE_TEMPLATE = """\
 /*
@@ -32,11 +33,11 @@ $include
 // libfuzzer infra to test the fuzz target
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   // the code below is copied verbatim out of a unit test, where it sits
-  // inside "namespace h265nal", and so refers to the project's types
+  // inside "namespace $project", and so refers to the project's types
   // unqualified. This entry point cannot: it has to be extern "C" at
   // global scope. Pull the namespace in rather than qualifying each name,
   // which would mean keeping a list of them here.
-  using namespace h265nal;  // NOLINT(build/namespaces)
+  using namespace $project;  // NOLINT(build/namespaces)
   // a test with no fuzzer::conv markers converts to an empty body
   (void)data;
   (void)size;
@@ -73,6 +74,7 @@ def do_something(options):
     # compose the output file
     infile = os.path.basename(options.infile)
     output['infile'] = infile
+    output['project'] = project
     code_template = string.Template(CODE_TEMPLATE)
     code = code_template.substitute(output)
     fout_code.write(code)
@@ -112,7 +114,7 @@ def read_input(infile, debug):
 def parse_input(lines, debug):
     lines_include = []
     lines_data = []
-    lines_code = []
+    blocks_code = []
     output = {}
 
     # extract the includes, data, and code
@@ -136,17 +138,16 @@ def parse_input(lines, debug):
             # begin code mode
             data_mode = False
             code_mode = True
-            lines_code.append('  {\n')
+            blocks_code.append([])
             continue
         elif 'fuzzer::conv: end' in line:
             # end code mode
             code_mode = False
-            lines_code.append('  }\n')
             continue
         if data_mode:
             lines_data[-1].append(line)
         if code_mode:
-            lines_code.append(line)
+            blocks_code[-1].append(line)
 
     # clean the includes
     output['include'] = ''
@@ -164,15 +165,40 @@ def parse_input(lines, debug):
                                             data_bytes)))
 
     # clean the code
-    # feed the fuzzer input in wherever the test passes its own buffer.
-    # The buffer is not always called "buffer": a test declaring more than
-    # one gives each a distinct name, so match whatever name the test used
-    # on both sides of the arraysize() call. Match on the whole block
-    # rather than line by line, because clang-format wraps a long enough
-    # call between the two arguments.
-    output['code'] = ''.join(lines_code)
-    output['code'] = re.sub(r'\b(\w+),\s*arraysize\(\1\)', 'data, size',
-                            output['code'])
+    #
+    # Substitute first, then drop duplicate blocks. A unit test that
+    # differs from another only in the bytes it feeds the parser becomes
+    # an identical block once its buffer is replaced by the fuzzer input,
+    # and a target that parses the same input several times per run is
+    # that many times slower for no extra coverage. The inputs are not
+    # lost: they are written out as corpus seeds either way. Blocks that
+    # differ in their arguments, not just their data, stay distinct and
+    # are kept.
+    seen = set()
+    unique = []
+    for block in blocks_code:
+        # feed the fuzzer input in wherever the test passes its own
+        # buffer. The buffer is not always called "buffer": a test
+        # declaring more than one gives each a distinct name, so match
+        # whatever name the test used on both sides of the arraysize()
+        # call. Match on the whole block rather than line by line,
+        # because clang-format wraps a long enough call between the two
+        # arguments.
+        code = re.sub(r'\b(\w+),\s*arraysize\(\1\)', 'data, size',
+                      ''.join(block))
+        # compare on whitespace-collapsed text, so that two blocks the
+        # formatter happened to wrap differently still count as one
+        key = re.sub(r'\s+', ' ', code).strip()
+        if key in seen:
+            continue
+        seen.add(key)
+        unique.append(code)
+
+    if debug > 0 and len(unique) < len(blocks_code):
+        print('dropped %i duplicate block(s) of %i' %
+              (len(blocks_code) - len(unique), len(blocks_code)))
+
+    output['code'] = ''.join('  {\n%s  }\n' % code for code in unique)
     output['code'] = output['code'].strip('\n')
 
     return output
