@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 
+#include <cinttypes>
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -158,8 +159,32 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
     if (!bit_buffer->ReadExponentialGolomb(pps->num_tile_columns_minus1)) {
       return nullptr;
     }
+    if (pps->num_tile_columns_minus1 < kNumTileColumnsMinus1Min ||
+        pps->num_tile_columns_minus1 > kNumTileColumnsMinus1Max) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid num_tile_columns_minus1: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              pps->num_tile_columns_minus1, kNumTileColumnsMinus1Min,
+              kNumTileColumnsMinus1Max);
+#endif  // FPRINT_ERRORS
+      return nullptr;
+    }
     // num_tile_rows_minus1  ue(v)
     if (!bit_buffer->ReadExponentialGolomb(pps->num_tile_rows_minus1)) {
+      return nullptr;
+    }
+    if (pps->num_tile_rows_minus1 < kNumTileRowsMinus1Min ||
+        pps->num_tile_rows_minus1 > kNumTileRowsMinus1Max) {
+#ifdef FPRINT_ERRORS
+      fprintf(stderr,
+              "invalid num_tile_rows_minus1: %" PRIu32
+              " not in range "
+              "[%" PRIu32 ", %" PRIu32 "]\n",
+              pps->num_tile_rows_minus1, kNumTileRowsMinus1Min,
+              kNumTileRowsMinus1Max);
+#endif  // FPRINT_ERRORS
       return nullptr;
     }
     // uniform_spacing_flag  u(1)

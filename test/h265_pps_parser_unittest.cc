@@ -112,4 +112,45 @@ TEST_F(H265PpsParserTest, TestSamplePPSWithUnparseableMultilayerExtension) {
   EXPECT_TRUE(pps == nullptr);
 }
 
+// A pair of synthetic PPSs with tiles enabled, differing only in
+// num_tile_columns_minus1: one at the limit and one past it. The rest of
+// the structure is well formed in both, so the parse only turns on the
+// range check.
+//
+// The bound matters because the entry point bound in the slice segment
+// header multiplies these out: an unchecked pair overflows the uint32_t
+// there, and the resulting maximum accepts any num_entry_point_offsets at
+// all.
+
+TEST_F(H265PpsParserTest, TestNumTileColumnsInRange) {
+  // num_tile_columns_minus1: 2110
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0x71, 0x84, 0x00, 0x20, 0xff, 0x84, 0x80
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(pps != nullptr);
+
+  EXPECT_EQ(1, pps->tiles_enabled_flag);
+  EXPECT_EQ(2110, pps->num_tile_columns_minus1);
+  EXPECT_EQ(0, pps->num_tile_rows_minus1);
+  EXPECT_EQ(1, pps->uniform_spacing_flag);
+}
+
+TEST_F(H265PpsParserTest, TestNumTileColumnsOutOfRange) {
+  // num_tile_columns_minus1: 2111
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0x71, 0x84, 0x00, 0x21, 0x03, 0x84, 0x80
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps == nullptr);
+}
+
 }  // namespace h265nal

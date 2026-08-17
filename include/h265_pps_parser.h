@@ -21,6 +21,19 @@ namespace h265nal {
 // an H265 NALU.
 class H265PpsParser {
  public:
+  // Section 7.4.3.3: "The value of num_tile_columns_minus1 shall be in the
+  // range of 0 to PicWidthInCtbsY - 1, inclusive", and num_tile_rows_minus1
+  // likewise against PicHeightInCtbsY. Both of those live in the sps, which
+  // ParsePps() does not resolve, so bound them by the largest either can
+  // reach instead: a picture is at most kMaxWidth by kMaxHeight samples and
+  // a CTB is at least 8 samples on a side. Loose, but enough to keep
+  // ( num_tile_columns_minus1 + 1 ) * ( num_tile_rows_minus1 + 1 ) from
+  // overflowing a uint32_t in the entry point bounds.
+  const static uint32_t kNumTileColumnsMinus1Min = 0;
+  const static uint32_t kNumTileColumnsMinus1Max = kMaxWidth / 8 - 1;
+  const static uint32_t kNumTileRowsMinus1Min = 0;
+  const static uint32_t kNumTileRowsMinus1Max = kMaxHeight / 8 - 1;
+
   // The parsed state of the PPS. Only some select values are stored.
   // Add more as they are actually needed.
   struct PpsState {
