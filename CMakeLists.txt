@@ -73,24 +73,60 @@ if(BUILD_CLANG_FUZZER)
   # coverage instrumentation. The fuzzers then link an uninstrumented
   # libh265nal: libFuzzer gets no feedback from the parsers and mutates
   # blind, and a memory error inside a parser goes unreported.
-  # Note that we ask for fuzzer-no-link rather than fuzzer: that is what
-  # instruments the library for coverage without linking libFuzzer's
-  # main() into everything. fuzz/ adds -fsanitize=fuzzer at link time.
-  # UBSan defaults to recoverable: it detects real UB, prints to stderr, and
-  # lets the process continue, so libFuzzer never sees a crash and writes no
-  # artifact. no-sanitize-recover puts it at parity with ASan, which aborts.
-  # -fsanitize=undefined is a group, not all of UBSan. It leaves unsigned
-  # wraparound and implicit integer truncation unchecked, both of which are
-  # ordinary bugs in a parser reading attacker-controlled widths even though
-  # neither is undefined behaviour. Enable them, but keep them recoverable:
-  # real UB aborts and produces a libFuzzer artifact, while the two new
-  # classes only report, so a noisy one cannot end a campaign. Promote them
-  # with -fno-sanitize-recover once the reports are clean. Order matters,
-  # the later -fsanitize-recover wins over the earlier -fno-.
+  #
+  # What each piece buys, for a parser walking attacker-controlled bits:
+  #
+  # address
+  #     AddressSanitizer: reads off the end of a NAL unit, use after free
+  #     of a parser state.
+  # undefined
+  #     The UBSan default group: signed overflow, oversized shift counts,
+  #     misaligned and null pointer use, out of range enum and bool loads,
+  #     and conversions of a non-representable float.
+  # unsigned-integer-overflow
+  #     Not in that group, and not undefined behaviour: unsigned
+  #     wraparound is well defined. It is still a bug when a length or an
+  #     offset computed from the bitstream wraps instead of being
+  #     rejected.
+  # implicit-conversion
+  #     Also well defined, also usually wrong here: a 32 bit field
+  #     silently narrowed to 8 or 16 bits loses the value the bitstream
+  #     asked for. A truncation that is deliberate is written as an
+  #     explicit static_cast, which this check ignores by design.
+  # unsigned-shift-base
+  #     In neither group. Catches a left shift that overflows an unsigned
+  #     type, which is this parser's shape exactly: the bit buffer masks
+  #     with 0xFF << shift and 1 << bit_count, where the shift comes from
+  #     a width the bitstream chose.
+  # local-bounds
+  #     Out of range indexing of a local array that array-bounds cannot
+  #     rule out statically. This one cannot be made recoverable: it
+  #     traps, so it dies on SIGILL with no diagnostic. A libFuzzer
+  #     artifact with no message at all is likely to be this.
+  # float-divide-by-zero
+  #     Well defined too, it yields an infinity, but in a framerate or
+  #     aspect ratio it means a zero denominator was read and not checked.
+  # fuzzer-no-link
+  #     Coverage instrumentation for the library without libFuzzer's
+  #     main(); the fuzz targets link that themselves.
+  #
+  # Recoverable or fatal. UBSan defaults to recoverable: it prints to
+  # stderr and lets the process continue, so libFuzzer never sees a crash
+  # and writes no artifact. no-sanitize-recover puts the undefined group
+  # at parity with ASan, which aborts.
+  #
+  # The three named in -fsanitize-recover stay recoverable, so that a
+  # noisy one cannot end a campaign. float-divide-by-zero is recoverable
+  # as well, without being named: it is outside the undefined group, so
+  # the -fno- above never reaches it. local-bounds is the exception that
+  # cannot be either, as noted above. Reports are clean today, so
+  # promoting the recoverable ones to fatal is a reasonable next step and
+  # a separate change. Order matters, the later -fsanitize-recover wins
+  # over the earlier -fno-.
   set(H265NAL_SAN_FLAGS
-      -fsanitize=address,undefined,unsigned-integer-overflow,implicit-conversion,local-bounds,float-divide-by-zero
+      -fsanitize=address,undefined,unsigned-integer-overflow,implicit-conversion,unsigned-shift-base,local-bounds,float-divide-by-zero
       -fno-sanitize-recover=undefined
-      -fsanitize-recover=unsigned-integer-overflow,implicit-conversion)
+      -fsanitize-recover=unsigned-integer-overflow,implicit-conversion,unsigned-shift-base)
   add_compile_options(${H265NAL_SAN_FLAGS} -fsanitize=fuzzer-no-link)
   add_link_options(${H265NAL_SAN_FLAGS})
 endif()
