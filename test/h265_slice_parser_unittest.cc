@@ -287,6 +287,81 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceInfersNumRefIdxFromPps) {
   EXPECT_EQ(6, slice_segment_header->slice_qp_delta);
 }
 
+TEST_F(H265SliceSegmentLayerParserTest, TestSliceRefPicListsModification) {
+  // A synthetic B slice that carries a ref_pic_lists_modification()
+  // (Section 7.3.6.2). The structure is present when
+  // lists_modification_present_flag is set and NumPicTotalCurr is above 1,
+  // and NumPicTotalCurr (Equation 7-57) counts the used_by_curr_pic flags
+  // of the reference picture set in use. The mock sps holds a single set
+  // with 3 such flags, so NumPicTotalCurr is 3 and each list_entry_lX[i]
+  // is Ceil(Log2(3)) == 2 bits wide.
+  //
+  // mvd_l1_zero_flag, five_minus_max_num_merge_cand and slice_qp_delta
+  // come after the structure, so they only read right if it is consumed
+  // with the right number of bits.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {0xe0, 0x96, 0x2e, 0x68};
+
+  // fuzzer::conv: begin
+  // get some mock state
+  H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->chroma_format_idc = 1;
+  sps->sample_adaptive_offset_enabled_flag = 0;
+  sps->log2_max_pic_order_cnt_lsb_minus4 = 4;
+  sps->num_short_term_ref_pic_sets = 1;
+  sps->sps_temporal_mvp_enabled_flag = 0;
+  // the single short term reference picture set, with 2 entries used by
+  // the current picture in list 0 and 1 in list 1
+  auto st_ref_pic_set =
+      std::make_unique<H265StRefPicSetParser::StRefPicSetState>();
+  st_ref_pic_set->num_negative_pics = 2;
+  st_ref_pic_set->used_by_curr_pic_s0_flag = {1, 1};
+  st_ref_pic_set->num_positive_pics = 1;
+  st_ref_pic_set->used_by_curr_pic_s1_flag = {1};
+  sps->st_ref_pic_set.push_back(std::move(st_ref_pic_set));
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  pps->lists_modification_present_flag = 1;
+  pps->num_ref_idx_l0_default_active_minus1 = 1;
+  pps->num_ref_idx_l1_default_active_minus1 = 0;
+  bitstream_parser_state.pps[0] = pps;
+
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          buffer, arraysize(buffer), NalUnitType::TRAIL_R,
+          &bitstream_parser_state);
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(slice_segment_layer != nullptr);
+
+  auto& slice_segment_header = slice_segment_layer->slice_segment_header;
+
+  EXPECT_EQ(1, slice_segment_header->first_slice_segment_in_pic_flag);
+  EXPECT_EQ(SliceType_B, slice_segment_header->slice_type);
+  EXPECT_EQ(4, slice_segment_header->slice_pic_order_cnt_lsb);
+  EXPECT_EQ(1, slice_segment_header->short_term_ref_pic_set_sps_flag);
+
+  // Equation 7-57
+  EXPECT_EQ(3, slice_segment_header->NumPicTotalCurr);
+
+  // ref_pic_lists_modification()
+  EXPECT_EQ(1, slice_segment_header->ref_pic_list_modification_flag_l0);
+  ASSERT_EQ(2, slice_segment_header->list_entry_l0.size());
+  EXPECT_EQ(2, slice_segment_header->list_entry_l0[0]);
+  EXPECT_EQ(0, slice_segment_header->list_entry_l0[1]);
+  EXPECT_EQ(1, slice_segment_header->ref_pic_list_modification_flag_l1);
+  ASSERT_EQ(1, slice_segment_header->list_entry_l1.size());
+  EXPECT_EQ(1, slice_segment_header->list_entry_l1[0]);
+
+  // still in sync after the structure
+  EXPECT_EQ(1, slice_segment_header->mvd_l1_zero_flag);
+  EXPECT_EQ(0, slice_segment_header->five_minus_max_num_merge_cand);
+  EXPECT_EQ(3, slice_segment_header->slice_qp_delta);
+}
+
 TEST_F(H265SliceSegmentLayerParserTest, TestSliceZeroPicSizeInCtbsY) {
   // A synthetic slice segment header with first_slice_segment_in_pic_flag
   // unset, so the parser reads slice_segment_address, whose width is

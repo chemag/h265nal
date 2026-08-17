@@ -426,23 +426,104 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
 
       slice_segment_header->lists_modification_present_flag =
           pps->lists_modification_present_flag;
-      // TODO(chemag): calculate NumPicTotalCurr support (page 99)
+      // NumPicTotalCurr, Equation 7-57. The short term half counts the
+      // entries of the reference picture set in use, which is the one
+      // parsed into this slice segment header when
+      // short_term_ref_pic_set_sps_flag is 0, and sps entry CurrRpsIdx
+      // otherwise.
       slice_segment_header->NumPicTotalCurr = 0;
-      if (slice_segment_header->lists_modification_present_flag) {
+      {
+        const struct H265StRefPicSetParser::StRefPicSetState* curr_rps =
+            nullptr;
+        if (!slice_segment_header->short_term_ref_pic_set_sps_flag) {
+          curr_rps = slice_segment_header->st_ref_pic_set.get();
+        } else if (slice_segment_header->short_term_ref_pic_set_idx <
+                   sps->st_ref_pic_set.size()) {
+          curr_rps = sps->st_ref_pic_set[slice_segment_header
+                                             ->short_term_ref_pic_set_idx]
+                         .get();
+        }
+        if (curr_rps != nullptr) {
+          for (const uint32_t& v : curr_rps->used_by_curr_pic_s0_flag) {
+            if (v) {
+              slice_segment_header->NumPicTotalCurr += 1;
+            }
+          }
+          for (const uint32_t& v : curr_rps->used_by_curr_pic_s1_flag) {
+            if (v) {
+              slice_segment_header->NumPicTotalCurr += 1;
+            }
+          }
+        }
+        // the long term half. Section 7.4.7.1 takes UsedByCurrPicLt[i]
+        // from the sps for the first num_long_term_sps entries, indexed by
+        // lt_idx_sps[i], and from this header for the rest. lt_idx_sps is
+        // only read when num_long_term_ref_pics_sps is above 1, and is
+        // inferred to 0 otherwise.
+        for (uint32_t i = 0; i < slice_segment_header->num_long_term_sps; i++) {
+          uint32_t lt_idx = 0;
+          if (i < slice_segment_header->lt_idx_sps.size()) {
+            lt_idx = slice_segment_header->lt_idx_sps[i];
+          }
+          if (lt_idx < sps->used_by_curr_pic_lt_sps_flag.size() &&
+              sps->used_by_curr_pic_lt_sps_flag[lt_idx]) {
+            slice_segment_header->NumPicTotalCurr += 1;
+          }
+        }
+        for (const uint32_t& v :
+             slice_segment_header->used_by_curr_pic_lt_flag) {
+          if (v) {
+            slice_segment_header->NumPicTotalCurr += 1;
+          }
+        }
+        if (pps->pps_scc_extension != nullptr &&
+            pps->pps_scc_extension->pps_curr_pic_ref_enabled_flag) {
+          slice_segment_header->NumPicTotalCurr += 1;
+        }
+      }
+
+      if (slice_segment_header->lists_modification_present_flag &&
+          slice_segment_header->NumPicTotalCurr > 1) {
         // ref_pic_lists_modification()
-        // TODO(chemag): add support for ref_pic_lists_modification()
-        //
-        // Section 7.3.6.1 has the structure present when
-        // "lists_modification_present_flag && NumPicTotalCurr > 1", and we
-        // do not derive NumPicTotalCurr (Equation 7-57), so we cannot tell
-        // whether it is there. Bail on the flag alone. That rejects the
-        // streams where NumPicTotalCurr is 0 or 1 and the structure is
-        // genuinely absent, which we would parse correctly, but the
-        // alternative is to keep reading and desync on the ones where it
-        // is present.
-        report_unimplemented("ref_pic_lists_modification()",
-                             "slice_segment_header()");
-        return nullptr;
+        // Section 7.3.6.2. list_entry_lX[i] is u(v), of
+        // Ceil(Log2(NumPicTotalCurr)) bits, which is at least 1 here since
+        // NumPicTotalCurr is above 1.
+        size_t list_entry_len = static_cast<size_t>(std::ceil(std::log2(
+            static_cast<float>(slice_segment_header->NumPicTotalCurr))));
+
+        // ref_pic_list_modification_flag_l0  u(1)
+        if (!bit_buffer->ReadBits(
+                1, slice_segment_header->ref_pic_list_modification_flag_l0)) {
+          return nullptr;
+        }
+        if (slice_segment_header->ref_pic_list_modification_flag_l0) {
+          for (uint32_t i = 0;
+               i <= slice_segment_header->num_ref_idx_l0_active_minus1; i++) {
+            // list_entry_l0[i]  u(v)
+            if (!bit_buffer->ReadBits(list_entry_len, bits_tmp)) {
+              return nullptr;
+            }
+            slice_segment_header->list_entry_l0.push_back(bits_tmp);
+          }
+        }
+
+        if (slice_segment_header->slice_type == SliceType_B) {
+          // ref_pic_list_modification_flag_l1  u(1)
+          if (!bit_buffer->ReadBits(
+                  1, slice_segment_header->ref_pic_list_modification_flag_l1)) {
+            return nullptr;
+          }
+          if (slice_segment_header->ref_pic_list_modification_flag_l1) {
+            for (uint32_t i = 0;
+                 i <= slice_segment_header->num_ref_idx_l1_active_minus1; i++) {
+              // list_entry_l1[i]  u(v)
+              if (!bit_buffer->ReadBits(list_entry_len, bits_tmp)) {
+                return nullptr;
+              }
+              slice_segment_header->list_entry_l1.push_back(bits_tmp);
+            }
+          }
+        }
       }
 
       if (slice_segment_header->slice_type == SliceType_B) {
@@ -905,7 +986,34 @@ void H265SliceSegmentHeaderParser::SliceSegmentHeaderState::fdump(
       }
 
       if (lists_modification_present_flag && NumPicTotalCurr > 1) {
-        // TODO(chemag): add support for ref_pic_lists_modification()
+        // ref_pic_lists_modification()
+        fdump_indent_level(outfp, indent_level);
+        fprintf(outfp, "ref_pic_list_modification_flag_l0: %i",
+                ref_pic_list_modification_flag_l0);
+
+        if (ref_pic_list_modification_flag_l0) {
+          fdump_indent_level(outfp, indent_level);
+          fprintf(outfp, "list_entry_l0 {");
+          for (const uint32_t& v : list_entry_l0) {
+            fprintf(outfp, " %i", v);
+          }
+          fprintf(outfp, " }");
+        }
+
+        if (slice_type == SliceType_B) {
+          fdump_indent_level(outfp, indent_level);
+          fprintf(outfp, "ref_pic_list_modification_flag_l1: %i",
+                  ref_pic_list_modification_flag_l1);
+
+          if (ref_pic_list_modification_flag_l1) {
+            fdump_indent_level(outfp, indent_level);
+            fprintf(outfp, "list_entry_l1 {");
+            for (const uint32_t& v : list_entry_l1) {
+              fprintf(outfp, " %i", v);
+            }
+            fprintf(outfp, " }");
+          }
+        }
       }
 
       if (slice_type == SliceType_B) {

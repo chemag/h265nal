@@ -70,6 +70,37 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   auto vps = std::make_shared<H265VpsParser::VpsState>();
   bitstream_parser_state.vps[0] = vps;
   auto sps = std::make_shared<H265SpsParser::SpsState>();
+  sps->chroma_format_idc = 1;
+  sps->sample_adaptive_offset_enabled_flag = 0;
+  sps->log2_max_pic_order_cnt_lsb_minus4 = 4;
+  sps->num_short_term_ref_pic_sets = 1;
+  sps->sps_temporal_mvp_enabled_flag = 0;
+  // the single short term reference picture set, with 2 entries used by
+  // the current picture in list 0 and 1 in list 1
+  auto st_ref_pic_set =
+      std::make_unique<H265StRefPicSetParser::StRefPicSetState>();
+  st_ref_pic_set->num_negative_pics = 2;
+  st_ref_pic_set->used_by_curr_pic_s0_flag = {1, 1};
+  st_ref_pic_set->num_positive_pics = 1;
+  st_ref_pic_set->used_by_curr_pic_s1_flag = {1};
+  sps->st_ref_pic_set.push_back(std::move(st_ref_pic_set));
+  bitstream_parser_state.sps[0] = sps;
+  auto pps = std::make_shared<H265PpsParser::PpsState>();
+  pps->lists_modification_present_flag = 1;
+  pps->num_ref_idx_l0_default_active_minus1 = 1;
+  pps->num_ref_idx_l1_default_active_minus1 = 0;
+  bitstream_parser_state.pps[0] = pps;
+  auto slice_segment_layer =
+      H265SliceSegmentLayerParser::ParseSliceSegmentLayer(
+          data, size, NalUnitType::TRAIL_R,
+          &bitstream_parser_state);
+  }
+  {
+  // get some mock state
+  H265BitstreamParserState bitstream_parser_state;
+  auto vps = std::make_shared<H265VpsParser::VpsState>();
+  bitstream_parser_state.vps[0] = vps;
+  auto sps = std::make_shared<H265SpsParser::SpsState>();
   bitstream_parser_state.sps[0] = sps;
   auto pps = std::make_shared<H265PpsParser::PpsState>();
   bitstream_parser_state.pps[0] = pps;

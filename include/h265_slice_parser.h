@@ -96,7 +96,11 @@ class H265SliceSegmentHeaderParser {
     uint32_t num_ref_idx_active_override_flag = 0;
     uint32_t num_ref_idx_l0_active_minus1 = 0;
     uint32_t num_ref_idx_l1_active_minus1 = 0;
-    // ref_pic_lists_modification()
+    // ref_pic_lists_modification() (Section 7.3.6.2)
+    uint32_t ref_pic_list_modification_flag_l0 = 0;
+    std::vector<uint32_t> list_entry_l0;
+    uint32_t ref_pic_list_modification_flag_l1 = 0;
+    std::vector<uint32_t> list_entry_l1;
     uint32_t mvd_l1_zero_flag = 0;
     uint32_t cabac_init_flag = 0;
     // default value is 1 (page 99 of 02/2018 standard)

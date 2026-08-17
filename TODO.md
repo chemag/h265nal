@@ -37,7 +37,7 @@ Notes on each:
   which is a latent desync for any stream that sets it.
 * the other two are larger structures serving one suite each.
 
-Per suite, as of the last sweep:
+Per suite, as of the last sweep.
 
 | suite   | files | clean |
 |---------|-------|-------|
@@ -54,19 +54,28 @@ Everything else marked TODO in `src/`, by count:
 
 | n | item                                                             |
 |---|------------------------------------------------------------------|
-| 2 | `ref_pic_lists_modification()`                                    |
 | 2 | `filler_data()`, `end_of_seq()`, `end_of_bitstream()` payloads     |
 | 1 | `byte_alignment()`                                                |
-| 1 | `NumPicTotalCurr` (page 99), which the above is gated on           |
 | 1 | num_entry_point_offsets, outside the three cases the spec lists    |
 | 1 | read the infile incrementally, rather than all of it at once       |
 | 1 | move the nal unit type dispatcher into its own function            |
 | 1 | ref_loc offsets should be a dictionary, not parallel vectors       |
 | 1 | enforce the nal_unit_type check                                    |
 
-`ref_pic_lists_modification()` is worth calling out: it is gated behind
-`NumPicTotalCurr`, which is hardcoded to 0, so the structure is never
-reached and never read. Any stream carrying one desyncs from there.
+Two more that are not marked TODO in the source, because neither is a
+defect in one place:
+
+* `RTC_DCHECK` and `RTC_CHECK` are both `assert()`, so every check in the
+  bit buffer disappears under `NDEBUG`. A malformed stream aborts a debug
+  build and is carried on with in a release one. Two bugs came out of
+  this: a rewind that only ran in debug builds, and a shift by a negative
+  count that a hang reached first. Both are fixed, the property is not.
+* `isValidNumEntryPointOffsets()` takes its sps and pps as `shared_ptr`
+  by value and only reads them. A const reference is the right signature
+  and clang-tidy asks for it, but the declaration is in a public header,
+  so narrowing it changes the mangled name and breaks the ABI. Suppressed
+  with the reasoning inline. Worth folding into the next change that
+  breaks the ABI for another reason.
 
 # 3. comparison with ffmpeg BSF
 
@@ -107,3 +116,26 @@ See `fuzz/Makefile`. Open items:
   with no `fuzzer::conv` markers, which yields a target that ignores its
   input. `h265_common__unescape_rbsp_fuzzer.cc` is hand written for that
   reason.
+* the sanitizers reach inlined libstdc++, and report it. Every run of the
+  h265nal tool emits eight lines from `ext/atomicity.h`, where
+  `__exchange_and_add` decrements a `shared_ptr` refcount by adding -1 as
+  unsigned, which `implicit-conversion` and `unsigned-integer-overflow`
+  both object to. It is correct code and not ours. This blocks the
+  conformance sweep, since `tools/h265nal-conformance.py` reads any
+  stderr as a failure and would mark all 317 files. Either build the tool
+  without the sanitizers or exclude system headers, e.g. with
+  `-fsanitize-ignorelist` on `src:*/include/c++/*`. The fuzz targets do
+  not report it, so whatever the tool does to trigger it is worth
+  understanding before the next campaign.
+* the two bounds below are looser than the standard, because the value
+  the standard bounds them against lives in the sps and the parser that
+  reads them does not resolve it. Both are safe, in that neither can
+  overflow the arithmetic downstream, but both accept parameter sets a
+  decoder would reject:
+  * `num_tile_columns_minus1` and `num_tile_rows_minus1` are bounded by
+    the largest picture rather than by `PicWidthInCtbsY` and
+    `PicHeightInCtbsY` (Section 7.4.3.3).
+  * `luma_bit_depth_entry_minus8` and `chroma_bit_depth_entry_minus8`
+    are range checked rather than compared against the sps bit depths
+    they are required to equal (Section 7.4.3.3.3). The exact test is
+    available here: `ParsePpsSccExtension()` is given those values.
