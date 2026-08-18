@@ -314,12 +314,17 @@ TEST_F(H265SliceSegmentLayerParserTest, TestSliceRefPicListsModification) {
   sps->num_short_term_ref_pic_sets = 1;
   sps->sps_temporal_mvp_enabled_flag = 0;
   // the single short term reference picture set, with 2 entries used by
-  // the current picture in list 0 and 1 in list 1
+  // the current picture in list 0 and 1 in list 1. num_negative_pics and
+  // num_positive_pics have to match the length of the vectors beside them:
+  // a later st_ref_pic_set() that predicts off this one walks
+  // delta_poc_s0_minus1 and delta_poc_s1_minus1 up to those counts.
   auto st_ref_pic_set =
       std::make_unique<H265StRefPicSetParser::StRefPicSetState>();
   st_ref_pic_set->num_negative_pics = 2;
+  st_ref_pic_set->delta_poc_s0_minus1 = {0, 0};
   st_ref_pic_set->used_by_curr_pic_s0_flag = {1, 1};
   st_ref_pic_set->num_positive_pics = 1;
+  st_ref_pic_set->delta_poc_s1_minus1 = {0};
   st_ref_pic_set->used_by_curr_pic_s1_flag = {1};
   sps->st_ref_pic_set.push_back(std::move(st_ref_pic_set));
   bitstream_parser_state.sps[0] = sps;
