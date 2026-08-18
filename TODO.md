@@ -130,11 +130,11 @@ See `fuzz/Makefile`. Open items:
   `-fsanitize-ignorelist` on `src:*/include/c++/*`. The fuzz targets do
   not report it, so whatever the tool does to trigger it is worth
   understanding before the next campaign.
-* the two bounds below are looser than the standard, because the value
-  the standard bounds them against lives in the sps and the parser that
-  reads them does not resolve it. Both are safe, in that neither can
-  overflow the arithmetic downstream, but both accept parameter sets a
-  decoder would reject:
+* the bounds below are looser than the standard, because the value the
+  standard bounds them against lives in the sps and the parser that reads
+  them does not resolve it. All are safe, in that none can overflow the
+  arithmetic downstream, but all accept parameter sets a decoder would
+  reject:
   * `num_tile_columns_minus1` and `num_tile_rows_minus1` are bounded by
     the largest picture rather than by `PicWidthInCtbsY` and
     `PicHeightInCtbsY` (Section 7.4.3.3).
