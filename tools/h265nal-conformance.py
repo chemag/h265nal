@@ -27,11 +27,20 @@ CSV_FIELDS = [
     "tier",
     "level",
     "number_of_nalus",
+    "number_of_slice_nalus",
     "number_of_slice_segment_headers",
     "h265nal_status",
+    "slice_header_status",
 ]
 
 STATUS_OK = "0"
+
+# NAL unit types h265nal is expected to turn into a slice segment header:
+# the non-IRAP pictures (0 to 9) and the IRAP ones (16 to 21). The
+# reserved VCL types (10 to 15, 22 to 31) are deliberately left out:
+# h265nal does not parse them, so counting them would report a shortfall
+# that is a missing feature rather than a failure.
+SLICE_NAL_UNIT_TYPES = tuple(range(0, 10)) + tuple(range(16, 22))
 
 DEFAULT_TIMEOUT = 60
 
@@ -182,10 +191,33 @@ def add_unique(values, value):
         values.append(value)
 
 
+def count_slice_nalus(stdout):
+    """Count the NAL units that should each yield one slice segment header."""
+    types = "|".join(str(t) for t in SLICE_NAL_UNIT_TYPES)
+    return len(re.findall(rf"\bnal_unit_type: (?:{types})\b", stdout))
+
+
+def get_slice_header_status(slice_nalus, slice_headers):
+    """Flag slice segment headers that went missing without h265nal saying so.
+
+    A slice NAL unit that yields no slice segment header was rejected
+    somewhere. The parser usually explains itself on stderr, but not
+    always: a sub-parser can return nullptr silently and the NAL unit is
+    then dumped with an empty payload. Comparing the two counts catches
+    that, which stderr alone does not. Kept out of h265nal_status so that
+    column stays a faithful record of what h265nal itself reported.
+    """
+    if slice_headers == slice_nalus:
+        return STATUS_OK
+    return f"unparsed slice segment headers: {slice_headers}/{slice_nalus}"
+
+
 def analyze_file(input_path, h265nal_path, timeout):
     """Build the CSV row for a single input file."""
     stdout, status = run_h265nal(input_path, h265nal_path, timeout)
     resolutions, profiles, tiers, levels = parse_sps_lines(stdout)
+    slice_nalus = count_slice_nalus(stdout)
+    slice_headers = stdout.count("slice_segment_header {")
 
     return {
         "input_path": input_path,
@@ -197,10 +229,11 @@ def analyze_file(input_path, h265nal_path, timeout):
         # in one-line mode there is exactly one "nal_unit {" per NAL unit,
         # and one "slice_segment_header {" per parsed slice segment header
         "number_of_nalus": stdout.count("nal_unit {"),
-        "number_of_slice_segment_headers": stdout.count(
-            "slice_segment_header {"
-        ),
+        "number_of_slice_nalus": slice_nalus,
+        "number_of_slice_segment_headers": slice_headers,
         "h265nal_status": status,
+        "slice_header_status": get_slice_header_status(slice_nalus,
+                                                       slice_headers),
     }
 
 
@@ -265,7 +298,14 @@ def main(argv):
     if not options.quiet:
         failed = sum(1 for row in rows
                      if row["h265nal_status"] != STATUS_OK)
-        print(f"parsed {len(rows)} file(s), {failed} with issues",
+        # files losing slice segment headers without h265nal reporting
+        # anything: worth calling out separately, as they look clean
+        # otherwise
+        silent = sum(1 for row in rows
+                     if row["h265nal_status"] == STATUS_OK
+                     and row["slice_header_status"] != STATUS_OK)
+        print(f"parsed {len(rows)} file(s), {failed} with issues, "
+              f"{silent} silently missing slice segment headers",
               file=sys.stderr)
 
 
