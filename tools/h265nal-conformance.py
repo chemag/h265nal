@@ -20,7 +20,7 @@ import sys
 
 
 CSV_FIELDS = [
-    "input_path",
+    "input_dir",
     "input_file",
     "resolution",
     "profile",
@@ -220,7 +220,11 @@ def analyze_file(input_path, h265nal_path, timeout):
     slice_headers = stdout.count("slice_segment_header {")
 
     return {
-        "input_path": input_path,
+        # the containing directory only, not the whole path: the full path
+        # is long, differs per machine, and is the same for every row of a
+        # run. For the JCT-VC suite the directory is the suite name.
+        "input_dir": os.path.basename(os.path.dirname(
+            os.path.abspath(input_path))),
         "input_file": os.path.basename(input_path),
         "resolution": ";".join(resolutions),
         "profile": ";".join(profiles),

@@ -1,0 +1,50 @@
+input_dir,input_file,resolution,profile,tier,level,number_of_nalus,number_of_slice_nalus,number_of_slice_segment_headers,h265nal_status,slice_header_status
+rext,adjust_ipred_angle_a_rext_mitsubishi_2.bit,1920x1080,Main 4:2:2 10,Main,6.2,9,3,3,0,0
+rext,bitdepth_a_rext_sony_1.bin,1920x1080,Main 4:4:4 12,Main,4.1,35,16,16,0,0
+rext,bitdepth_b_rext_sony_1.bin,1920x1080,Main 4:4:4 12,Main,4.1,35,16,16,0,0
+rext,ccp_10bit_rext_qcom.bin,1920x1080,Main 4:4:4 10,Main,4.1,12,9,9,0,0
+rext,ccp_12bit_rext_qcom.bin,2560x1600,Main 4:4:4 12,Main,6.2,12,9,9,0,0
+rext,ccp_8bit_rext_qcom.bin,1280x720,Main 4:4:4,Main,4.1,12,9,9,0,0
+rext,explicitrdpcm_a_bbc_1.bit,1280x720,Main 4:4:4,Main,6.2,1203,600,600,0,0
+rext,explicitrdpcm_b_bbc_2.bit,2560x1600,Main 4:4:4 12,Main,6.2,303,150,150,0,0
+rext,extprec_highthroughput_444_16_intra_10bit_rext_sony_1.bit,400x384,High Throughput 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_highthroughput_444_16_intra_12bit_rext_sony_1.bit,400x384,High Throughput 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_highthroughput_444_16_intra_16bit_rext_sony_1.bit,400x384,High Throughput 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_highthroughput_444_16_intra_8bit_rext_sony_1.bit,400x384,High Throughput 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_main_444_16_intra_10bit_rext_sony_1.bit,400x384,Main 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_main_444_16_intra_12bit_rext_sony_1.bit,400x384,Main 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_main_444_16_intra_16bit_rext_sony_1.bit,400x384,Main 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,extprec_main_444_16_intra_8bit_rext_sony_1.bit,400x384,Main 4:4:4 16 Intra,Main,3.0,10,2,2,0,0
+rext,general_10b_420_rext_sony_1.bit,400x384,Main 10 Intra,Main,3.0,5,1,1,0,0
+rext,general_10b_422_rext_sony_1.bit,400x384,Main 4:2:2 10 Intra,Main,3.0,10,2,2,0,0
+rext,general_10b_444_rext_sony_2.bit,400x384,Main 4:4:4 10 Intra,Main,3.0,48,12,12,0,0
+rext,general_12b_400_rext_sony_1.bit,400x384,Monochrome (12-bit),Main,3.0,5,1,1,0,0
+rext,general_12b_420_rext_sony_1.bit,400x384,Main 12 Intra,Main,3.0,5,1,1,0,0
+rext,general_12b_422_rext_sony_1.bit,400x384,Main 4:2:2 12 Intra,Main,3.0,10,2,2,0,0
+rext,general_12b_444_rext_sony_2.bit,400x384,Main 4:4:4 12 Intra,Main,3.0,56,14,14,0,0
+rext,general_16b_400_rext_sony_1.bit,400x384,Monochrome (16-bit),Main,3.0,35,7,7,0,0
+rext,general_16b_444_highthroughput_rext_sony_2.bit,400x384,High Throughput 4:4:4 16 Intra,Main,3.0,64,16,16,0,0
+rext,general_16b_444_rext_sony_2.bit,400x384,Main 4:4:4 16 Intra,Main,3.0,64,16,16,0,0
+rext,general_8b_400_rext_sony_1.bit,400x384,Monochrome (8-bit),Main,3.0,5,1,1,0,0
+rext,general_8b_420_rext_sony_1.bit,400x384,Main Intra,Main,3.0,5,1,1,0,0
+rext,general_8b_444_rext_sony_2.bit,400x384,Main 4:4:4 Intra,Main,3.0,56,14,14,0,0
+rext,ipcm_a_rext_nec_2.bit,416x240,Main 4:2:2 10,Main,2.0,4,1,1,0,0
+rext,ipcm_b_rext_nec.bit,416x240,Main 4:4:4 12,Main,2.0,4,1,1,0,0
+rext,main_422_10_a_rext_sony_2.bin,1920x1080,Main 4:2:2 10,Main,4.0,20,9,9,0,0
+rext,main_422_10_b_rext_sony_2.bin,2560x1600,Main 4:2:2 10,Main,5.0,4,1,1,0,0
+rext,persist_rparam_a_rext_sony_3.bit,400x384,Main 4:4:4 12 Intra,Main,3.0,10,2,2,0,0
+rext,qmatrix_a_rext_sony_1.bit,1280x720,Main 4:4:4,Main,4.0,62,20,20,0,0
+rext,sao_a_rext_mediatek_1.bit,2560x1600,Main 4:4:4 12,Main,6.2,11,8,8,0,0
+rext,tsctx_10bit_i_rext_sharp_1.bin,1920x1080,Main 4:4:4 10,Main,6.2,21,9,9,0,0
+rext,tsctx_10bit_rext_sharp_1.bin,1920x1080,Main 4:4:4 10,Main,6.2,21,9,9,0,0
+rext,tsctx_12bit_i_rext_sharp_1.bin,2560x1600,Main 4:4:4 12,Main,6.2,21,9,9,0,0
+rext,tsctx_12bit_rext_sharp_1.bin,2560x1600,Main 4:4:4 12,Main,6.2,21,9,9,0,0
+rext,tsctx_8bit_i_rext_sharp_1.bin,1920x1080,Main 4:4:4,Main,6.2,21,9,9,0,0
+rext,tsctx_8bit_rext_sharp_1.bin,1920x1080,Main 4:4:4,Main,6.2,21,9,9,0,0
+rext,wavetiles_rext_sony_2.bit,512x384,High Throughput 4:4:4 16 Intra,Main,3.0,45,29,29,0,0
+rext,wpp_and_tile_10bit422test_high_tp_444_10bit_rext_apple_2.bit,1920x1080,High Throughput 4:4:4 14,Main,4.0,9,3,3,0,0
+rext,wpp_and_tile_and_cabac_bypass_align_0_high_tp_444_14bit_rext_apple_2.bit,1024x768,High Throughput 4:4:4 14,Main,3.1,9,3,3,0,0
+rext,wpp_and_tile_and_cabac_bypass_align_1_high_tp_444_14bit_rext_apple_2.bit,1024x768,High Throughput 4:4:4 14,Main,3.1,9,3,3,0,0
+rext,wpp_and_tile_and_cabac_ext_prec_1_high_tp_444_14bit_rext_apple_2.bit,1024x768,High Throughput 4:4:4 14,Main,3.1,9,3,3,0,0
+rext,wpp_and_tile_high_tp_444_8bit_rext_apple_2.bit,1024x768,High Throughput 4:4:4 14,Main,3.1,9,3,3,0,0
+rext,wpp_high_tp_444_8bit_rext_apple_2.bit,1024x768,High Throughput 4:4:4 14,Main,3.1,9,3,3,0,0

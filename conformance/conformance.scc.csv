@@ -1,0 +1,16 @@
+input_dir,input_file,resolution,profile,tier,level,number_of_nalus,number_of_slice_nalus,number_of_slice_segment_headers,h265nal_status,slice_header_status
+scc,bipred_8by8_a_qualcomm_2.bit,416x240,Screen-Extended Main 4:4:4,Main,2.0,9,3,3,0,0
+scc,delta_qp_chroma_qp_offsets_a_qualcomm_2.bit,1280x720,Screen-Extended Main 4:4:4,Main,4.0,10,2,2,0,0
+scc,dpb_loop_filters_a_mediatek_2.bit,1280x720,Screen-Extended Main 4:4:4,Main,4.0,14,10,10,0,0
+scc,ht_a_scc_apple_2.bit,1920x1080,Screen-Extended High Throughput 4:4:4 10,Main,4.1,9,3,3,0,0
+scc,ht_b_scc_apple_3.bit,1280x720,Screen-Extended High Throughput 4:4:4 14,Main,4.0,15,3,3,0,0
+scc,ht_c_scc_apple_3.bit,1280x720,Screen-Extended High Throughput 4:4:4 14,Main,4.0,15,3,3,0,0
+scc,ibf_disabled_a_mediatek_2.bit,1280x720,Screen-Extended,Main,4.0,36,33,33,0,0
+scc,ibf_disabled_b_mediatek_2.bit,1280x720,Screen-Extended,Main,4.0,36,33,33,0,0
+scc,mvresidc_a_ms_2.bit,1280x720,Screen-Extended,Main,4.0,21,9,9,0,0
+scc,mvresidc_b_ms_2.bit,1280x720,Screen-Extended,Main,4.0,21,9,9,0,0
+scc,mvresidc_c_ms_3.bit,1280x720,Screen-Extended,Main,4.0,21,9,9,0,0
+scc,ppi_a_interdigital_2.bit,1280x720,Screen-Extended,Main,3.1,71,33,33,0,0
+scc,ppi_b_interdigital_2.bit,1280x720,Screen-Extended,Main,3.1,71,33,33,0,0
+scc,slice_act_qp_offsets_a_qualcomm_2.bit,1280x720,Screen-Extended,Main,4.0,9,2,2,0,0
+scc,zero_and_one_palette_size_a_canon_2.bit,1920x1080,Screen-Extended,Main,4.0,5,1,1,0,0

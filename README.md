@@ -37,31 +37,16 @@ Feel free to test all the unittests:
 ```
 $ make test
 Running tests...
-Test project h265nal/build
+Test project ...h265nal/build
       Start  1: h265_profile_tier_level_parser_unittest
- 1/10 Test  #1: h265_profile_tier_level_parser_unittest ...   Passed    0.00 sec
-      Start  2: h265_vps_parser_unittest
- 2/10 Test  #2: h265_vps_parser_unittest ..................   Passed    0.00 sec
-      Start  3: h265_vui_parameters_parser_unittest
- 3/10 Test  #3: h265_vui_parameters_parser_unittest .......   Passed    0.00 sec
-      Start  4: h265_st_ref_pic_set_parser_unittest
- 4/10 Test  #4: h265_st_ref_pic_set_parser_unittest .......   Passed    0.00 sec
-      Start  5: h265_sps_parser_unittest
- 5/10 Test  #5: h265_sps_parser_unittest ..................   Passed    0.00 sec
-      Start  6: h265_pps_parser_unittest
- 6/10 Test  #6: h265_pps_parser_unittest ..................   Passed    0.00 sec
-      Start  7: h265_aud_parser_unittest
- 7/10 Test  #7: h265_aud_parser_unittest ..................   Passed    0.00 sec
-      Start  8: h265_slice_parser_unittest
- 8/10 Test  #8: h265_slice_parser_unittest ................   Passed    0.00 sec
-      Start  9: h265_bitstream_parser_unittest
- 9/10 Test  #9: h265_bitstream_parser_unittest ............   Passed    0.00 sec
-      Start 10: h265_nal_unit_parser_unittest
-10/10 Test #10: h265_nal_unit_parser_unittest .............   Passed    0.00 sec
+ 1/29 Test  #1: h265_profile_tier_level_parser_unittest .........   Passed    0.02 sec
+...
+      Start 29: h265_configuration_box_parser_unittest
+29/29 Test #29: h265_configuration_box_parser_unittest ..........   Passed    0.02 sec
 
-100% tests passed, 0 tests failed out of 10
+100% tests passed, 0 tests failed out of 29
 
-Total Test time (real) =   0.04 sec
+Total Test time (real) =   0.55 sec
 ```
 
 Or to test any of the unittests:
@@ -264,7 +249,99 @@ The [fuzz](fuzz/README.md) directory contains information on fuzzing the
 parser.
 
 
-# 7. TODO
+# 7. Conformance
+
+h265nal has been run against the JCT-VC H.265 conformance suite (the 201810
+release), which is 317 bitstreams across 6 folders. Results can be
+regenerated whenever the parser changes.
+
+## 7.1. Current status
+
+| suite     | files | clean | unimplemented | invalid | silent |
+|-----------|-------|-------|---------------|---------|--------|
+| hevc_v1   |   147 |   147 |             0 |       0 |      0 |
+| rext      |    49 |    49 |             0 |       0 |      0 |
+| scc       |    15 |    15 |             0 |       0 |      0 |
+| mv-hevc   |     9 |     2 |             7 |       0 |      0 |
+| 3d-hevc   |    27 |     0 |            27 |       0 |      0 |
+| shvc      |    70 |     3 |            67 |       0 |      0 |
+| TOTAL     |   317 |   216 |           101 |       0 |      0 |
+
+The columns are the four outcomes h265nal can produce, which are worth
+keeping apart:
+
+* clean: parsed in full, and every slice NAL unit yielded a slice segment
+  header. Exit code 0.
+* unimplemented: the bitstream needs syntax h265nal does not implement.
+  It says which, on stderr, and exits 2. This is a deliberate refusal
+  rather than a failure.
+* invalid: h265nal rejected the bitstream. Exit code 1. On this suite that
+  would mean a bug, since every file in it is conforming.
+* silent: exited 0 but produced fewer slice segment headers than there
+  were slice NAL units, so something was dropped without being reported.
+  The CSV tracks this in its own column because such a file looks clean
+  otherwise. All 62127 slice NAL units in the suite are accounted for.
+
+There are no crashes, no invalid verdicts and no silent shortfalls. The
+three single-layer suites are complete. All 101 unimplemented files are
+asking for annexes that are not written:
+
+| missing syntax                                      | files |
+|-----------------------------------------------------|-------|
+| multi-layer sps extension                           |   101 |
+| `pps_3d_extension()`, plus the above                |    26 |
+| `colour_mapping_table()`, plus the above            |     9 |
+
+The multi-layer sps extension is Section F.7.3.2.2.1, selected when
+`nuh_layer_id > 0` and `sps_ext_or_max_sub_layers_minus1 == 7`. Every
+remaining file needs it, which is why the count matches the total: the
+other two structures only appear in files whose sps already stopped us,
+so neither unlocks a file on its own. That accounts for the 3 folders at
+or near zero clean: they are entirely multi-layer content (SHVC, MV-HEVC
+and 3D-HEVC). See section 9 for what is not supported.
+
+## 7.2. Regenerating the results
+
+```
+$ mkdir conformance
+$ cd conformance
+$ make                                  # every suite
+$ make conformance.hevc_v1.csv          # just one
+$ make DATASET=/path/to/201810          # a copy elsewhere
+$ make -B                               # rebuild everything
+$ make clean
+```
+
+The dataset is not in this repository. `DATASET` defaults to
+`$(HOME)/work/video/dataset/h265_conformance/201810` and has to point at a
+directory holding the 6 suite folders.
+
+Build the binary without the fuzzing sanitizers, which is the default:
+
+```
+$ mkdir build && cd build && cmake .. && make
+```
+
+A build configured with `-DBUILD_CLANG_FUZZER=ON` is not usable here. The
+UBSan checks it turns on report libstdc++'s own reference counting on
+every `shared_ptr` release, and the script reads stderr as parser output,
+so every file comes back changed. Pass `H265NAL=` to use a binary from
+somewhere other than `../build/tools/h265nal`.
+
+Underneath, the Makefile runs
+[tools/h265nal-conformance.py](tools/h265nal-conformance.py), which can
+also be used on its own for any set of files:
+
+```
+$ ./tools/h265nal-conformance.py -o out.csv /path/to/*.265
+```
+
+It writes one row per file with the resolution, profile, tier, level, NAL
+unit counts, and the parser status, and prints a summary to stderr. A full
+run over the 317 files takes about 3 seconds.
+
+
+# 8. TODO
 
 List of tasks:
 * add lacking parsers (e.g. SEI)
@@ -274,12 +351,12 @@ List of tasks:
 * add a set of Annex B files for testing
 
 
-# 8. Limitations
+# 9. Limitations
 
 * no support for PACI (rfc7798 Section 4.4.4)
 
 
-# 9. License
+# 10. License
 
 h265nal is BSD licensed, as found in the [LICENSE](LICENSE) file.
 
