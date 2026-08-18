@@ -32,6 +32,7 @@ if(H265NAL_SMALL_FOOTPRINT)
       h265_scaling_list_data_parser.cc
       h265_sps_parser.cc
       h265_pps_multilayer_extension_parser.cc
+      h265_pps_range_extension_parser.cc
       h265_pps_scc_extension_parser.cc
       h265_pps_parser.cc
       h265_aud_parser.cc
@@ -63,6 +64,7 @@ else()
       h265_scaling_list_data_parser.cc
       h265_sps_parser.cc
       h265_pps_multilayer_extension_parser.cc
+      h265_pps_range_extension_parser.cc
       h265_pps_scc_extension_parser.cc
       h265_pps_parser.cc
       h265_aud_parser.cc

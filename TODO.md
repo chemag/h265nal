@@ -12,12 +12,11 @@ stream.
 The file counts come from the 201810 conformance suite, swept with
 `tools/h265nal-conformance.py` (see `conformance/Makefile`). A file is
 counted once per structure it needs, so the column does not add up to
-the 132 failing files: many need more than one.
+the 101 failing files: many need more than one.
 
 | structure                  | files | where                             |
 |----------------------------|-------|-----------------------------------|
 | multi-layer sps extension  |   101 | shvc, 3d-hevc, mv-hevc            |
-| `pps_range_extension()`    |    31 | rext, scc                         |
 | `pps_3d_extension()`       |    26 | 3d-hevc                           |
 | `colour_mapping_table()`   |     9 | shvc, in pps_multilayer_extension |
 
@@ -27,23 +26,20 @@ Notes on each:
   `nuh_layer_id > 0` and `sps_ext_or_max_sub_layers_minus1 == 7`. The
   sps then carries no `profile_tier_level()`, and an
   `update_rep_format_flag` in place of the format fields, which it
-  inherits from the vps. Biggest gap by file count, and the largest
-  piece of work: a second sps syntax path plus vps `rep_format`
-  plumbing.
-* `pps_range_extension()` is Section 7.3.2.3.2, a small flat structure
-  comparable to the `pps_scc_extension()` that already exists. Best
-  ratio of files unlocked to work. It also retires the hardcoded
-  `chroma_qp_offset_list_enabled_flag = 0` in the slice segment header,
-  which is a latent desync for any stream that sets it.
-* the other two are larger structures serving one suite each.
+  inherits from the vps. Every remaining file needs it, and it is the
+  largest piece of work left: a second sps syntax path plus vps
+  `rep_format` plumbing.
+* the other two are larger structures serving one suite each, and both
+  sit behind the multi-layer sps extension in every file that needs
+  them, so neither unlocks a file on its own.
 
 Per suite, as of the last sweep.
 
 | suite   | files | clean |
 |---------|-------|-------|
 | hevc_v1 |   147 |   147 |
-| rext    |    49 |    30 |
-| scc     |    15 |     3 |
+| rext    |    49 |    49 |
+| scc     |    15 |    15 |
 | mv-hevc |     9 |     2 |
 | 3d-hevc |    27 |     0 |
 | shvc    |    70 |     3 |
@@ -99,6 +95,13 @@ To make the ffmpeg side diffable against ours:
 
 then meld.
 
+One trap when comparing parameter sets rather than slices: ffmpeg prints
+an `Extradata` block before the first `Packet:` line, holding a copy of
+the leading VPS/SPS/PPS that the demuxer lifted out of the stream. That
+copy is not a second parameter set in the file, so a naive diff reports
+every single-pps stream as a mismatch. Skip everything before the first
+`Packet:`.
+
 Worth automating: a script that aligns the two per slice segment header
 and reports the first differing field turns this from an afternoon into
 a command.
@@ -139,3 +142,9 @@ See `fuzz/Makefile`. Open items:
     are range checked rather than compared against the sps bit depths
     they are required to equal (Section 7.4.3.3.3). The exact test is
     available here: `ParsePpsSccExtension()` is given those values.
+  * `diff_cu_chroma_qp_offset_depth` is bounded by 3 rather than by
+    `log2_diff_max_min_luma_coding_block_size`, and
+    `log2_sao_offset_scale_luma` and `log2_sao_offset_scale_chroma` by 6
+    rather than by `Max(0, BitDepthY - 10)` and `Max(0, BitDepthC - 10)`
+    (Section 7.4.3.3.2). The three bounds are what those sps values can
+    reach at their most permissive.

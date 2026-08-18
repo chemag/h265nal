@@ -648,10 +648,13 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
       }
     }
 
-    // TODO(chemag): add support for pps_range_extension()
-    // slice_segment_header->chroma_qp_offset_list_enabled_flag =
-    //    pps->pps_range_extension->chroma_qp_offset_list_enabled_flag;
     slice_segment_header->chroma_qp_offset_list_enabled_flag = 0;
+    if (pps->pps_range_extension_flag) {
+      if (pps->pps_range_extension != nullptr) {
+        slice_segment_header->chroma_qp_offset_list_enabled_flag =
+            pps->pps_range_extension->chroma_qp_offset_list_enabled_flag;
+      }
+    }
     if (slice_segment_header->chroma_qp_offset_list_enabled_flag) {
       // cu_chroma_qp_offset_enabled_flag  u(1)
       if (!bit_buffer->ReadBits(

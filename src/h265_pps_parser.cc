@@ -316,9 +316,12 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
 
   if (pps->pps_range_extension_flag) {
     // pps_range_extension()
-    // TODO(chemag): add support for pps_range_extension()
-    report_unimplemented("pps_range_extension()", "pps()");
-    return nullptr;
+    pps->pps_range_extension =
+        H265PpsRangeExtensionParser::ParsePpsRangeExtension(
+            bit_buffer, pps->transform_skip_enabled_flag);
+    if (pps->pps_range_extension == nullptr) {
+      return nullptr;
+    }
   }
 
   if (pps->pps_multilayer_extension_flag) {
@@ -339,7 +342,7 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   }
 
   if (pps->pps_scc_extension_flag) {
-    // pps_range_extension()
+    // pps_scc_extension()
     pps->pps_scc_extension =
         H265PpsSccExtensionParser::ParsePpsSccExtension(bit_buffer);
     if (pps->pps_scc_extension == nullptr) {
@@ -545,9 +548,8 @@ void H265PpsParser::PpsState::fdump(FILE* outfp, int indent_level) const {
 
   if (pps_range_extension_flag) {
     // pps_range_extension()
-    // TODO(chemag): add support for pps_range_extension()
     fdump_indent_level(outfp, indent_level);
-    fdump_unimplemented(outfp, "pps_range_extension");
+    pps_range_extension->fdump(outfp, indent_level);
   }
 
   if (pps_multilayer_extension_flag) {
