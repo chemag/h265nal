@@ -116,4 +116,33 @@ TEST_F(H265StRefPicSetParserTest, TestDeltaPocS0Minus1OutOfRange) {
   EXPECT_TRUE(st_ref_pic_set == nullptr);
 }
 
+TEST_F(H265StRefPicSetParserTest, TestInconsistentRefSetCounts) {
+  // A synthetic st_ref_pic_set() that predicts off a reference set whose
+  // num_negative_pics and num_positive_pics do not match the length of the
+  // vectors beside them. ParseStRefPicSet() fills each pair together and
+  // so cannot produce that, but StRefPicSetState is public with public
+  // fields, and a state built by hand can: DeriveValues() used to walk
+  // delta_poc_s0_minus1 up to num_negative_pics and read past its end.
+  // This is not run through the fuzzer, since the mock state is the point
+  // of the test rather than the input.
+  auto ref = std::make_unique<H265StRefPicSetParser::StRefPicSetState>();
+  ref->num_negative_pics = 2;
+  ref->num_positive_pics = 1;
+  // delta_poc_s0_minus1 and delta_poc_s1_minus1 left empty
+
+  std::vector<std::unique_ptr<struct H265StRefPicSetParser::StRefPicSetState>>
+      st_ref_pic_set_state_vector;
+  st_ref_pic_set_state_vector.push_back(std::move(ref));
+
+  // inter_ref_pic_set_prediction_flag 1, delta_idx_minus1 absent (stRpsIdx
+  // equals num_short_term_ref_pic_sets is false here, so it is inferred
+  // 0), delta_rps_sign 0, abs_delta_rps_minus1 0, then the
+  // used_by_curr_pic_flag/use_delta_flag pairs
+  const uint8_t buffer[] = {0xd8, 0x00};
+  auto st_ref_pic_set = H265StRefPicSetParser::ParseStRefPicSet(
+      buffer, arraysize(buffer), 1, 2, &st_ref_pic_set_state_vector, 16);
+
+  EXPECT_TRUE(st_ref_pic_set == nullptr);
+}
+
 }  // namespace h265nal

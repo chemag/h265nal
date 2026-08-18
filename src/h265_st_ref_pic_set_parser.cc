@@ -53,10 +53,27 @@ bool H265StRefPicSetParser::StRefPicSetState::DeriveValues(
   }
   const auto& ref = (*st_ref_pic_set_state_vector)[RefRpsIdx];
 
+  // Everything below walks four vectors by a count held next to them
+  // rather than by their own length: the ref set's delta_poc_s0_minus1 and
+  // delta_poc_s1_minus1 by its num_negative_pics and num_positive_pics,
+  // and this set's use_delta_flag and used_by_curr_pic_flag up to
+  // NumDeltaPocs[RefRpsIdx]. ParseStRefPicSet() fills each pair together,
+  // so the counts agree for anything it produced, but StRefPicSetState is
+  // public and its fields are public: a state assembled by hand can
+  // disagree, and then these are out of bounds reads. Check the lengths
+  // once here rather than at each index.
+  const uint32_t ref_num_delta_pocs =
+      ref->num_negative_pics + ref->num_positive_pics;
+  if (ref->delta_poc_s0_minus1.size() < ref->num_negative_pics ||
+      ref->delta_poc_s1_minus1.size() < ref->num_positive_pics ||
+      use_delta_flag.size() <= ref_num_delta_pocs ||
+      used_by_curr_pic_flag.size() <= ref_num_delta_pocs) {
+    return false;
+  }
+
   // Equation 7-60
   int32_t delta_rps = (1 - 2 * static_cast<int32_t>(delta_rps_sign)) *
                       static_cast<int32_t>(abs_delta_rps_minus1 + 1);
-  uint32_t ref_num_delta_pocs = ref->num_negative_pics + ref->num_positive_pics;
 
   int32_t d_poc = 0;
   for (uint32_t i = 0; i < ref->num_negative_pics; i++) {
