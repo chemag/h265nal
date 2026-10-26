@@ -19,20 +19,30 @@ set(CMAKE_CXX_STANDARD 14)
 # Only the .cc files are listed. Headers are analysed as part of the
 # translation units that include them, selected by HeaderFilterRegex;
 # passing a header directly has no entry in the compilation database.
+#
+# The target is called "h265nal-tidy" so that it does not collide with other
+# projects' tidy targets when h265nal is added as a subproject (target names
+# are global in CMake). "make tidy" is kept as an alias only when h265nal is
+# the top-level project. Sources are found from PROJECT_SOURCE_DIR (this
+# project), not CMAKE_SOURCE_DIR (the top-level one). The compilation
+# database is always written to the top-level CMAKE_BINARY_DIR.
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_program(CLANG_TIDY_EXE NAMES clang-tidy)
 if(CLANG_TIDY_EXE)
   file(GLOB_RECURSE ALL_CXX_SOURCES
-    ${CMAKE_SOURCE_DIR}/src/*.cc
+    ${PROJECT_SOURCE_DIR}/src/*.cc
   )
-  add_custom_target(tidy
+  add_custom_target(h265nal-tidy
     COMMAND ${CLANG_TIDY_EXE}
       -p ${CMAKE_BINARY_DIR}
       -quiet
       ${ALL_CXX_SOURCES}
-    COMMENT "Running clang-tidy..."
+    COMMENT "Running clang-tidy on h265nal..."
     VERBATIM
   )
+  if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    add_custom_target(tidy DEPENDS h265nal-tidy)
+  endif()
 endif()
 if(WIN32)
   # Designated initializers throughout project requires C++20 on windows
