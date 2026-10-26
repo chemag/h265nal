@@ -22,6 +22,10 @@ class H265ScalingListDataParser {
   // range of -128 to +127, inclusive."
   const static int32_t kScalingListDeltaCoefMin = -128;
   const static int32_t kScalingListDeltaCoefMax = 127;
+  // Section 7.4.5: "The value of scaling_list_dc_coef_minus8[ sizeId - 2 ][
+  // matrixId ] shall be in the range of -7 to 247, inclusive."
+  const static int32_t kScalingListDcCoefMinus8Min = -7;
+  const static int32_t kScalingListDcCoefMinus8Max = 247;
 
   // The parsed state of the ScalingListData.
   struct ScalingListDataState {

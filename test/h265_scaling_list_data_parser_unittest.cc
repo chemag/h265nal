@@ -181,4 +181,66 @@ TEST_F(H265ScalingListDataParserTest, TestScalingListDeltaCoefOutOfRange) {
   EXPECT_TRUE(scaling_list_data == nullptr);
 }
 
+TEST_F(H265ScalingListDataParserTest, TestScalingListDcCoefMinus8OutOfRange) {
+  // A synthetic scaling_list_data() whose only explicit list (sizeId 2,
+  // matrixId 0) has scaling_list_dc_coef_minus8 equal to 248, one past the
+  // +247 that Section 7.4.5 allows. nextCoef is derived from it, and then
+  // used in an int32_t sum, so an unbounded value overflows.
+  //
+  // The rest of the structure is well formed: the 64 coefficients of that
+  // list are zero, and the other 19 matrices are predicted with a delta of
+  // zero. So the parse only fails on the range check, and the test still
+  // means something if that check is removed.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0x55, 0x55, 0x55, 0x80, 0x7c, 0x3f, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xd5, 0x55
+  };
+  // fuzzer::conv: begin
+  auto scaling_list_data = H265ScalingListDataParser::ParseScalingListData(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(scaling_list_data == nullptr);
+}
+
+TEST_F(H265ScalingListDataParserTest, TestScalingListDcCoefMinus8BelowRange) {
+  // Same structure, with scaling_list_dc_coef_minus8 equal to -8, one below
+  // the -7 that Section 7.4.5 allows.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0x55, 0x55, 0x55, 0x84, 0x7f, 0xff, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xd5, 0x55
+  };
+  // fuzzer::conv: begin
+  auto scaling_list_data = H265ScalingListDataParser::ParseScalingListData(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(scaling_list_data == nullptr);
+}
+
+TEST_F(H265ScalingListDataParserTest, TestScalingListDcCoefMinus8MaxValue) {
+  // Same structure, with scaling_list_dc_coef_minus8 equal to 247, the
+  // largest value Section 7.4.5 allows: the DC coefficient is 255, and all
+  // the (zero-delta) coefficients of the list stay at 255.
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0x55, 0x55, 0x55, 0x80, 0x7b, 0xbf, 0xff, 0xff,
+      0xff, 0xff, 0xff, 0xff, 0xff, 0xd5, 0x55
+  };
+  // fuzzer::conv: begin
+  auto scaling_list_data = H265ScalingListDataParser::ParseScalingListData(
+      buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(scaling_list_data != nullptr);
+  EXPECT_EQ(247, scaling_list_data->scaling_list_dc_coef_minus8[0][0]);
+  EXPECT_EQ(1, scaling_list_data->scaling_list_pred_mode_flag[2][0]);
+  ASSERT_EQ(64, scaling_list_data->ScalingList[2][0].size());
+  for (const auto& coef : scaling_list_data->ScalingList[2][0]) {
+    EXPECT_EQ(255, coef);
+  }
+}
+
 }  // namespace h265nal

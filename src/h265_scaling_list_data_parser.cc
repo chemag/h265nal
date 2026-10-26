@@ -82,6 +82,25 @@ H265ScalingListDataParser::ParseScalingListData(
                       ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId])) {
             return nullptr;
           }
+          // nextCoef is derived from this value, and then used in an
+          // int32_t sum below, so an unbounded value overflows
+          if (scaling_list_data
+                      ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] <
+                  kScalingListDcCoefMinus8Min ||
+              scaling_list_data
+                      ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] >
+                  kScalingListDcCoefMinus8Max) {
+#ifdef FPRINT_ERRORS
+            fprintf(stderr,
+                    "invalid scaling_list_dc_coef_minus8: %" PRIi32
+                    " not in range "
+                    "[%" PRIi32 ", %" PRIi32 "]\n",
+                    scaling_list_data
+                        ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId],
+                    kScalingListDcCoefMinus8Min, kScalingListDcCoefMinus8Max);
+#endif  // FPRINT_ERRORS
+            return nullptr;
+          }
           nextCoef = static_cast<uint32_t>(
               scaling_list_data
                   ->scaling_list_dc_coef_minus8[sizeId - 2][matrixId] +
