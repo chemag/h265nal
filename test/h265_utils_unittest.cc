@@ -7,6 +7,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <limits>
+
 #include "h265_bitstream_parser_state.h"
 #include "h265_common.h"
 #include "h265_pps_parser.h"
@@ -147,6 +149,84 @@ TEST_F(H265UtilsTest, TestGetSliceQpYPFrame) {
   ASSERT_EQ(1, slice_qp_y_vector.size());
   // check the value is right
   EXPECT_EQ(26, slice_qp_y_vector[0]);
+}
+
+// SliceQpY (Equation 7-54) must be in the range of -QpBdOffsetY to +51
+// (Section 7.4.7.1). The slice below has slice_qp_delta = 9, so the
+// init_qp_minus26 in the (mock) pps sets SliceQpY to 35 + init_qp_minus26.
+// A slice out of range fails to parse, so no value is returned. A very
+// large init_qp_minus26 (the state can be built by the caller) used to
+// overflow the sum.
+TEST_F(H265UtilsTest, TestGetSliceQpYRange) {
+  const uint8_t buffer[] = {
+      // slice (I-frame)
+      0x00, 0x00, 0x00, 0x01,
+      0x26, 0x01, 0xaf, 0x09, 0x40, 0xfb, 0x27, 0x5b,
+      0xfd, 0x5d, 0xc2, 0x4d, 0xe8, 0xb2, 0x0f, 0xcd,
+      0x68, 0xdb, 0xc3, 0x41, 0x12, 0x2e, 0x13, 0x8d,
+      0xdf, 0x66, 0xc9, 0x1f, 0xaa, 0xd4, 0x9b, 0x8d,
+      0xdd, 0xe2, 0xa1, 0xda, 0x2e, 0xbd, 0x53, 0x74,
+      0xd1, 0xbb, 0xde, 0x54, 0x8f, 0xa5, 0xe7, 0x2f,
+      0xcc, 0xf7, 0x98, 0xd6, 0x33, 0xd5, 0x06, 0x01,
+      0x52, 0x84, 0xbc, 0xa7, 0xe6, 0x02, 0x7f, 0xe9,
+      0x50, 0x0a, 0x9a, 0x60, 0x89, 0xa0, 0xc0, 0xb4,
+      0x6d, 0x60, 0x53, 0xe5, 0xdd, 0x93, 0xde, 0x03,
+      0xff, 0xa8, 0xb0, 0x4d, 0x27, 0xa5, 0x82, 0xba,
+      0xac, 0x63, 0x8b, 0x6f, 0x69, 0x7f, 0x93, 0xb2,
+      0xe3, 0x0c, 0xfd, 0x29, 0x44, 0x42, 0xa7, 0x13,
+      0xe9, 0xec, 0x37, 0xbb, 0x93, 0xe0, 0x62, 0xa9,
+      0xa4, 0x44, 0x45, 0x59, 0x16, 0xf6, 0xb6, 0x5b,
+      0x3a, 0xdb, 0xc3
+  };
+
+  struct TestCase {
+    int32_t init_qp_minus26;
+    uint32_t bit_depth_luma_minus8;
+    bool valid;
+    int32_t slice_qp_y;
+  };
+  const TestCase test_cases[] = {
+      // upper limit: 51
+      {16, 0, true, 51},
+      {17, 0, false, 0},
+      // lower limit, 8-bit (QpBdOffsetY = 0): 0
+      {-35, 0, true, 0},
+      {-36, 0, false, 0},
+      // lower limit, 10-bit (QpBdOffsetY = 12): -12
+      {-36, 2, true, -1},
+      {-47, 2, true, -12},
+      {-48, 2, false, 0},
+      // values that overflowed the int32_t sum
+      {std::numeric_limits<int32_t>::max() - 10, 0, false, 0},
+      {std::numeric_limits<int32_t>::min(), 0, false, 0},
+  };
+
+  for (const auto& test_case : test_cases) {
+    // get some mock state
+    H265BitstreamParserState bitstream_parser_state;
+    auto vps = std::make_shared<H265VpsParser::VpsState>();
+    bitstream_parser_state.vps[0] = vps;
+    auto sps = std::make_shared<H265SpsParser::SpsState>();
+    sps->sample_adaptive_offset_enabled_flag = 1;
+    sps->chroma_format_idc = 1;
+    sps->bit_depth_luma_minus8 = test_case.bit_depth_luma_minus8;
+    bitstream_parser_state.sps[0] = sps;
+    auto pps = std::make_shared<H265PpsParser::PpsState>();
+    pps->init_qp_minus26 = test_case.init_qp_minus26;
+    bitstream_parser_state.pps[0] = pps;
+
+    std::vector<int32_t> slice_qp_y_vector = H265Utils::GetSliceQpY(
+        buffer, arraysize(buffer), &bitstream_parser_state);
+
+    if (test_case.valid) {
+      ASSERT_EQ(1, slice_qp_y_vector.size())
+          << "init_qp_minus26: " << test_case.init_qp_minus26;
+      EXPECT_EQ(test_case.slice_qp_y, slice_qp_y_vector[0]);
+    } else {
+      EXPECT_EQ(0, slice_qp_y_vector.size())
+          << "init_qp_minus26: " << test_case.init_qp_minus26;
+    }
+  }
 }
 
 }  // namespace h265nal

@@ -148,3 +148,7 @@ See `fuzz/Makefile`. Open items:
     rather than by `Max(0, BitDepthY - 10)` and `Max(0, BitDepthC - 10)`
     (Section 7.4.3.3.2). The three bounds are what those sps values can
     reach at their most permissive.
+  * `init_qp_minus26` is bounded by -( 26 + 48 ) rather than by
+    -( 26 + QpBdOffsetY ) (Section 7.4.3.3.1), 48 being what QpBdOffsetY
+    reaches at the largest `bit_depth_luma_minus8`. The slice header
+    then checks SliceQpY exactly.

@@ -91,6 +91,17 @@ std::shared_ptr<H265PpsParser::PpsState> H265PpsParser::ParsePps(
   if (!bit_buffer->ReadSignedExponentialGolomb(pps->init_qp_minus26)) {
     return nullptr;
   }
+  if (pps->init_qp_minus26 < kInitQpMinus26Min ||
+      pps->init_qp_minus26 > kInitQpMinus26Max) {
+#ifdef FPRINT_ERRORS
+    fprintf(stderr,
+            "invalid init_qp_minus26: %" PRIi32
+            " not in range "
+            "[%" PRIi32 ", %" PRIi32 "]\n",
+            pps->init_qp_minus26, kInitQpMinus26Min, kInitQpMinus26Max);
+#endif  // FPRINT_ERRORS
+    return nullptr;
+  }
 
   // constrained_intra_pred_flag  u(1)
   if (!bit_buffer->ReadBits(1, pps->constrained_intra_pred_flag)) {

@@ -153,4 +153,67 @@ TEST_F(H265PpsParserTest, TestNumTileColumnsOutOfRange) {
   EXPECT_TRUE(pps == nullptr);
 }
 
+// init_qp_minus26 is bounded by -( 26 + 48 ) and +25 (Section 7.4.3.3.1,
+// with QpBdOffsetY at its largest). The buffers are TestSamplePPS with only
+// init_qp_minus26 changed. An unbounded value overflows SliceQpY
+// (Equation 7-54).
+
+TEST_F(H265PpsParserTest, TestInitQpMinus26Min) {
+  // init_qp_minus26: -74
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0xe0, 0x25, 0x4f, 0x00, 0x08, 0x40
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(pps != nullptr);
+  EXPECT_EQ(-74, pps->init_qp_minus26);
+  EXPECT_EQ(1, pps->cu_qp_delta_enabled_flag);
+  EXPECT_EQ(3, pps->log2_parallel_merge_level_minus2);
+}
+
+TEST_F(H265PpsParserTest, TestInitQpMinus26BelowRange) {
+  // init_qp_minus26: -75
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0xe0, 0x25, 0xcf, 0x00, 0x08, 0x40
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps == nullptr);
+}
+
+TEST_F(H265PpsParserTest, TestInitQpMinus26Max) {
+  // init_qp_minus26: 25
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0xe0, 0xc8, 0xf0, 0x00, 0x84
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  ASSERT_TRUE(pps != nullptr);
+  EXPECT_EQ(25, pps->init_qp_minus26);
+  EXPECT_EQ(1, pps->cu_qp_delta_enabled_flag);
+  EXPECT_EQ(3, pps->log2_parallel_merge_level_minus2);
+}
+
+TEST_F(H265PpsParserTest, TestInitQpMinus26AboveRange) {
+  // init_qp_minus26: 26
+  // fuzzer::conv: data
+  const uint8_t buffer[] = {
+      0xc0, 0xe0, 0xd0, 0xf0, 0x00, 0x84
+  };
+  // fuzzer::conv: begin
+  auto pps = H265PpsParser::ParsePps(buffer, arraysize(buffer));
+  // fuzzer::conv: end
+
+  EXPECT_TRUE(pps == nullptr);
+}
+
 }  // namespace h265nal

@@ -34,6 +34,14 @@ class H265PpsParser {
   const static uint32_t kNumTileColumnsMinus1Max = kMaxWidth / 8 - 1;
   const static uint32_t kNumTileRowsMinus1Min = 0;
   const static uint32_t kNumTileRowsMinus1Max = kMaxHeight / 8 - 1;
+  // Section 7.4.3.3.1: "The value of init_qp_minus26 shall be in the range
+  // of -( 26 + QpBdOffsetY ) to +25, inclusive." QpBdOffsetY (Equation 7-4,
+  // 6 * bit_depth_luma_minus8) lives in the sps, which ParsePps() does not
+  // resolve, so bound it by its largest value instead (bit_depth_luma_minus8
+  // is at most 8). Loose, but enough to keep SliceQpY (Equation 7-54) from
+  // overflowing. The slice header checks SliceQpY exactly.
+  const static int32_t kInitQpMinus26Min = -(26 + 6 * 8);
+  const static int32_t kInitQpMinus26Max = 25;
 
   // The parsed state of the PPS. Only some select values are stored.
   // Add more as they are actually needed.

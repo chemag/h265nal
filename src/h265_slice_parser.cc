@@ -606,6 +606,27 @@ H265SliceSegmentHeaderParser::ParseSliceSegmentHeader(
             slice_segment_header->slice_qp_delta)) {
       return nullptr;
     }
+    // Section 7.4.7.1: "The value of SliceQpY shall be in the range of
+    // -QpBdOffsetY to +51, inclusive." Both the pps and the sps are known
+    // here, so check it exactly. Use 64 bits: slice_qp_delta is unbounded
+    // until checked, and the sum would overflow an int32_t.
+    {
+      const int64_t qp_bd_offset_y =
+          6 * static_cast<int64_t>(sps->bit_depth_luma_minus8);
+      const int64_t slice_qpy =
+          26 + static_cast<int64_t>(pps->init_qp_minus26) +
+          static_cast<int64_t>(slice_segment_header->slice_qp_delta);
+      if (slice_qpy < -qp_bd_offset_y || slice_qpy > 51) {
+#ifdef FPRINT_ERRORS
+        fprintf(stderr,
+                "invalid slice_qp_delta: %" PRIi32 " (SliceQpY: %" PRIi64
+                " not in range [%" PRIi64 ", 51])\n",
+                slice_segment_header->slice_qp_delta, slice_qpy,
+                -qp_bd_offset_y);
+#endif  // FPRINT_ERRORS
+        return nullptr;
+      }
+    }
 
     slice_segment_header->pps_slice_chroma_qp_offsets_present_flag =
         pps->pps_slice_chroma_qp_offsets_present_flag;

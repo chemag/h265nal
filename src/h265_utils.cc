@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -69,9 +70,17 @@ std::unique_ptr<int32_t> GetSliceQpYInternal(
   const auto init_qp_minus26 = pps->init_qp_minus26;
 
   // Equation 7-54, Section 7.4.7.1
-  int32_t slice_qpy = 26 + init_qp_minus26 + slice_qp_delta;
+  // The parsers bound both values, but the state can also be built by the
+  // caller, so add in 64 bits, and reject results outside the int32_t
+  // range instead of overflowing.
+  const int64_t slice_qpy = 26 + static_cast<int64_t>(init_qp_minus26) +
+                            static_cast<int64_t>(slice_qp_delta);
+  if (slice_qpy < std::numeric_limits<int32_t>::min() ||
+      slice_qpy > std::numeric_limits<int32_t>::max()) {
+    return nullptr;
+  }
 
-  return std::make_unique<int32_t>(slice_qpy);
+  return std::make_unique<int32_t>(static_cast<int32_t>(slice_qpy));
 }
 }  // namespace
 
