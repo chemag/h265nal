@@ -374,9 +374,11 @@ clang's fuzzer sanitizer:
 $ CC=gcc CXX=g++ cmake -DBUILD_CLANG_FUZZER=OFF ..
 ```
 
-If you want to build in debug mode, you need to add some variables:
+If you want to build in debug mode, set the build type. Debug builds use the
+warning flags in CMakeLists.txt and treat warnings as errors (`make
+check-debug` runs Debug builds with gcc and clang, and the tests):
 ```
-$ cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_C_FLAGS_DEBUG="-g -O0" -DCMAKE_CXX_FLAGS_DEBUG="-g -O0" -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+$ cmake -DCMAKE_BUILD_TYPE=DEBUG -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 ```
 
 
