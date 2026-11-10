@@ -1,0 +1,46 @@
+// Soong build for AOSP imports of h265nal (e.g. as a liblcvm submodule).
+
+package {
+    default_applicable_licenses: ["h265nal_license"],
+}
+
+license {
+    name: "h265nal_license",
+    visibility: [":__subpackages__"],
+    license_kinds: [
+        "SPDX-license-identifier-BSD-3-Clause",
+    ],
+    license_text: [
+        "LICENSE",
+    ],
+}
+
+cc_library_shared {
+    name: "libh265nal",
+    vendor_available: true,
+    product_available: true,
+    host_supported: true,
+    srcs: ["src/*.cc"],
+    rtti: true,
+    // The warning flags match the CMake Debug build.
+    cflags: [
+        "-Wall",
+        "-Wextra",
+        "-Wunused-parameter",
+        "-Wshadow",
+        "-Wformat",
+        "-Wextra-semi",
+        "-Wextra-semi-stmt",
+        "-Wsign-conversion",
+        "-Werror",
+        "-fexceptions",
+        "-DFDUMP_DEFINE",
+        "-DRTP_DEFINE",
+        "-DFPRINT_ERRORS",
+    ],
+    local_include_dirs: [
+        "src",
+        "include",
+    ],
+    export_include_dirs: ["include"],
+}
