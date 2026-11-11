@@ -1,0 +1,28 @@
+name: ci-macos
+
+# Debug build with AppleClang, using the warning flags in CMakeLists.txt with
+# -Werror, plus the tests.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  debug:
+    name: debug (AppleClang)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: brew install ninja googletest
+      - name: Configure
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_CLANG_FUZZER=OFF
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure --parallel 4

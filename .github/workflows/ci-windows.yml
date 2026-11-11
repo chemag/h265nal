@@ -1,0 +1,29 @@
+name: ci-windows
+
+# Debug build with MSVC, plus the tests. MSVC uses its default warning flags
+# (the CMakeLists.txt Debug flags are for gcc and clang). The tool uses the
+# ya_getopt submodule for getopt_long(). googletest comes from vcpkg.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  debug:
+    name: debug (MSVC)
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install dependencies
+        run: vcpkg install gtest:x64-windows
+      - name: Configure
+        run: >
+          cmake -S . -B build -A x64
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+          -DBUILD_CLANG_FUZZER=OFF
+      - name: Build
+        run: cmake --build build --config Debug --parallel
+      - name: Test
+        run: ctest --test-dir build -C Debug --output-on-failure --parallel 4

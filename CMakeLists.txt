@@ -56,14 +56,17 @@ else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif()
 
-# Set debug flags for both C and C++
-set(COMMON_DEBUG_FLAGS "-g -O0 -Wall -Wextra -Wunused-parameter -Wshadow -Wformat -Wextra-semi -Wsign-conversion -Werror")
-# Only Clang (incl. AppleClang) has -Wextra-semi-stmt
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(COMMON_DEBUG_FLAGS "${COMMON_DEBUG_FLAGS} -Wextra-semi-stmt")
+# Set debug flags for both C and C++ with gcc and clang (MSVC keeps its own
+# defaults)
+if(NOT MSVC)
+  set(COMMON_DEBUG_FLAGS "-g -O0 -Wall -Wextra -Wunused-parameter -Wshadow -Wformat -Wextra-semi -Wsign-conversion -Werror")
+  # Only Clang (incl. AppleClang) has -Wextra-semi-stmt
+  if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(COMMON_DEBUG_FLAGS "${COMMON_DEBUG_FLAGS} -Wextra-semi-stmt")
+  endif()
+  set(CMAKE_C_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
 endif()
-set(CMAKE_C_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}")
 
 # Ensure CMake honors normal variable values when calling option()
 if(POLICY CMP0077)
