@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <string>
 #include <vector>
 
 #include "h265_common.h"
@@ -56,6 +57,53 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     h265nal::get_current_offset(&bit_buffer);
     h265nal::more_rbsp_data(&bit_buffer);
     h265nal::rbsp_trailing_bits(&bit_buffer);
+  }
+
+  // The NAL unit type and profile helpers, on every input byte: The parsers
+  // only call them with values a bitstream syntax element can hold, so
+  // out-of-range values (e.g. a 5-bit nal_unit_type field holds 0..31, but
+  // the helpers take a uint32_t) are never seen otherwise.
+  {
+    std::string str;
+    for (size_t i = 0; i < size && i < 64; i++) {
+      uint32_t value = data[i];
+      if (i + 1 < size && (data[i] & 0x80)) {
+        // sometimes widen to 16 bits, to reach values above 255
+        value = (value << 8) | data[i + 1];
+      }
+      h265nal::NalUnitTypeToString(value);
+      h265nal::IsSliceSegment(value);
+      h265nal::IsNalUnitTypeVcl(value);
+      h265nal::IsNalUnitTypeNonVcl(value);
+      h265nal::IsNalUnitTypeUnspecified(value);
+      h265nal::profileTypeToString(static_cast<h265nal::ProfileType>(data[i]),
+                                   str);
+    }
+  }
+
+  // NaluChecksum, on the input from a varying bit offset, then dumped
+  // through fdump() into a buffer of varying length. The length starts at
+  // 1: fdump() with output_len 0 writes output[-1], a known bug, and the
+  // fuzzer would find it on every run.
+  {
+    h265nal::BitBuffer bit_buffer(data, size);
+    if (size > 0) {
+      size_t bits_to_skip = data[0] % 17;
+      if (bits_to_skip > 0) {
+        uint32_t scratch = 0;
+        bit_buffer.ReadBits(bits_to_skip, scratch);
+      }
+    }
+    auto checksum = h265nal::NaluChecksum::GetNaluChecksum(&bit_buffer);
+    if (checksum != nullptr) {
+      char output[2 * h265nal::NaluChecksum::kMaxLength + 1];
+      int output_len = 1;
+      if (size > 0) {
+        output_len += data[size - 1] % static_cast<int>(sizeof(output));
+      }
+      checksum->fdump(output, output_len);
+      checksum->GetPrintableChecksum();
+    }
   }
 
   return 0;
