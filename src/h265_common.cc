@@ -760,12 +760,21 @@ std::shared_ptr<NaluChecksum> NaluChecksum::GetNaluChecksum(
 }
 
 void NaluChecksum::fdump(char* output, int output_len) const {
+  // An empty (or missing) buffer has no room even for the terminator. The
+  // truncation path below used to write output[output_len - 1] anyway,
+  // which is output[-1] for output_len 0.
+  if (output == nullptr || output_len <= 0) {
+    return;
+  }
+  // terminate up front, so that the output is a valid (empty) string even
+  // when nothing else is written (length 0, or no room for one byte)
+  output[0] = '\0';
   int i = 0;
   int oi = 0;
   while (i < length) {
-    // make sure there is space in the output buffer
+    // make sure there is space for 2 hex digits and the terminator. The
+    // previous snprintf (or the line above) already terminated the output.
     if (oi + 2 >= output_len) {
-      output[output_len - 1] = '\0';
       break;
     }
     oi += snprintf(output + oi, static_cast<size_t>(output_len - oi), "%02x",
@@ -783,8 +792,7 @@ std::string NaluChecksum::GetPrintableChecksum() const {
   // ever set to 4 against a buffer sized for kMaxLength, but the guard was
   // being carried by that invariant rather than by the code.
   //
-  // Zero initialized because fdump() writes nothing when length is 0, and
-  // otherwise terminates only via snprintf or its own truncation path.
+  // fdump() always terminates a non-empty buffer.
   char buffer[(kMaxLength * 2) + 1] = {};
   fdump(buffer, static_cast<int>(sizeof(buffer)));
   return std::string(buffer);

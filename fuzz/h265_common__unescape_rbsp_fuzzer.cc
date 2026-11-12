@@ -82,9 +82,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
   }
 
   // NaluChecksum, on the input from a varying bit offset, then dumped
-  // through fdump() into a buffer of varying length. The length starts at
-  // 1: fdump() with output_len 0 writes output[-1], a known bug, and the
-  // fuzzer would find it on every run.
+  // through fdump() into a buffer of varying length, including 0 (which
+  // used to write output[-1]).
   {
     h265nal::BitBuffer bit_buffer(data, size);
     if (size > 0) {
@@ -97,9 +96,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     auto checksum = h265nal::NaluChecksum::GetNaluChecksum(&bit_buffer);
     if (checksum != nullptr) {
       char output[2 * h265nal::NaluChecksum::kMaxLength + 1];
-      int output_len = 1;
+      int output_len = 0;
       if (size > 0) {
-        output_len += data[size - 1] % static_cast<int>(sizeof(output));
+        output_len = data[size - 1] % static_cast<int>(sizeof(output) + 1);
       }
       checksum->fdump(output, output_len);
       checksum->GetPrintableChecksum();

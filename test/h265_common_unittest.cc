@@ -282,6 +282,41 @@ TEST_F(H265CommonNaluChecksumTest, TestAlignedBitBuffer) {
   EXPECT_EQ(arraysize(buffer) * 8, bit_buffer.RemainingBitCount());
 }
 
+// fdump() into short buffers. With output_len 0 it used to write
+// output[-1], through its truncation path.
+TEST_F(H265CommonNaluChecksumTest, TestFdumpShortBuffers) {
+  const uint8_t buffer[] = {0xde, 0xad, 0xbe, 0xef, 0x12, 0x34};
+  BitBuffer bit_buffer(buffer, arraysize(buffer));
+
+  auto checksum = NaluChecksum::GetNaluChecksum(&bit_buffer);
+  ASSERT_TRUE(checksum != nullptr);
+  const std::string printable = checksum->GetPrintableChecksum();
+  ASSERT_EQ(8u, printable.size());
+
+  // output_len 0 (or less): nothing is written, not even the terminator
+  char guarded[4] = {'x', 'x', 'x', 'x'};
+  checksum->fdump(guarded + 1, 0);
+  checksum->fdump(guarded + 1, -1);
+  EXPECT_EQ("xxxx", std::string(guarded, sizeof(guarded)));
+  // a null buffer is ignored
+  checksum->fdump(nullptr, 8);
+
+  // output_len 1 and 2: room for the terminator only
+  for (int output_len = 1; output_len <= 2; output_len++) {
+    char output[4] = {'x', 'x', 'x', 'x'};
+    checksum->fdump(output, output_len);
+    EXPECT_EQ("", std::string(output));
+    // nothing written past the buffer
+    EXPECT_EQ('x', output[output_len]);
+  }
+
+  // output_len 5: room for 2 bytes (4 hex digits) and the terminator
+  char output[6] = {'x', 'x', 'x', 'x', 'x', 'x'};
+  checksum->fdump(output, 5);
+  EXPECT_EQ(printable.substr(0, 4), std::string(output));
+  EXPECT_EQ('x', output[5]);
+}
+
 class H265CommonBitBufferTest : public ::testing::Test {
  public:
   H265CommonBitBufferTest() {}
